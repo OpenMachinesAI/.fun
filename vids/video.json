@@ -1,0 +1,16 @@
+{
+  "videos": [
+    {
+      "name": "Video 1",
+      "tags": ["tech", "tutorial", "robotics"],
+      "creator": "JohnDoe",
+      "video_url": "https://example.com/video.mp4"
+    },
+    {
+      "name": "Another Video",
+      "tags": ["gaming", "review"],
+      "creator": "JaneDoe",
+      "video_url": "https://example.com/video2.mp4"
+    }
+  ]
+}

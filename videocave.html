@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>90s Geocities Video Portal</title>
+  <style>
+    /* Overall 90s Geocities style */
+    body {
+      background-color: #ffcc00;
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #003399;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 2em;
+      border-bottom: 4px double #fff;
+    }
+    .container {
+      margin: 20px;
+    }
+    /* Filter section */
+    .filter {
+      background-color: #fff;
+      padding: 10px;
+      border: 2px dashed #000;
+      margin-bottom: 20px;
+    }
+    .filter h3 {
+      margin: 0 0 10px 0;
+    }
+    /* Video grid similar to a Netflix layout */
+    .videos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .video-card {
+      background-color: #fff;
+      border: 2px solid #000;
+      padding: 10px;
+      width: 300px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .video-card:hover {
+      transform: scale(1.05);
+    }
+    .video-card h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #003399;
+    }
+    .video-card h4 {
+      margin: 5px 0 0 0;
+      font-size: 16px;
+      color: #666;
+    }
+    /* Windows 95 style modal window */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-window {
+      background-color: #c0c0c0;
+      border: 2px solid #000;
+      width: 80%;
+      max-width: 800px;
+      box-shadow: 5px 5px 0 #000;
+    }
+    .modal-header {
+      background: #000080;
+      color: white;
+      padding: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: "MS Sans Serif", sans-serif;
+    }
+    .modal-header button {
+      background: #c0c0c0;
+      border: 2px outset #fff;
+      font-family: "MS Sans Serif", sans-serif;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    .modal-content {
+      padding: 10px;
+      background: #fff;
+    }
+    .modal-content video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Welcome to My 90s Geocities Video Portal
+  </header>
+
+  <div class="container">
+    <div class="filter">
+      <h3>Filter by Tags:</h3>
+      <div id="tag-filters"></div>
+    </div>
+
+    <div class="videos" id="video-list">
+      <!-- Video cards will be injected here -->
+    </div>
+  </div>
+
+  <!-- Modal for video playback -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span id="modal-title">Video Player</span>
+        <div>
+          <button id="fullscreen-btn">Full Screen</button>
+          <button id="close-btn">Close</button>
+        </div>
+      </div>
+      <div class="modal-content">
+        <video id="modal-video" controls>
+          <source id="video-source" src="" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let videosData = [];
+    let selectedTags = [];
+
+    // Fetch video data from JSON file in the "vids" folder
+    fetch('vids/video.json')
+      .then(response => response.json())
+      .then(data => {
+        videosData = data.videos;
+        initTagFilters();
+        renderVideos();
+      })
+      .catch(error => console.error('Error loading video data:', error));
+
+    // Create unique tag filters from the video data
+    function initTagFilters() {
+      const tagContainer = document.getElementById('tag-filters');
+      let tagsSet = new Set();
+      videosData.forEach(video => {
+        video.tags.forEach(tag => tagsSet.add(tag));
+      });
+      Array.from(tagsSet).sort().forEach(tag => {
+        const label = document.createElement('label');
+        label.style.marginRight = '10px';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = tag;
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) {
+            selectedTags.push(tag);
+          } else {
+            selectedTags = selectedTags.filter(t => t !== tag);
+          }
+          renderVideos();
+        });
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(' ' + tag));
+        tagContainer.appendChild(label);
+      });
+    }
+
+    // Render videos as cards
+    function renderVideos() {
+      const videoList = document.getElementById('video-list');
+      videoList.innerHTML = '';
+      let filteredVideos = videosData;
+      if (selectedTags.length > 0) {
+        filteredVideos = videosData.filter(video => {
+          return video.tags.some(tag => selectedTags.includes(tag));
+        });
+      }
+      filteredVideos.forEach(video => {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.innerHTML = `
+          <h2>${video.name}</h2>
+          <h4>Creator: ${video.creator}</h4>
+        `;
+        card.addEventListener('click', () => openModal(video));
+        videoList.appendChild(card);
+      });
+    }
+
+    // Modal functionality for playing videos
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalVideo = document.getElementById('modal-video');
+    const videoSource = document.getElementById('video-source');
+    const modalTitle = document.getElementById('modal-title');
+
+    function openModal(video) {
+      modalTitle.textContent = video.name;
+      videoSource.src = video.video_url;
+      modalVideo.load();
+      modalOverlay.style.display = 'flex';
+    }
+
+    document.getElementById('close-btn').addEventListener('click', () => {
+      modalOverlay.style.display = 'none';
+      modalVideo.pause();
+    });
+
+    document.getElementById('fullscreen-btn').addEventListener('click', () => {
+      if (modalVideo.requestFullscreen) {
+        modalVideo.requestFullscreen();
+      } else if (modalVideo.webkitRequestFullscreen) {
+        modalVideo.webkitRequestFullscreen();
+      } else if (modalVideo.msRequestFullscreen) {
+        modalVideo.msRequestFullscreen();
+      }
+    });
+  </script>
+</body>
+</html>

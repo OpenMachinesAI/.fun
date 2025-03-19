@@ -31,13 +31,37 @@
       border: 2px dashed #ff00ff;
       background-color: #003333;
       padding: 10px;
+      animation: blink-bg 2s infinite alternate, neon-border 1.5s infinite alternate; /* Added animations to h1 */
     }
+
+    @keyframes blink-bg {
+      from { background-color: #003333; }
+      to { background-color: #005555; }
+    }
+
+    @keyframes neon-border {
+      from { border-color: #ff00ff; box-shadow: 0 0 5px #ff00ff; }
+      to { border-color: #ff66ff; box-shadow: 0 0 15px #ff66ff; }
+    }
+
+
     marquee {
       color: #ffff00;
       font-weight: bold;
       font-size: 1.2em;
       margin-bottom: 20px;
+      animation: color-cycle 5s infinite linear; /* Added color cycle to marquee */
     }
+
+    @keyframes color-cycle {
+      0% { color: #ffff00; }
+      25% { color: #ff9900; }
+      50% { color: #ff0000; }
+      75% { color: #cc00ff; }
+      100% { color: #ffff00; }
+    }
+
+
     .banner-left,
     .banner-right {
       position: absolute;
@@ -50,6 +74,17 @@
       text-align: center;
       z-index: 1;
     }
+
+    @keyframes wobble {
+      0%, 100% { transform: translateX(0deg) rotate(0deg); }
+      15% { transform: translateX(-5px) rotate(-2deg); }
+      30% { transform: translateX(5px) rotate(2deg); }
+      45% { transform: translateX(-5px) rotate(-2deg); }
+      60% { transform: translateX(5px) rotate(2deg); }
+      80% { transform: translateX(0px) rotate(1deg); }
+    }
+
+
     .banner-left {
       left: 0;
     }
@@ -61,7 +96,14 @@
       background: red;
       color: #fff;
       margin: 0;
+      animation: blink-text 1s infinite step-end; /* Added blinking text to banner titles */
     }
+
+    @keyframes blink-text {
+      50% { opacity: 0; }
+    }
+
+
     .bottom-nav {
       position: absolute;
       bottom: 20px;
@@ -75,6 +117,10 @@
       color: #fff;
       text-align: center;
       font-size: 14px;
+      transition: transform 0.3s ease-in-out; /* Smooth transition for hover */
+    }
+    .nav-item:hover {
+      transform: scale(1.1); /* Scale up on hover for a 'clicky' feel */
     }
     .nav-item span {
       display: block;
@@ -84,13 +130,24 @@
       width: 32px;
       height: 32px;
       fill: #ffcc00;
+      transition: fill 0.3s ease-in-out, transform 0.5s ease-in-out; /* Transition for fill and transform */
     }
     .nav-item:hover svg {
       fill: #ff0000;
+      transform: rotate(360deg); /* Spin on hover */
     }
     .nav-item:hover span {
       color: #ff0000;
     }
+
+    /* New 90s Cursor Style */
+    body, a {
+      cursor: url('cursor.gif'), auto; /* Replace 'cursor.gif' with a 90s style cursor GIF */
+    }
+    a:hover {
+      cursor: url('cursor_hover.gif'), auto; /* Optional: different cursor on hover */
+    }
+
   </style>
 </head>
 <body>
@@ -106,6 +163,7 @@
     <p>High Quality From CSP!</p>
     <hr>
     <p>CLICK HERE!</p>
+    <img src="animated_rocket.gif" alt="Animated Rocket" width="100"> <!-- Example of a 90s GIF -->
   </a>
   <a href="banner2.html" class="banner-right">
     <h3>URGENT</h3>
@@ -115,6 +173,7 @@
     <p>Made with cheap plastic!</p>
     <hr>
     <p>CLICK HERE!</p>
+    <img src="animated_robot.gif" alt="Animated Robot" width="100"> <!-- Example of a 90s GIF -->
   </a>
 
   <!-- Main Title and Marquee -->
@@ -193,7 +252,7 @@
     // Canvas background effect
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
-    
+
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;

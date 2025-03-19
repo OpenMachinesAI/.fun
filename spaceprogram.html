@@ -40,16 +40,13 @@
       width: 120px;
       height: 120px;
       margin: 20px;
-      text-decoration: none;
       color: #fff;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s;
-    }
-    .planet:hover {
-      transform: scale(1.2);
+      transition: transform 0.3s, width 0.3s, height 0.3s;
+      cursor: pointer;
     }
     .planet svg {
       width: 100%;
@@ -63,9 +60,55 @@
       text-anchor: middle;
     }
 
+    /* Expanded planet state */
+    .planet.expanded {
+      width: 240px;
+      height: 240px;
+      z-index: 100;
+    }
+
+    /* Planet menu */
+    .planet-menu {
+      position: absolute;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 50%;
+    }
+    .planet.expanded .planet-menu {
+      display: flex;
+    }
+    
+    /* Menu options */
+    .menu-option {
+      background: #ff00ff;
+      color: #fff;
+      padding: 8px 15px;
+      margin: 5px;
+      font-weight: bold;
+      text-decoration: none;
+      border: 2px solid #00ff00;
+      border-radius: 10px;
+      text-align: center;
+      font-family: "Comic Sans MS", cursive;
+      text-shadow: 2px 2px #000;
+      transform: rotate(-5deg);
+      transition: transform 0.2s;
+    }
+    .menu-option:hover {
+      transform: scale(1.1) rotate(5deg);
+      background: #00ff00;
+      color: #000;
+      border-color: #ff00ff;
+    }
+
     /* Gradients for the flight planets and the BR planet */
     svg defs {
-      /* Example bright radial gradients; tweak as desired */
+      /* Existing gradients */
     }
     .flight1 circle {
       fill: url(#gradFlight1);
@@ -106,6 +149,61 @@
     .nav-link:hover {
       background: #ff9900;
     }
+
+    /* Flight info section */
+    .flight-info {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      overflow: auto;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+    .flight-info-content {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #000066;
+      border: 5px solid #ff00ff;
+      padding: 20px;
+      color: #00ff00;
+      font-family: "Comic Sans MS", cursive;
+      text-shadow: 1px 1px #000;
+      position: relative;
+    }
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ff0000;
+      color: #fff;
+      border: 3px solid #ffff00;
+      font-weight: bold;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: "Comic Sans MS", cursive;
+    }
+    .close-button:hover {
+      background: #ffff00;
+      color: #ff0000;
+    }
+
+    /* Blink animation for titles */
+    @keyframes blink {
+      0% { color: #ff00ff; }
+      50% { color: #00ff00; }
+      100% { color: #ff00ff; }
+    }
+    .flight-title {
+      font-size: 2em;
+      text-align: center;
+      margin-bottom: 20px;
+      animation: blink 2s infinite;
+    }
   </style>
 </head>
 <body>
@@ -144,45 +242,145 @@
   <!-- Planets container for flights + build rocket -->
   <div class="planet-container">
     <!-- Flight 1 -->
-    <a class="planet flight1" href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;E9EF6015-BD56-4B5F-97EA-0BCE1D16A5B7" target="_blank">
+    <div class="planet flight1" data-flight="1">
       <svg viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="45" />
         <text x="50" y="55">1</text>
       </svg>
-    </a>
+      <div class="planet-menu">
+        <a href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;E9EF6015-BD56-4B5F-97EA-0BCE1D16A5B7" target="_blank" class="menu-option">Watch Video</a>
+        <a href="?flight=1" class="menu-option read-option" data-flight="1">Read About</a>
+      </div>
+    </div>
 
     <!-- Flight 2 -->
-    <a class="planet flight2" href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;C204F6B5-96EA-4B48-BC3C-2A86A0059FE6" target="_blank">
+    <div class="planet flight2" data-flight="2">
       <svg viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="45" />
         <text x="50" y="55">2</text>
       </svg>
-    </a>
+      <div class="planet-menu">
+        <a href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;C204F6B5-96EA-4B48-BC3C-2A86A0059FE6" target="_blank" class="menu-option">Watch Video</a>
+        <a href="?flight=2" class="menu-option read-option" data-flight="2">Read About</a>
+      </div>
+    </div>
 
     <!-- Flight 3 -->
-    <a class="planet flight3" href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;696BF824-8CDD-466B-9F2C-E6B479B75203" target="_blank">
+    <div class="planet flight3" data-flight="3">
       <svg viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="45" />
         <text x="50" y="55">3</text>
       </svg>
-    </a>
+      <div class="planet-menu">
+        <a href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;696BF824-8CDD-466B-9F2C-E6B479B75203" target="_blank" class="menu-option">Watch Video</a>
+        <a href="?flight=3" class="menu-option read-option" data-flight="3">Read About</a>
+      </div>
+    </div>
 
     <!-- Flight 4 -->
-    <a class="planet flight4" href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;2B3BF10A-FF21-4DAE-9B52-9FC1732A96A7" target="_blank">
+    <div class="planet flight4" data-flight="4">
       <svg viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="45" />
         <text x="50" y="55">4</text>
       </svg>
-    </a>
+      <div class="planet-menu">
+        <a href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;2B3BF10A-FF21-4DAE-9B52-9FC1732A96A7" target="_blank" class="menu-option">Watch Video</a>
+        <a href="?flight=4" class="menu-option read-option" data-flight="4">Read About</a>
+      </div>
+    </div>
 
     <!-- Build a Rocket -->
-    <a class="planet build-rocket" href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;38600550-D80C-4FB6-9712-D5A05751DCCE" target="_blank">
+    <div class="planet build-rocket" data-flight="br">
       <svg viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="45" />
         <text x="50" y="55">BR</text>
       </svg>
-    </a>
+      <div class="planet-menu">
+        <a href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;38600550-D80C-4FB6-9712-D5A05751DCCE" target="_blank" class="menu-option">Watch Video</a>
+        <a href="?flight=br" class="menu-option read-option" data-flight="br">Read About</a>
+      </div>
+    </div>
   </div>
+
+  <!-- Flight info sections -->
+<div id="flight-1-info" class="flight-info">
+    <div class="flight-info-content">
+      <button class="close-button">X</button>
+      <h2 class="flight-title">FLIGHT 1: EAGLE'S DEBUT</h2>
+      <p>Our inaugural launch of The Eagle was a SMASHING success! Powered by C6-5 Engines, this rocket showed its potential, kicking off our rocket launching adventure!</p>
+      <p>MISSION DETAILS:</p>
+      <ul>
+        <li>Launch Date: Jan 21st 2025</li>
+        <li>Rocket: Eagle 1</li>
+        <li>Engine: C6-5</li>
+        <li>Max Altitude: Reached a moderate altitude, exact height not measurable.</li>
+        <li>Mission Result: EXCELLENT LAUNCH AND FLIGHT!</li>
+      </ul>
+      <p>The Eagle’s first flight beautifully demonstrated the thrill of model rocketry. From the preparation on the school field to the impressive vertical climb and smooth, smoky trail, it was a captivating experience. The safe and controlled flight, followed by cheers from the young rocketeers, proves this to be a successful initial test.
+Further enhancements needed to measure maximum altitude.
+</p>
+    </div>
+  </div>
+
+ <div id="flight-2-info" class="flight-info">
+    <div class="flight-info-content">
+      <button class="close-button">X</button>
+      <h2 class="flight-title">FLIGHT 2: THE EAGLE'S CRASH LANDING</h2>
+      <p>The second flight of The Eagle, powered by C6-5 engines, was an UNFORTUNATE turn of events! While the initial ascent was promising, the rocket did not survive the attempt.</p>
+      <p>MISSION DETAILS:</p>
+      <ul>
+        <li>Launch Date: Jan 22nd 2025</li>
+        <li>Rocket: Eagle 1</li>
+        <li>Engine: C6-5</li>
+        <li>Max Altitude: Reached a high altitude, but not measured.</li>
+        <li>Mission Result: ROCKET DESTRUCTION!</li>
+      </ul>
+      <p>Despite the initial success, the rocket experienced a Rapid Fall of death (R.F.O.D)
+. The rocket was lost, but we all learned a valuable lesson: rocketry is not always predictable, and safety precautions are paramount. R.I.P Eagle 1.</p>
+    </div>
+  </div>
+
+  <div id="flight-3-info" class="flight-info">
+    <div class="flight-info-content">
+      <button class="close-button">X</button>
+      <h2 class="flight-title">FLIGHT 3: EAGLE 1.5 RISES AGAIN!</h2>
+      <p>From the ashes of its predecessor, Eagle 1.5, with its vibrant new paint job and a reliable C6-5 engine, takes to the skies once more!  This flight proved that perseverance pays off in rocketry!</p>
+      <p>MISSION DETAILS:</p>
+      <ul>
+        <li>Launch Date: Jan 24th 2025</li>
+        <li>Rocket: Eagle 1.5 (Remade)</li>
+        <li>Engine: C6-5</li>
+        <li>Max Altitude: Achieved a good altitude, visually similar to Flight 1.</li>
+        <li>Mission Result:  SPECTACULAR SUCCESS! REDEMPTION FLIGHT!</li>
+      </ul>
+      <p>Eagle 1.5 soared gracefully, demonstrating a stable and impressive flight path. The rebuilt rocket performed admirably, marking a fantastic comeback and a testament to the builder's skill. While altitude wasn't measured, the flight was visually a clear success, reaching a satisfying height and returning safely. A truly RADICAL launch!</p>
+    </div>
+  </div>
+
+<div id="flight-4-info" class="flight-info">
+    <div class="flight-info-content">
+      <button class="close-button">X</button>
+      <h2 class="flight-title">FLIGHT 4: EAGLE II - SPACEY STYLE!</h2>
+      <p>Get ready for lift-off as Eagle II, powered by the dependable C6-5 engine, soars into the wild blue yonder! This launch isn't just a flight; it's a SPACEY adventure!</p>
+      <p>MISSION DETAILS:</p>
+      <ul>
+        <li>Launch Date: Jan 24th 2025 (Same day as Flight 3)</li>
+        <li>Rocket: Eagle II</li>
+        <li>Engine: C6-5</li>
+        <li>Max Altitude: Achieved a visually impressive altitude, similar to previous flights.</li>
+        <li>Mission Result:  ASTOUNDINGLY AWESOME! SPACEY SUCCESS!</li>
+      </ul>
+      <p>Eagle II launches with gusto, leaving a trail of smoke as it climbs high against a brilliant blue sky. The flight is stable, reaching a respectable altitude before a safe descent and recovery.  This launch solidifies the Eagle series as a true rocketry champion, proving we're not just different from SpaceX, but in our own way, WORSE BUT STILL DIFFERENT! Get SPACEY! </p>
+    </div>
+  </div>
+
+  <div id="flight-br-info" class="flight-info">
+    <div class="flight-info-content">
+      <button class="close-button">X</button>
+      <h2 class="flight-title">A song about building a rocket</h2>
+            <h1 class="flight-title">No launch just music</h2>
+
+  
 
   <!-- Bottom nav for the rocket/engine links -->
   <div class="bottom-nav">
@@ -193,6 +391,81 @@
     <a class="nav-link" href="https://sites.google.com/sd61learn.ca/csp/engine/1a_1" target="_blank">Otter 1A</a>
     <a class="nav-link" href="https://sites.google.com/sd61learn.ca/csp/engine/1a" target="_blank">Otter 1+</a>
   </div>
+
+  <script>
+    // Function to handle planet clicks
+    document.querySelectorAll('.planet').forEach(planet => {
+      planet.addEventListener('click', function() {
+        // Remove expanded class from all planets
+        document.querySelectorAll('.planet').forEach(p => {
+          if (p !== planet) p.classList.remove('expanded');
+        });
+        
+        // Toggle expanded class for the clicked planet
+        this.classList.toggle('expanded');
+      });
+    });
+
+    // Close planets when clicking elsewhere
+    document.addEventListener('click', function(event) {
+      if (!event.target.closest('.planet')) {
+        document.querySelectorAll('.planet').forEach(planet => {
+          planet.classList.remove('expanded');
+        });
+      }
+    });
+
+    // Check for flight parameter in URL
+    function getFlightParam() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('flight');
+    }
+
+    // Show flight info based on URL parameter
+    const flightParam = getFlightParam();
+    if (flightParam) {
+      const flightInfo = document.getElementById(`flight-${flightParam}-info`);
+      if (flightInfo) {
+        flightInfo.style.display = 'block';
+      }
+    }
+
+    // Close button functionality
+    document.querySelectorAll('.close-button').forEach(button => {
+      button.addEventListener('click', function() {
+        this.closest('.flight-info').style.display = 'none';
+        // Remove the flight parameter from URL
+        const url = new URL(window.location);
+        url.searchParams.delete('flight');
+        window.history.pushState({}, '', url);
+      });
+    });
+
+    // Prevent default for read options and handle via JS
+    document.querySelectorAll('.read-option').forEach(option => {
+      option.addEventListener('click', function(e) {
+        const flightId = this.getAttribute('data-flight');
+        const flightInfo = document.getElementById(`flight-${flightId}-info`);
+        
+        if (flightInfo) {
+          // Update URL with flight parameter
+          const url = new URL(window.location);
+          url.searchParams.set('flight', flightId);
+          window.history.pushState({}, '', url);
+          
+          // Show the flight info
+          flightInfo.style.display = 'block';
+          
+          // Close the planet menu
+          document.querySelectorAll('.planet').forEach(planet => {
+            planet.classList.remove('expanded');
+          });
+          
+          e.preventDefault();
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>

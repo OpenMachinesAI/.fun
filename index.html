@@ -1,1 +1,221 @@
-i 💖 fun
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CentralSchool.fun</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: teal;
+      font-family: "Courier New", monospace;
+      overflow: hidden;
+      color: #fff;
+    }
+    #bgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+    }
+    h1, marquee {
+      text-align: center;
+      width: 100%;
+      margin: 0 auto;
+    }
+    h1 {
+      margin: 20px 0;
+      display: block;
+      border: 2px dashed #ff00ff;
+      background-color: #003333;
+      padding: 10px;
+    }
+    marquee {
+      color: #ffff00;
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+    .banner-left,
+    .banner-right {
+      position: absolute;
+      top: 80px;
+      width: 120px;
+      background: #f0f0f0;
+      color: #000;
+      padding: 5px;
+      border: 2px solid red;
+      text-align: center;
+      z-index: 1;
+    }
+    .banner-left {
+      left: 0;
+    }
+    .banner-right {
+      right: 0;
+    }
+    .banner-left h3,
+    .banner-right h3 {
+      background: red;
+      color: #fff;
+      margin: 0;
+    }
+    .bottom-nav {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 30px;
+    }
+    .nav-item {
+      text-decoration: none;
+      color: #fff;
+      text-align: center;
+      font-size: 14px;
+    }
+    .nav-item span {
+      display: block;
+      margin-top: 4px;
+    }
+    svg {
+      width: 32px;
+      height: 32px;
+      fill: #ffcc00;
+    }
+    .nav-item:hover svg {
+      fill: #ff0000;
+    }
+    .nav-item:hover span {
+      color: #ff0000;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Canvas -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Banner Ads -->
+  <a href="banner1.html" class="banner-left">
+    <h3>URGENT</h3>
+    <p>Single Rockets<br>In YOUR Area!</p>
+    <hr>
+    <p>They are hot... literally<br></p>
+    <p>High Quality From CSP!</p>
+    <hr>
+    <p>CLICK HERE!</p>
+  </a>
+  <a href="banner2.html" class="banner-right">
+    <h3>URGENT</h3>
+    <p>Single Robots<br>In YOUR Area!</p>
+    <hr>
+    <p>THEY JUST WANT LOVE 😭<br></p>
+    <p>Made with cheap plastic!</p>
+    <hr>
+    <p>CLICK HERE!</p>
+  </a>
+
+  <!-- Main Title and Marquee -->
+  <h1>Welcome to CentralSchool.fun</h1>
+
+  <marquee behavior="scroll" direction="left">The Home of Alex's Stuff, Enjoy your stay... or don't</marquee>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <!-- Project Museum -->
+    <a class="nav-item" href="https://centralschool.fun/projectmuseum.html">
+      <svg viewBox="0 0 100 100">
+        <polygon points="50,5 95,97 5,97" />
+      </svg>
+      <span>Project Museum</span>
+    </a>
+
+    <!-- Space Program -->
+    <a class="nav-item" href="https://centralschool.fun/spaceprogram.html">
+      <svg viewBox="0 0 100 100">
+        <path d="M50 5 L65 55 A10 10 0 0 1 35 55 Z" />
+      </svg>
+      <span>Space Program</span>
+    </a>
+
+    <!-- Video Cave -->
+    <a class="nav-item" href="https://centralschool.fun/videocave.html">
+      <svg viewBox="0 0 100 100">
+        <rect x="20" y="20" width="60" height="40" />
+        <polygon points="45,30 65,40 45,50" fill="black" />
+      </svg>
+      <span>Video Cave</span>
+    </a>
+
+    <!-- PRO Gamer Den! -->
+    <a class="nav-item" href="https://centralschool.fun/progamerden.html">
+      <svg viewBox="0 0 100 100">
+        <rect x="10" y="35" width="80" height="30" rx="8" ry="8" />
+        <circle cx="30" cy="50" r="5" fill="black"/>
+        <circle cx="70" cy="50" r="5" fill="black"/>
+      </svg>
+      <span>PRO Gamer Den!</span>
+    </a>
+
+    <!-- Products -->
+    <a class="nav-item" href="https://centralschool.fun/products.html">
+      <svg viewBox="0 0 100 100">
+        <rect x="20" y="30" width="60" height="40" rx="10" ry="10" />
+        <text x="50" y="55" font-size="14" text-anchor="middle" fill="black" dominant-baseline="middle">Buy</text>
+      </svg>
+      <span>Products</span>
+    </a>
+
+    <!-- Site Change Log -->
+    <a class="nav-item" href="https://centralschool.fun/changelog.html">
+      <svg viewBox="0 0 100 100">
+        <rect x="15" y="15" width="70" height="70" />
+        <line x1="20" y1="25" x2="80" y2="25" stroke="black" stroke-width="4"/>
+        <line x1="20" y1="40" x2="80" y2="40" stroke="black" stroke-width="4"/>
+        <line x1="20" y1="55" x2="80" y2="55" stroke="black" stroke-width="4"/>
+        <line x1="20" y1="70" x2="80" y2="70" stroke="black" stroke-width="4"/>
+      </svg>
+      <span>Site Change Log</span>
+    </a>
+
+    <!-- ARCH -->
+    <a class="nav-item" href="https://centralschool.fun/arch.html">
+      <svg viewBox="0 0 100 100">
+        <path d="M10,70 Q50,10 90,70" stroke-width="8" stroke="black" fill="none" />
+      </svg>
+      <span>ARCH</span>
+    </a>
+  </div>
+
+  <script>
+    // Canvas background effect
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function drawBackground() {
+      const size = 50;
+      for (let y = 0; y < canvas.height; y += size) {
+        for (let x = 0; x < canvas.width; x += size) {
+          ctx.fillStyle = ((x + y) / size) % 2 === 0 ? '#006666' : '#008080';
+          ctx.fillRect(x, y, size, size);
+        }
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      drawBackground();
+    });
+
+    resizeCanvas();
+    drawBackground();
+  </script>
+</body>
+</html>

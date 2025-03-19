@@ -2,41 +2,80 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>90s Geocities Video Portal</title>
+  <title>CCP - Central Content Pool</title>
   <style>
-    /* Overall 90s Geocities style */
+    /* 90s Geocities + Windows 95 aesthetic */
     body {
       background-color: #ffcc00;
       font-family: "Comic Sans MS", cursive, sans-serif;
       margin: 0;
       padding: 0;
+      text-align: center;
     }
     header {
       background-color: #003399;
       color: white;
       padding: 15px;
-      text-align: center;
       font-size: 2em;
       border-bottom: 4px double #fff;
     }
+    .logo {
+      font-size: 50px;
+      font-weight: bold;
+      color: #ff0000;
+      text-shadow: 3px 3px 0 #000;
+      margin-top: 20px;
+    }
+    .subtext {
+      font-size: 24px;
+      color: black;
+      margin-top: -10px;
+    }
+    .fineprint {
+      font-size: 12px;
+      color: gray;
+      margin-top: -5px;
+      font-style: italic;
+    }
     .container {
-      margin: 20px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 1200px;
+    }
+    /* Search Bar */
+    .search-container {
+      margin: 20px auto;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    #search-input {
+      width: 80%;
+      padding: 10px;
+      font-size: 18px;
+      border: 3px solid #000;
+      outline: none;
+      background: #ffffff;
+      transition: 0.3s ease-in-out;
+    }
+    #search-input:focus {
+      background: #ffff99;
     }
     /* Filter section */
     .filter {
       background-color: #fff;
-      padding: 10px;
+      padding: 15px;
       border: 2px dashed #000;
       margin-bottom: 20px;
+      display: inline-block;
+      text-align: left;
     }
-    .filter h3 {
-      margin: 0 0 10px 0;
-    }
-    /* Video grid similar to a Netflix layout */
+    /* Video Grid */
     .videos {
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
+      justify-content: center;
     }
     .video-card {
       background-color: #fff;
@@ -44,22 +83,14 @@
       padding: 10px;
       width: 300px;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      animation: fadeIn 0.5s ease-in;
     }
     .video-card:hover {
       transform: scale(1.05);
+      box-shadow: 5px 5px 0 #000;
     }
-    .video-card h2 {
-      margin: 0;
-      font-size: 20px;
-      color: #003399;
-    }
-    .video-card h4 {
-      margin: 5px 0 0 0;
-      font-size: 16px;
-      color: #666;
-    }
-    /* Windows 95 style modal window */
+    /* Windows 95 Style Modal */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -70,6 +101,7 @@
       display: none;
       align-items: center;
       justify-content: center;
+      animation: fadeIn 0.5s;
     }
     .modal-window {
       background-color: #c0c0c0;
@@ -77,6 +109,7 @@
       width: 80%;
       max-width: 800px;
       box-shadow: 5px 5px 0 #000;
+      animation: slideDown 0.5s ease-out;
     }
     .modal-header {
       background: #000080;
@@ -85,12 +118,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-family: "MS Sans Serif", sans-serif;
     }
     .modal-header button {
       background: #c0c0c0;
       border: 2px outset #fff;
-      font-family: "MS Sans Serif", sans-serif;
       cursor: pointer;
       margin-left: 5px;
     }
@@ -103,16 +134,33 @@
       height: auto;
       display: block;
     }
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
   <header>
-    Welcome to My 90s Geocities Video Portal
+    Welcome to CCP
   </header>
 
+  <div class="logo">CCP</div>
+  <div class="subtext">(Central Content Pool)</div>
+  <div class="fineprint">(not the China guys, they copied us...)</div>
+
   <div class="container">
+    <!-- Search Bar -->
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search by name or tag">
+    </div>
+
     <div class="filter">
-      <h3>Filter by Tags:</h3>
       <div id="tag-filters"></div>
     </div>
 
@@ -143,18 +191,16 @@
   <script>
     let videosData = [];
     let selectedTags = [];
+    let searchQuery = '';
 
-    // Fetch video data from JSON file in the "vids" folder
     fetch('vids/video.json')
       .then(response => response.json())
       .then(data => {
         videosData = data.videos;
         initTagFilters();
         renderVideos();
-      })
-      .catch(error => console.error('Error loading video data:', error));
+      });
 
-    // Create unique tag filters from the video data
     function initTagFilters() {
       const tagContainer = document.getElementById('tag-filters');
       let tagsSet = new Set();
@@ -162,8 +208,6 @@
         video.tags.forEach(tag => tagsSet.add(tag));
       });
       Array.from(tagsSet).sort().forEach(tag => {
-        const label = document.createElement('label');
-        label.style.marginRight = '10px';
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.value = tag;
@@ -175,60 +219,40 @@
           }
           renderVideos();
         });
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(' ' + tag));
-        tagContainer.appendChild(label);
+        tagContainer.appendChild(checkbox);
+        tagContainer.appendChild(document.createTextNode(' ' + tag + ' '));
       });
     }
 
-    // Render videos as cards
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      searchQuery = e.target.value.toLowerCase();
+      renderVideos();
+    });
+
     function renderVideos() {
       const videoList = document.getElementById('video-list');
       videoList.innerHTML = '';
-      let filteredVideos = videosData;
-      if (selectedTags.length > 0) {
-        filteredVideos = videosData.filter(video => {
-          return video.tags.some(tag => selectedTags.includes(tag));
-        });
-      }
+      let filteredVideos = videosData.filter(video =>
+        video.name.toLowerCase().includes(searchQuery) ||
+        video.tags.some(tag => tag.toLowerCase().includes(searchQuery))
+      );
       filteredVideos.forEach(video => {
         const card = document.createElement('div');
         card.className = 'video-card';
-        card.innerHTML = `
-          <h2>${video.name}</h2>
-          <h4>Creator: ${video.creator}</h4>
-        `;
+        card.innerHTML = `<h2>${video.name}</h2><h4>Creator: ${video.creator}</h4>`;
         card.addEventListener('click', () => openModal(video));
         videoList.appendChild(card);
       });
     }
 
-    // Modal functionality for playing videos
-    const modalOverlay = document.getElementById('modal-overlay');
-    const modalVideo = document.getElementById('modal-video');
-    const videoSource = document.getElementById('video-source');
-    const modalTitle = document.getElementById('modal-title');
-
     function openModal(video) {
-      modalTitle.textContent = video.name;
-      videoSource.src = video.video_url;
-      modalVideo.load();
-      modalOverlay.style.display = 'flex';
+      document.getElementById('modal-title').textContent = video.name;
+      document.getElementById('video-source').src = video.video_url;
+      document.getElementById('modal-overlay').style.display = 'flex';
     }
 
     document.getElementById('close-btn').addEventListener('click', () => {
-      modalOverlay.style.display = 'none';
-      modalVideo.pause();
-    });
-
-    document.getElementById('fullscreen-btn').addEventListener('click', () => {
-      if (modalVideo.requestFullscreen) {
-        modalVideo.requestFullscreen();
-      } else if (modalVideo.webkitRequestFullscreen) {
-        modalVideo.webkitRequestFullscreen();
-      } else if (modalVideo.msRequestFullscreen) {
-        modalVideo.msRequestFullscreen();
-      }
+      document.getElementById('modal-overlay').style.display = 'none';
     });
   </script>
 </body>

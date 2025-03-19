@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Central Space Program - SpaceJam Style</title>
+  <style>
+    /* Scaled background */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Courier New", monospace;
+      background: url('https://t4.ftcdn.net/jpg/02/43/75/73/360_F_243757367_gBpS6R5c8DB7pL5gw9gi9KXlzFfbdZOA.jpg') no-repeat center center;
+      background-size: cover;
+      color: #fff;
+    }
+
+    /* Center heading (optional) */
+    .center-heading {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 2.5em;
+      background: #ff00ff;
+      display: inline-block;
+      padding: 10px 20px;
+      border: 5px double #00ff00;
+    }
+
+    /* Container for the planets */
+    .planet-container {
+      position: relative;
+      width: 100%;
+      height: 70vh; /* enough space for large planets */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Each planet button */
+    .planet {
+      width: 120px;
+      height: 120px;
+      margin: 20px;
+      text-decoration: none;
+      color: #fff;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+    .planet:hover {
+      transform: scale(1.2);
+    }
+    .planet svg {
+      width: 100%;
+      height: 100%;
+    }
+    .planet text {
+      font-size: 48px;
+      fill: #000;
+      font-weight: bold;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+
+    /* Gradients for the flight planets and the BR planet */
+    svg defs {
+      /* Example bright radial gradients; tweak as desired */
+    }
+    .flight1 circle {
+      fill: url(#gradFlight1);
+    }
+    .flight2 circle {
+      fill: url(#gradFlight2);
+    }
+    .flight3 circle {
+      fill: url(#gradFlight3);
+    }
+    .flight4 circle {
+      fill: url(#gradFlight4);
+    }
+    .build-rocket circle {
+      fill: url(#gradBR);
+    }
+
+    /* Bottom navigation for rockets */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: #fff;
+      background: #ffcc00;
+      padding: 5px 10px;
+      border: 2px solid #000;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .nav-link:hover {
+      background: #ff9900;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden SVG for radial gradients -->
+  <svg width="0" height="0">
+    <defs>
+      <radialGradient id="gradFlight1" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff" />
+        <stop offset="100%" stop-color="#9933FF" />
+      </radialGradient>
+      <radialGradient id="gradFlight2" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff" />
+        <stop offset="100%" stop-color="#FF66CC" />
+      </radialGradient>
+      <radialGradient id="gradFlight3" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff" />
+        <stop offset="100%" stop-color="#FF3333" />
+      </radialGradient>
+      <radialGradient id="gradFlight4" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff" />
+        <stop offset="100%" stop-color="#66CCFF" />
+      </radialGradient>
+      <radialGradient id="gradBR" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff" />
+        <stop offset="100%" stop-color="#00AA00" />
+      </radialGradient>
+    </defs>
+  </svg>
+
+  <!-- Optional heading -->
+  <div style="text-align: center; margin-top: 20px;">
+    <div class="center-heading">CENTRAL SPACE PROGRAM</div>
+  </div>
+
+  <!-- Planets container for flights + build rocket -->
+  <div class="planet-container">
+    <!-- Flight 1 -->
+    <a class="planet flight1" href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;E9EF6015-BD56-4B5F-97EA-0BCE1D16A5B7" target="_blank">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" />
+        <text x="50" y="55">1</text>
+      </svg>
+    </a>
+
+    <!-- Flight 2 -->
+    <a class="planet flight2" href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;C204F6B5-96EA-4B48-BC3C-2A86A0059FE6" target="_blank">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" />
+        <text x="50" y="55">2</text>
+      </svg>
+    </a>
+
+    <!-- Flight 3 -->
+    <a class="planet flight3" href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;696BF824-8CDD-466B-9F2C-E6B479B75203" target="_blank">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" />
+        <text x="50" y="55">3</text>
+      </svg>
+    </a>
+
+    <!-- Flight 4 -->
+    <a class="planet flight4" href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;2B3BF10A-FF21-4DAE-9B52-9FC1732A96A7" target="_blank">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" />
+        <text x="50" y="55">4</text>
+      </svg>
+    </a>
+
+    <!-- Build a Rocket -->
+    <a class="planet build-rocket" href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb;38600550-D80C-4FB6-9712-D5A05751DCCE" target="_blank">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" />
+        <text x="50" y="55">BR</text>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Bottom nav for the rocket/engine links -->
+  <div class="bottom-nav">
+    <a class="nav-link" href="https://sites.google.com/sd61learn.ca/csp/rockets/eagle" target="_blank">Eagle Rocket</a>
+    <a class="nav-link" href="https://sites.google.com/sd61learn.ca/csp/rockets/steller-jay" target="_blank">Steller Jay</a>
+    <a class="nav-link" href="https://sites.google.com/sd61learn.ca/csp/rockets/bfr" target="_blank">Big Fat Rocket</a>
+    <a class="nav-link" href="https://sites.google.com/sd61learn.ca/csp/rideshare" target="_blank">SpaceY Rideshare</a>
+    <a class="nav-link" href="https://sites.google.com/sd61learn.ca/csp/engine/1a_1" target="_blank">Otter 1A</a>
+    <a class="nav-link" href="https://sites.google.com/sd61learn.ca/csp/engine/1a" target="_blank">Otter 1+</a>
+  </div>
+
+</body>
+</html>

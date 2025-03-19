@@ -25,34 +25,34 @@
       "video_url": "vids/cole level crime.mp4"
     },
     {
-      "name": "Cute Animal Video",
-      "tags": ["animals", "cute"],
-      "creator": "AnimalLover",
-      "video_url": "/vids/cute_animals.mp4"
+      "name": "This Billboard is hiding a dark secret",
+      "tags": ["LGBTQ"],
+      "creator": "Alex Rose",
+      "video_url": "vids/Hiding-Dark-Secrets.mp4"
     },
     {
-      "name": "ASMR Relaxation",
-      "tags": ["asmmr", "relaxation"],
-      "creator": "ASMRQueen",
-      "video_url": "https://example.com/asmr_relax.mp4"
+      "name": "Advice on how not to land a rocket",
+      "tags": ["Space Program", "Eagle"],
+      "creator": "CSP Inc",
+      "video_url": "vids/HowNotToLandEagle.mp4"
     },
     {
-      "name": "Car Review",
-      "tags": ["cars", "review"],
-      "creator": "CarExpert",
-      "video_url": "/vids/car_review.mp4"
+      "name": "The hardest minion edit",
+      "tags": ["minion"],
+      "creator": "Alex Rose",
+      "video_url": "vids/edit1.mp4"
     },
     {
-      "name": "Vlog Day 1",
-      "tags": ["vlog", "travel"],
-      "creator": "TravelVlogger",
-      "video_url": "https://example.com/vlog_day1.mp4"
+      "name": "Low Taper Reed",
+      "tags": ["memes"],
+      "creator": "Alex Rose",
+      "video_url": "vids/low-taper-reed.mp4"
     },
     {
-      "name": "Gaming Montage",
-      "tags": ["gaming", "montage"],
+      "name": "Wanted for crimes",
+      "tags": ["Central Avengers"],
       "creator": "GamingMontage",
-      "video_url": "/vids/gaming_montage.mp4"
+      "video_url": "vids/wanted.mp4"
     },
     {
       "name": "DIY Tutorial",

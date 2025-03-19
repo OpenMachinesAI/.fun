@@ -1,10 +1,10 @@
 {
   "videos": [
     {
-      "name": "Video 1",
-      "tags": ["tech", "tutorial", "robotics"],
+      "name": "Don't your dare Abudel",
+      "tags": ["memes"],
       "creator": "JohnDoe",
-      "video_url": "vids/copy_4053E033-1DB9-444B-BCFF-D7BF88274513 (1).mp4"
+      "video_url": "/vids/abudel.mp4"
     },
     {
       "name": "Another Video",

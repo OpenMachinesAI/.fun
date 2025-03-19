@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CentralSchool.fun - PRO GAMER DEN</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: #000;
+      font-family: "Courier New", monospace;
+      color: #fff;
+      text-align: center;
+    }
+    /* Logo */
+    .logo {
+      margin-bottom: 20px;
+    }
+    .logo img {
+      max-width: 100%;
+      height: auto;
+    }
+    /* Banner ads flashing red and orange */
+    @keyframes flashBanner {
+      0% { background-color: red; }
+      50% { background-color: orange; }
+      100% { background-color: red; }
+    }
+    .banner-ad {
+      font-size: 1.5em;
+      font-weight: bold;
+      padding: 10px;
+      margin: 10px auto;
+      width: 90%;
+      border: 3px dashed #fff;
+      animation: flashBanner 2s infinite;
+    }
+    /* Game item styles */
+    @keyframes flashText {
+      0%, 50% { color: #ff00ff; }
+      51%, 100% { color: #00ffff; }
+    }
+    .game-item {
+      font-size: 2em;
+      margin: 30px 0;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .game-item:hover {
+      animation: flashText 1s infinite;
+      transform: scale(1.1);
+    }
+    /* Exclusive games button */
+    .exclusive-btn {
+      font-size: 1.5em;
+      padding: 10px 20px;
+      margin-top: 40px;
+      background: #ffcc00;
+      border: 3px dashed #fff;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .exclusive-btn:hover {
+      background: #ff9900;
+      transform: scale(1.1);
+    }
+    /* Modal styles with Windows 95 toolbar */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      height: 80%;
+      background-color: #c0c0c0;
+      border: 2px solid #000;
+      box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    .modal-toolbar {
+      background: #000080;
+      color: #fff;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 1.2em;
+    }
+    .toolbar-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .toolbar-button {
+      background: #c0c0c0;
+      border: 2px outset #fff;
+      padding: 2px 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .toolbar-button:hover {
+      background: #fff;
+    }
+    .modal-content {
+      height: calc(100% - 40px);
+    }
+    .modal-content iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .modal-close {
+      cursor: pointer;
+      padding: 0 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- Logo -->
+  <div class="logo">
+    <img src="https://r72.cooltext.com/rendered/cooltext478531818067848.png" alt="PRO GAMER DEN Logo">
+  </div>
+  
+  <!-- Banner Ads -->
+  <div class="banner-ad">
+    HOT GAME ALERT: DODGE BURGER IS ON FIRE!
+  </div>
+  <div class="banner-ad">
+    EXPLOSIVE ACTION: EA SIMULATOR IS READY TO PLAY!
+  </div>
+  
+  <!-- Game List -->
+  <div class="games-list">
+    <!-- Dodge Burger: opens modal with game.html -->
+    <div class="game-item" onclick="openModalDodgeBurger()">Dodge Burger</div>
+    <!-- EA Simulator: opens modal with the other link -->
+    <div class="game-item" onclick="openModalEASimulator()">EA Simulator</div>
+  </div>
+  
+  <!-- Exclusive Games Button -->
+  <div>
+    <button class="exclusive-btn" onclick="checkAccount()">View Exclusive Central Games</button>
+  </div>
+  
+  <!-- Modal for games with Windows 95 toolbar -->
+  <div id="gameModal" class="modal">
+    <div class="modal-toolbar">
+      <div>Windows 95 Mode - Game</div>
+      <div class="toolbar-buttons">
+        <div class="toolbar-button" onclick="goFullScreen()">Full Screen</div>
+        <div class="toolbar-button modal-close" onclick="closeModal()">X</div>
+      </div>
+    </div>
+    <div class="modal-content">
+      <iframe id="gameFrame" src=""></iframe>
+    </div>
+  </div>
+  
+  <script>
+    function openModalDodgeBurger() {
+      document.getElementById("gameFrame").src = "https://openmachinesai.github.io/X/game.html";
+      document.getElementById("gameModal").style.display = "block";
+    }
+    function openModalEASimulator() {
+      document.getElementById("gameFrame").src = "https://openmachinesai.github.io/X/MR%20Shortreed%20hire%20game.html";
+      document.getElementById("gameModal").style.display = "block";
+    }
+    function closeModal() {
+      document.getElementById("gameModal").style.display = "none";
+      document.getElementById("gameFrame").src = "";
+    }
+    function goFullScreen() {
+      var modal = document.getElementById("gameModal");
+      if (modal.requestFullscreen) {
+        modal.requestFullscreen();
+      } else if (modal.webkitRequestFullscreen) { /* Safari */
+        modal.webkitRequestFullscreen();
+      } else if (modal.msRequestFullscreen) { /* IE11 */
+        modal.msRequestFullscreen();
+      }
+    }
+    function checkAccount() {
+      var answer = confirm("You must be logged in to an sd61learn.ca account to view exclusive central games.\n\nDo you want to proceed?");
+      if(answer) {
+        window.location.href = "https://sites.google.com/sd61learn.ca/arch/games";
+      }
+    }
+  </script>
+</body>
+</html>

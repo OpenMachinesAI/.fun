@@ -61,7 +61,7 @@
     #search-input:focus {
       background: #ffff99;
     }
-    /* Filter section */
+    /* Filter Section: Now only displays the tag checkboxes */
     .filter {
       background-color: #fff;
       padding: 15px;
@@ -89,6 +89,16 @@
     .video-card:hover {
       transform: scale(1.05);
       box-shadow: 5px 5px 0 #000;
+    }
+    .video-card h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #003399;
+    }
+    .video-card h4 {
+      margin: 5px 0 0 0;
+      font-size: 16px;
+      color: #666;
     }
     /* Windows 95 Style Modal */
     .modal-overlay {
@@ -193,14 +203,17 @@
     let selectedTags = [];
     let searchQuery = '';
 
+    // Load video data from JSON file
     fetch('vids/video.json')
       .then(response => response.json())
       .then(data => {
         videosData = data.videos;
         initTagFilters();
         renderVideos();
-      });
+      })
+      .catch(error => console.error('Error loading video data:', error));
 
+    // Build tag filters (checkboxes with tag names only)
     function initTagFilters() {
       const tagContainer = document.getElementById('tag-filters');
       let tagsSet = new Set();
@@ -224,18 +237,31 @@
       });
     }
 
+    // Listen for search input
     document.getElementById('search-input').addEventListener('input', (e) => {
       searchQuery = e.target.value.toLowerCase();
       renderVideos();
     });
 
+    // Render videos by filtering with search query and selected tags
     function renderVideos() {
       const videoList = document.getElementById('video-list');
       videoList.innerHTML = '';
-      let filteredVideos = videosData.filter(video =>
-        video.name.toLowerCase().includes(searchQuery) ||
-        video.tags.some(tag => tag.toLowerCase().includes(searchQuery))
-      );
+      let filteredVideos = videosData;
+
+      if (selectedTags.length > 0) {
+        filteredVideos = filteredVideos.filter(video =>
+          video.tags.some(tag => selectedTags.includes(tag))
+        );
+      }
+
+      if (searchQuery.trim() !== '') {
+        filteredVideos = filteredVideos.filter(video =>
+          video.name.toLowerCase().includes(searchQuery) ||
+          video.tags.some(tag => tag.toLowerCase().includes(searchQuery))
+        );
+      }
+
       filteredVideos.forEach(video => {
         const card = document.createElement('div');
         card.className = 'video-card';
@@ -245,14 +271,32 @@
       });
     }
 
+    // Open modal and load the video properly
     function openModal(video) {
       document.getElementById('modal-title').textContent = video.name;
       document.getElementById('video-source').src = video.video_url;
+      var modalVideo = document.getElementById('modal-video');
+      modalVideo.load(); // Ensure the video loads from the new source
       document.getElementById('modal-overlay').style.display = 'flex';
     }
 
+    // Close modal and pause the video
     document.getElementById('close-btn').addEventListener('click', () => {
+      var modalVideo = document.getElementById('modal-video');
+      modalVideo.pause();
       document.getElementById('modal-overlay').style.display = 'none';
+    });
+
+    // Fullscreen functionality for the video
+    document.getElementById('fullscreen-btn').addEventListener('click', () => {
+      var modalVideo = document.getElementById('modal-video');
+      if (modalVideo.requestFullscreen) {
+        modalVideo.requestFullscreen();
+      } else if (modalVideo.webkitRequestFullscreen) {
+        modalVideo.webkitRequestFullscreen();
+      } else if (modalVideo.msRequestFullscreen) {
+        modalVideo.msRequestFullscreen();
+      }
     });
   </script>
 </body>

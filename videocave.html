@@ -61,7 +61,7 @@
     #search-input:focus {
       background: #ffff99;
     }
-    /* Filter Section: Now only displays the tag checkboxes */
+    /* Filter Section: Only displays the tag checkboxes */
     .filter {
       background-color: #fff;
       padding: 15px;
@@ -142,6 +142,8 @@
     .modal-content video {
       width: 100%;
       height: auto;
+      max-height: 80vh; /* Ensures video doesn't exceed viewport height */
+      object-fit: contain;
       display: block;
     }
     /* Animations */
@@ -276,7 +278,7 @@
       document.getElementById('modal-title').textContent = video.name;
       document.getElementById('video-source').src = video.video_url;
       var modalVideo = document.getElementById('modal-video');
-      modalVideo.load(); // Ensure the video loads from the new source
+      modalVideo.load(); // Reload the video with the new source
       document.getElementById('modal-overlay').style.display = 'flex';
     }
 

@@ -11,6 +11,28 @@
       font-family: "Courier New", monospace;
       color: #000;
     }
+
+    /* Flashing Warning */
+    @keyframes flash {
+      0%, 50% {
+        opacity: 1;
+      }
+      50.1%, 100% {
+        opacity: 0;
+      }
+    }
+    .flashing-warning {
+      animation: flash 1s infinite;
+      text-align: center;
+      background: red;
+      color: #fff;
+      font-weight: bold;
+      padding: 5px;
+      margin: 0 0 10px 0;
+      font-size: 1.1em;
+      border: 2px dashed #000;
+    }
+
     h1 {
       text-align: center;
       background: #ff00ff;
@@ -57,7 +79,6 @@
       margin-right: 8px;
       fill: #000;
     }
-    /* Smaller text label on the banner */
     .banner span {
       font-weight: bold;
       font-size: 0.95em;
@@ -65,6 +86,11 @@
   </style>
 </head>
 <body>
+
+  <!-- Flashing Warning -->
+  <div class="flashing-warning">
+    You must be logged in to an sd61learn.ca account to view products
+  </div>
 
   <h1>CentralSchool.fun - Product Museum</h1>
 

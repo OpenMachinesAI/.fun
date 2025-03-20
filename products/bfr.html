@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Big Fat Rocket (BFR) - The Ultimate Overkill</title>
+    <style>
+        body {
+            background-color: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            color: red;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .subtitle {
+            font-size: 18px;
+            color: orange;
+        }
+        .quote-box {
+            background: #222;
+            color: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 90%;
+            font-size: 32px;
+            animation: slideIn 1.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+        }
+        .quote-text {
+            flex: 1;
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .quote-author {
+            flex: 1;
+            font-size: 24px;
+            text-align: right;
+            font-style: italic;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">Big Fat Rocket (BFR)</h1>
+    <p class="subtitle">The absolute unit of a spacecraft. If SpaceX has Starship, we have a whole Star-Planet.</p>
+    
+    <div class="quote-box">
+        <span class="quote-text">"If we were SpaceX, this thing would be called Falcon Too Heavy"</span>
+        <span class="quote-author">- Lead Engineer, totally qualified</span>
+    </div>
+    
+    <div class="quote-box" style="background: gray;">
+        <span class="quote-text">"We tried launching it, but it was too big to fit on the launchpad... and the country."</span>
+        <span class="quote-author">- Someone in Mission Control</span>
+    </div>
+    
+    <div class="quote-box">
+        <span class="quote-text">"Our partnership with SpaceY and ASSA made this possible. Their motto: ‘Bigger is always better’ was taken way too literally."</span>
+        <span class="quote-author">- CEO of SpaceY</span>
+    </div>
+    
+    <div class="quote-box">
+        <span class="quote-text">"If we ever get this thing off the ground, NASA is legally required to rename the moon to BFR Landing Zone Alpha."</span>
+        <span class="quote-author">- Space Policy Analyst</span>
+    </div>
+</body>
+</html>

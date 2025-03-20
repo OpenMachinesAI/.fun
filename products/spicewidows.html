@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spice It Up - Introducing Chips</title>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            color: red;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .subtitle {
+            font-size: 18px;
+            color: darkred;
+        }
+        .quote-box {
+            background: #333;
+            color: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 90%;
+            font-size: 32px;
+            animation: slideIn 1.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+        }
+        .quote-text {
+            flex: 1;
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .quote-author {
+            flex: 1;
+            font-size: 24px;
+            text-align: right;
+            font-style: italic;
+        }
+        .quote-image {
+            max-width: 350px;
+            height: auto;
+            margin-left: 20px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">Spice It Up</h1>
+    <p class="subtitle">Introducing Chips. (Something never done before)</p>
+    
+    <div class="quote-box">
+        <span class="quote-text">"Burns like a marvel lawsuit"</span>
+        <span class="quote-author">- Alex Rose</span>
+    </div>
+    
+    <div class="quote-box" style="background: gray;">
+        <span class="quote-text">ow ow ow ow stop IT BURNS</span>
+        <span class="quote-author">- One of the snack widow clones we lit on fire</span>
+    </div>
+    
+    <div class="quote-box">
+        <span class="quote-text">"According to official Central Avengers lore, I'm married to a pot—so legally, I can't disclose which one I used for this recipe... (P.S. I cheated on my wife with another pot)"</span>
+        <span class="quote-author">- IRON DEFICIENCY MAN</span>
+        <img class="quote-image" src="https://lh7-rt.googleusercontent.com/u/0/docs/AHkbwyKUK09shll4JSM-jcSe0Dd_wP3lghVSPdWqKiXOl0Xp11odlKim1_utnlGa_6LNyDXNd7XRqvJxBbP6eHbfsM1zUvGIaZ2x_cKM81bp3pcVZMz-hUssLFgnv-DLczAHFdHda7rFZNdcsezv2dsU_A0o11-2Ca7wY-sgUVV3oQ6AqiNIhUtYaNxT04wgoRaDjoax7_1U5iSGwoHUoi86dFloz99FvVohtXwUaL3_h326fnuGsDLxrjgaEWD1TeoIBaEu0LCBnNqdkvyaqaCkO916PXy4-t3UnQIjfHr3BGWPtS0q9dX8ZESHEuIuT_1K51g2NjItL-m3IxHa8S4nN6cQ0oXWEQ_4qmMOhAvEzlQ_2CaZ7lvygg67ywg3E7aIvRpHsuHdVmywpp9kucAPOwQ2rJYaDdjZZruORPaiJFOEv3bs_0KFxoUlTlc66rLpdNTJhgdUAxS7qwvj80PkMsfA8P20h8U64aA8ftSdM1YF-v1T2fKC1_04ePpTAaxcb-6LMKVRJXR6SFATCOlrb3F_9UiMC398FDWED4Hxdde-Grnj65RxHp52qBM9mZycL0hl844LcXzgQh5ZFqY4bdVCEALcsFftaPy-C_uYYcCrCOryWX_GQwjccQC_qjcgxSZqXEVw4os3Sz1ddMmz0lnEK93m1d17O1z1R0jrfqH85IooBdrKVGy00R59i_4700_MRMkgPyVlHagbskmwYWTw7W5ohQXjQyD0IrwVrbK_iYKg9_PuFdAayuxHiL7uqEdwxeV_8M1Vq_geOhDDNbrWOQf4MNDvReYmroZDwxwo1V4nJJKx3Ft24TqTD0osCT5MOBn0wNKmU4FwV7b8KIPcRH5C1xiKgdD8iuGm4GARBDnIifftaZSNuvF6n9CxooLgYbAro55KiGV8lWj4uWjIWZuUdPc" alt="Iron Man Image">
+    </div>
+    
+    <div class="quote-box">
+        <span class="quote-text">I have become death, the maker of... chips</span>
+        <span class="quote-author">- Alex Rose</span>
+        <img class="quote-image" src="https://lh7-rt.googleusercontent.com/u/0/docs/AHkbwyIqCT8KmZlU6xUWoHMR-8Ps_5jgylE_ZcV1ucSb4gMUCFiS2LXKMS7733KLI6Cuy7QtLrgk3KH1t4VPubRyJPS8K5sgUqWUZhMS_X-sGP7rykm_ZKGaPFzBeFUoZZ7VPK1tutyM27kijix1hF_x2qOyqtoutE2jpkgKgluyqkly_rCdp3_87JCl54R0o0HW6452D2JjudnlofTVYVWbes9lE_GYuzMW5j0hcSSoD_1bipv1P4uiRdAu-gPLkWzlizVwFh6D0Uz4DOg38PwW5ajL9BEtIGrK5Xh3eh2d9DCDHbVhSWrE8mBZSKxvaBVgqTcuts7ERYyCc9ZNIENvup7iREX3223a7zAqe-mGZe9qrC2OTvgDsByDDWeX9cWlZ_tbXIn_6y_Zw51zoTgGhu8Yy-9GkZdXdm4KtcZJpXjmwmFJnPPNqms8ynxkrPCRn7m4g8RixofeuHyxUZvppVxl2zUUGc2tTSX0fE16kL7qTi7x20sh4pWcAZWjOBluUMDzWc8YaQjSKAv3vD79xeWw0x6SFFzeFqwCgCU0SYiA3muYRNxODNZGe5n9he7HLD3OTcpm6eBimGF2nGJt4n0_CGkxB9StTn14ubSOGpYXkZjSTIC382RNKtIiB-SIBrJu7zEjGNgC0q6QL91VuK0ST-DQybo_ZWJk-om-cbR9TyXZPQk1Wcg7ScDa24efbEQmFOGc9s7WGyFf3iKJB17SGAHjA69lcfJgMViWobwpyqIo0ycL3KMHTKw6qRM6mI1XeFyVrPNEvAUThMIW6FTT2IHSr98fk8IbNDURmIb-g5kP3Rqn28AC5xzhOp15o366fVR7yMPmvh5xEnlN9TNfMIXaHFGqZh_GBDg2wL9d-UWqvk_jK--E9e5Im92ik1wadPdLLxR2ngJjMJf6UVzi--9KG8s" alt="Oppenheimer Image">
+    </div>
+    
+    <div class="quote-box">
+        <span class="quote-text">"These aren’t spicy enough for the skibidi rizz kid bro"</span>
+        <span class="quote-author">- Cole (the skibidi rizz kid)</span>
+        <img class="quote-image" src="https://lh7-rt.googleusercontent.com/u/0/docs/AHkbwyJXtELoEh16RxYSsdStTAayakQRViWlyzqkAZ1wrltv55PeV-DL2KKaxyhIdZNGkZfQd74zPByDBVpQNT4Y0MLi0fuvVAMdsR3b-vmS9J4MZZ8mqYaAcDzfKFvpOx9n8TpAp2rnLN7USGfx_XejY_fWuFb-9WP0_WRlspeNQzxD5Am3iXYQUCLlikXEQvhBbykJ4Rh5i8Baw2TxqH5SWnZhB8r4aLtSNxONnlB5yGIMrekFzO3SjUSQmezNJQr_5EgWa8EyIJrsTnaDOVwLbRbNDz6Oye-liDa4Ll3QhBoQl-b7XlzncmLXIJ7xv02h95j1qtcVGRiZREGDLw1R3eT3Gnv9HQ2JIv3AcPUzZZNb4JRTTih3p530DGUlDzW4o2S1_ID9lf3EMdXbH75sh3MfL9d8a8jrcBjp3Zc9XelH9EFqcpTSkb-Pt7A-F2lJS0LDiO9iEaYeoYMIntDteP8BHHxlAhWudzC_kDdFcVMtK9XPSY3Fo0KpEtSDgapVzhi8NT5d1yNuybVtIpdcQBUmUAhzsWE20Fc6iIFiQ1ur7fFLyRPgU0GRajnDc_YP8H2H7H5eLjN-BOH9SezFMpjjKRN4ZZ9eeer2gMLuXm8FHWWjB9ADv2_rTJkEPMej6gGsyo-t2dklNN4JhluLtZerOM0h45lbM5VBH-KDblsdkqxdnzoW0ZmeiSZJmQyok_lZBiHrQlZ8kTnQ_C6vl7xT5wgnZEDYJretuEysOTlzz3W3BHYmbv8yqBWGU1fAeFYrtcHq2FI_NHRGiBmmnMRKQ-17D6y6FjG8lImIMA25IqLLqRE5V3USi6i6hk6HOCaIGDkXIpLV3TKtdFHcBgUgJ24lCvyBnSiKczzoryWizbpdOMePajVarOh_woZY-MnjW_dBUyiZbroxlHDgMW6e3UR16Es" alt="Kid Image">
+    </div>
+</body>
+</html>

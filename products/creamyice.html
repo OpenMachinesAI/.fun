@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spoofed Man's Creamy Ice</title>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            color: blue;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .subtitle {
+            font-size: 18px;
+            color: darkblue;
+        }
+        .quote-box {
+            background: #222;
+            color: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 90%;
+            font-size: 32px;
+            animation: slideIn 1.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+        }
+        .quote-text {
+            flex: 1;
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .quote-author {
+            flex: 1;
+            font-size: 24px;
+            text-align: right;
+            font-style: italic;
+        }
+        .quote-image {
+            max-width: 350px;
+            height: auto;
+            margin-left: 20px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">Spoofed Man's Creamy Ice</h1>
+    <p class="subtitle">The only ice cream legally distinct enough to not get sued (maybe)</p>
+    
+    <div class="quote-box">
+        <span class="quote-text">"Tastes like a Marvel lawsuit waiting to happen"</span>
+        <span class="quote-author">- Alex Rose</span>
+    </div>
+    
+    <div class="quote-box" style="background: gray;">
+        <span class="quote-text">"Why does it feel like Disney's lawyers are already on their way?"</span>
+        <span class="quote-author">- Concerned Customer</span>
+    </div>
+    
+    <div class="quote-box">
+        <span class="quote-text">"At this point, I'm surprised they haven't just sent a cease and desist flavored cone"</span>
+        <span class="quote-author">- Legal Expert</span>
+    </div>
+    
+    <div class="quote-box">
+        <span class="quote-text">"Our ice cream is so good, even the Mouse himself wants a cut of the profits."</span>
+        <span class="quote-author">- Spoofed Man, probably</span>
+    </div>
+</body>
+</html>

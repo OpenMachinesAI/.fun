@@ -157,250 +157,106 @@
       "video_url": "vids/the squid game master.mp4"
     },
     {
-      "name": "Animal Compilation",
-      "tags": ["animals", "compilation"],
-      "creator": "AnimalLover",
-      "video_url": "/vids/animal_compilation.mp4"
+      "name": "Alex and Cole get explled",
+      "tags": ["Cole", "Alex"],
+      "creator": "Alex Rose",
+      "video_url": "vids/alex and cole get expelled.mp4"
     },
     {
-      "name": "Prank Video",
-      "tags": ["prank", "video"],
-      "creator": "Prankster",
-      "video_url": "https://example.com/prank_video.mp4"
+      "name": "Canadian Schools",
+      "tags": ["Songs", "Music"],
+      "creator": "Alex Rose",
+      "video_url": "vids/calfironia schools.mp4"
     },
     {
-      "name": "Food Review",
-      "tags": ["food", "review"],
-      "creator": "Foodie",
-      "video_url": "/vids/food_review.mp4"
+      "name": "Cole Bullying",
+      "tags": ["cole", "bullying"],
+      "creator": "cole cam",
+      "video_url": "vids/cole was elonmusk.mp4"
     },
     {
-      "name": "Travel Guide",
+      "name": "Cute Valentines Day Vibes",
       "tags": ["travel", "guide"],
       "creator": "TravelGuide",
-      "video_url": "https://example.com/travel_guide.mp4"
+      "video_url": "vids/cute valtimse day vibes.mp4"
     },
     {
-      "name": "Music Covers",
-      "tags": ["music", "covers"],
-      "creator": "MusicCovers",
-      "video_url": "/vids/music_covers.mp4"
+      "name": "Google Classroom Musical",
+      "tags": ["music", "classroom"],
+      "creator": "Alex Rose",
+      "video_url": "vids/google classroom msucial.mp4"
     },
     {
-      "name": "DIY Home Decor",
-      "tags": ["diy", "home decor"],
-      "creator": "DIYHomeDecor",
-      "video_url": "https://example.com/diy_home_decor.mp4"
+      "name": "Mr Shortred: I used to run the school",
+      "tags": ["music"],
+      "creator": "Mr Shortreed",
+      "video_url": "vids/i used to run the school.mp4"
     },
     {
-      "name": "Comedy Skit",
-      "tags": ["comedy", "skit"],
-      "creator": "ComedyKings",
-      "video_url": "/vids/comedy_skit.mp4"
+      "name": "Wa Pa Central Style",
+      "tags": ["music", "songs"],
+      "creator": "Mr Shortreed",
+      "video_url": "vids/wa pa central style.mp4"
     },
     {
-      "name": "Automotive Review",
-      "tags": ["automotive", "review"],
-      "creator": "AutomotiveExpert",
-      "video_url": "https://example.com/automotive_review.mp4"
+      "name": "Introducing Central Money (we have a problem)",
+      "tags": ["money", "enrichment"],
+      "creator": "Money God 69420",
+      "video_url": "vids/we got an issue.mp4"
     },
     {
-      "name": "Gaming Tutorial",
-      "tags": ["gaming", "tutorial"],
-      "creator": "GamingTutorial",
-      "video_url": "/vids/gaming_tutorial.mp4"
+      "name": "Pro at being an idiot",
+      "tags": ["Central Avengers"],
+      "creator": "Alex Rose",
+      "video_url": "vids/Alex Rose Idiot.mp4"
     },
     {
-      "name": "Vlog Day 2",
-      "tags": ["vlog", "travel"],
-      "creator": "TravelVlogger",
-      "video_url": "https://example.com/vlog_day2.mp4"
+      "name": "Gpts got us fallin in love tonight!",
+      "tags": ["RizzGPP", "song", "music"],
+      "creator": "Alex Rose",
+      "video_url": "vids/GPT'S got us falling in love again.mp4"
     },
     {
-      "name": "Fashion Haul",
-      "tags": ["fashion", "haul"],
-      "creator": "Fashionista",
-      "video_url": "/vids/fashion_haul.mp4"
+      "name": "Chrome Busters theme song",
+      "tags": ["ChromeBusters"],
+      "creator": "CBx Inc",
+      "video_url": "vids/busting theme.mp4"
     },
     {
-      "name": "Motivational Speech",
-      "tags": ["motivation", "speech"],
-      "creator": "MotivationGuru",
-      "video_url": "https://example.com/motivational_speech.mp4"
+      "name": "Sam Remix (Remix)",
+      "tags": ["Sam"],
+      "creator": "Sam Music Inc",
+      "video_url": "vids/funnt.mp4"
     },
     {
-      "name": "Q&A Session 2",
-      "tags": ["qa", "session"],
-      "creator": "QandAHost",
-      "video_url": "/vids/qa_session2.mp4"
+      "name": "Ginger the russian spy",
+      "tags": ["ginger"],
+      "creator": "Dog",
+      "video_url": "vids/ginger the russian spy.mp4"
     },
     {
-      "name": "Challenging Video",
-      "tags": ["challenge", "video"],
-      "creator": "ChallengeMaster",
-      "video_url": "https://example.com/challenging_video.mp4"
+      "name": "MR SHORTREED'S EMAIL SONG",
+      "tags": ["song", "music"],
+      "creator": "KSI",
+      "video_url": "vids/in the thick of it.mp4"
     },
     {
-      "name": "Home Decor Tour",
-      "tags": ["home decor", "tour"],
-      "creator": "HomeDecorExpert",
-      "video_url": "/vids/home_decor_tour.mp4"
+      "name": "Shortreed Anime",
+      "tags": ["anime", "japan"],
+      "creator": "Alex Rose",
+      "video_url": "vids/mr shortreed anime.mp4"
     },
     {
-      "name": "Travel Vlog 2",
-      "tags": ["travel", "vlog"],
-      "creator": "TravelVlogger",
-      "video_url": "https://example.com/travel_vlog2.mp4"
+      "name": "Song of the summer",
+      "tags": ["song", "music"],
+      "creator": "Song of the summer",
+      "video_url": "vids/song of the summer.mp4"
     },
     {
-      "name": "Product Demo",
-      "tags": ["product", "demo"],
-      "creator": "ProductDemo",
-      "video_url": "/vids/product_demo.mp4"
-    },
-    {
-      "name": "Review of the Week",
-      "tags": ["review", "week"],
-      "creator": "ReviewPro",
-      "video_url": "https://example.com/review_of_the_week.mp4"
-    },
-    {
-      "name": "DIY Furniture",
-      "tags": ["diy", "furniture"],
-      "creator": "DIYFurniture",
-      "video_url": "/vids/diy_furniture.mp4"
-    },
-    {
-      "name": "Beauty Tutorial",
-      "tags": ["beauty", "tutorial"],
-      "creator": "BeautyGuru",
-      "video_url": "https://example.com/beauty_tutorial.mp4"
-    },
-    {
-      "name": "Gaming Challenge",
-      "tags": ["gaming", "challenge"],
-      "creator": "GamingChallenge",
-      "video_url": "/vids/gaming_challenge.mp4"
-    },
-    {
-      "name": "Food Challenge",
-      "tags": ["food", "challenge"],
-      "creator": "FoodChallenger",
-      "video_url": "https://example.com/food_challenge.mp4"
-    },
-    {
-      "name": "Travel Guide 2",
-      "tags": ["travel", "guide"],
-      "creator": "TravelGuide",
-      "video_url": "https://example.com/travel_guide2.mp4"
-    },
-    {
-      "name": "Music Video 2",
-      "tags": ["music", "video"],
-      "creator": "MusicArtist",
-      "video_url": "/vids/music_video2.mp4"
-    },
-    {
-      "name": "Viral Dance 2",
-      "tags": ["viral", "dance"],
-      "creator": "DanceQueen",
-      "video_url": "https://example.com/viral_dance2.mp4"
-    },
-    {
-      "name": "Motivational Video 2",
-      "tags": ["motivation", "video"],
-      "creator": "MotivationGuru",
-      "video_url": "https://example.com/motivational_video2.mp4"
-    },
-    {
-      "name": "Behind the Scenes 2",
-      "tags": ["bts", "behind the scenes"],
-      "creator": "BTSPro",
-      "video_url": "/vids/bts2.mp4"
-    },
-    {
-      "name": "Gaming News 2",
-      "tags": ["gaming", "news"],
-      "creator": "GamingNews",
-      "video_url": "https://example.com/gaming_news2.mp4"
-    },
-    {
-      "name": "Animal Compilation 2",
-      "tags": ["animals", "compilation"],
-      "creator": "AnimalLover",
-      "video_url": "/vids/animal_compilation2.mp4"
-    },
-    {
-      "name": "Prank Video 2",
-      "tags": ["prank", "video"],
-      "creator": "Prankster",
-      "video_url": "https://example.com/prank_video2.mp4"
-    },
-    {
-      "name": "Food Review 2",
-      "tags": ["food", "review"],
-      "creator": "Foodie",
-      "video_url": "/vids/food_review2.mp4"
-    },
-    {
-      "name": "Travel Guide 3",
-      "tags": ["travel", "guide"],
-      "creator": "TravelGuide",
-      "video_url": "https://example.com/travel_guide3.mp4"
-    },
-    {
-      "name": "Music Covers 2",
-      "tags": ["music", "covers"],
-      "creator": "MusicCovers",
-      "video_url": "/vids/music_covers2.mp4"
-    },
-    {
-      "name": "DIY Home Decor 2",
-      "tags": ["diy", "home decor"],
-      "creator": "DIYHomeDecor",
-      "video_url": "https://example.com/diy_home_decor2.mp4"
-    },
-    {
-      "name": "Comedy Skit 2",
-      "tags": ["comedy", "skit"],
-      "creator": "ComedyKings",
-      "video_url": "/vids/comedy_skit2.mp4"
-    },
-    {
-      "name": "Automotive Review 2",
-      "tags": ["automotive", "review"],
-      "creator": "AutomotiveExpert",
-      "video_url": "https://example.com/automotive_review2.mp4"
-    },
-    {
-      "name": "Gaming Tutorial 2",
-      "tags": ["gaming", "tutorial"],
-      "creator": "GamingTutorial",
-      "video_url": "/vids/gaming_tutorial2.mp4"
-    },
-    {
-      "name": "Vlog Day 3",
-      "tags": ["vlog", "travel"],
-      "creator": "TravelVlogger",
-      "video_url": "https://example.com/vlog_day3.mp4"
-    },
-    {
-      "name": "Fashion Haul 2",
-      "tags": ["fashion", "haul"],
-      "creator": "Fashionista",
-      "video_url": "/vids/fashion_haul2.mp4"
-    },
-    {
-      "name": "Motivational Speech 2",
-      "tags": ["motivation", "speech"],
-      "creator": "MotivationGuru",
-      "video_url": "https://example.com/motivational_speech2.mp4"
-    },
-    {
-      "name": "Q&A Session 3",
-      "tags": ["qa", "session"],
-      "creator": "QandAHost",
-      "video_url": "/vids/qa_session3.mp4"
+      "name": "Zuckerturd's  Rizz Scale",
+      "tags": ["memes"],
+      "creator": "Mark Zuckerturd",
+      "video_url": "vids/zuckerturd.mp4"
     }
   ]
 }

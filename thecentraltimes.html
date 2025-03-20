@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon!</title>
+    <style>
+        body {
+            background-color: yellow;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: #0000FF;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            font-size: 50px;
+            margin-top: 100px;
+            text-shadow: 2px 2px 5px #FF0000;
+        }
+        p {
+            font-size: 24px;
+            color: #FF00FF;
+            text-shadow: 1px 1px 5px #FFFF00;
+        }
+        .blink {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+        marquee {
+            font-size: 30px;
+            color: #00FF00;
+            margin-top: 20px;
+        }
+        .footer {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            color: #00FFFF;
+        }
+      }
+        h4 {
+            font-size: 50px;
+            margin-top: 100px;
+            text-shadow: 2px 2px 5px black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Times will be here soon!</h1>
+    <p>CMS Times will be printed here weekly!</p>
+    <marquee behavior="scroll" direction="left">Exciting things are on the way!!!</marquee>
+    <p class="blink">Don't forget to bookmark this!</p>
+    <div class="footer">
+        <h4>CMS Times is not owned by ARCH but will be hosted here</h4>
+    </div>
+</body>
+</html>

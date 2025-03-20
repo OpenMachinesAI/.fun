@@ -148,12 +148,39 @@
       cursor: url('cursor_hover.gif'), auto; /* Optional: different cursor on hover */
     }
 
+    #news-banner {
+  background-color: #000;
+  color: #ff0;
+  padding: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  box-shadow: 0 0 10px yellow;
+  font-weight: bold;
+}
+
+#news-banner span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: ticker 120s linear infinite;
+}
+
+@keyframes ticker {
+  to { transform: translateX(-100%); }
+}
+
+
   </style>
 </head>
 <body>
   <!-- Background Canvas -->
   <canvas id="bgCanvas"></canvas>
 
+  <!-- News Banner -->
+<div id="news-banner">
+  <span id="news-text"></span>
+</div>
+
+  
   <!-- Banner Ads -->
   <a href="banner1.html" class="banner-left">
     <h3>URGENT</h3>
@@ -178,6 +205,8 @@
 
   <!-- Main Title and Marquee -->
   <h1>Welcome to CentralSchool.fun</h1>
+
+  
 
   <marquee behavior="scroll" direction="left">The Home of Alex's Stuff, Enjoy your stay... or don't</marquee>
 
@@ -291,6 +320,115 @@
 
     resizeCanvas();
     drawBackground();
+
+    const headlines = [
+  "BREAKING: Banner realises it's pointless!",
+  "SHOCKER: Local student claims homework ate his dog!",
+  "BANNER: 'I'm just sliding across your screen, feeling empty inside.'",
+  "SCANDAL: School lunches now classified as biohazards!",
+  "ALERT: Principal declares Monday illegal—students rejoice!",
+  "Exclusive: Math teacher caught secretly using calculator!",
+  "STUDY: Breathing oxygen linked to survival!",
+  "JUST IN: Pencils protest against sharpening!",
+  "SCHOOL NEWS: Gym socks escape, terrorize town!",
+  "WEATHER ALERT: Sky confirms, it's still blue!",
+  "UNBELIEVABLE: Banner bored with own scrolling!",
+  "BREAKING: Cafeteria food officially used as rocket fuel!",
+  "DISCOVERY: Science project creates perpetual boredom machine!",
+  "SPORTS: Football found guilty of being too spherical!",
+  "TECH NEWS: Computer Lab overtaken by sentient floppy disks!",
+  "HEALTH: Experts agree, eating food prevents hunger!",
+  "CRITICAL UPDATE: Banner demands pay raise!",
+  "FASHION: Students unanimously agree socks with sandals are chic!",
+  "ECONOMICS: Monopoly money now accepted at school vending machines!",
+  "MYSTERY: Lost homework found vacationing in Hawaii!",
+  "BREAKING NEWS: Library books develop severe paper cuts!",
+  "SPECIAL REPORT: Banner considers early retirement!",
+  "LOCAL: Erasers unionize, demand better rubbing conditions!",
+  "BANNER CONFESSION: 'I repeat myself way too often!'",
+  "ASTRONOMY: Moon admits to just reflecting sunlight, feels guilty!"
+];
+
+function shuffle(array) {
+  let currentIndex = array.length, randomIndex;
+
+  while (currentIndex !== 0) {
+Indent mode
+
+Spaces
+Indent size
+
+2
+Line wrap mode
+
+No wrap
+Editing index.html file contents
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
+
+function displayHeadlines() {
+  const banner = document.getElementById('news-text');
+  banner.innerHTML = shuffle(headlines).join(" &nbsp; ✦ &nbsp; ");
+}
+
+displayHeadlines();
+setInterval(displayHeadlines, 60000); // reshuffle headlines every minute
+
   </script>
 </body>
 </html>

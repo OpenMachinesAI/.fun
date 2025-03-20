@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Steller Jay - Central Space Program</title>
+  <style>
+    /* GLOBAL STYLES */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      overflow-x: hidden;
+      color: white;
+      background: #000;
+    }
+    /* STAR CANVAS */
+    #starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    /* NAVIGATION */
+    .navbar {
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      padding: 15px 0;
+      transition: background 0.3s ease-in-out;
+    }
+    .navbar a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+      margin: 0 15px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .navbar a:hover {
+      text-decoration: underline;
+    }
+    /* HERO SECTION */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100vh;
+      padding: 0 20px;
+    }
+    .hero h3 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+    .hero p {
+      font-size: 22px;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+    /* CONTENT SECTIONS */
+    .section {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .section h2 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 2px solid #fff;
+      display: inline-block;
+      padding-bottom: 5px;
+      margin-top: 40px;
+    }
+    .section p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+    /* SCROLL ANIMATION ON NAV */
+    .scrolled {
+      background: rgba(0, 0, 0, 0.9);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CANVAS FOR STARFIELD -->
+  <canvas id="starfield"></canvas>
+
+  <!-- NAVIGATION -->
+  <div class="navbar" id="mainNav">
+    <a href="#overview">OVERVIEW</a>
+    <a href="#missions">MISSIONS</a>
+    <a href="#technology">TECHNOLOGY</a>
+    <a href="#team">TEAM</a>
+    <a href="#contact">CONTACT</a>
+  </div>
+
+  <!-- HERO SECTION -->
+  <div class="hero">
+    <h3>Steller Jay Rocket</h3>
+    <p>The next generation of flying for Central Middle School. Dedicated to carrying student projects and staff payloads into the sky and returning them safely.</p>
+  </div>
+
+  <!-- PAGE SECTIONS -->
+  <div class="section" id="overview">
+    <h2>Overview</h2>
+    <p>
+      Steller Jay is a revolutionary rocket designed to transport educational payloads thousands of feet into the sky. This initiative empowers students and faculty to engage in real-world space exploration.
+    </p>
+  </div>
+
+  <div class="section" id="missions">
+    <h2>Missions</h2>
+    <p>
+      Our missions aim to provide hands-on experience in aerospace science, enabling students to launch their experiments and projects skyward.
+    </p>
+  </div>
+
+  <div class="section" id="technology">
+    <h2>Technology</h2>
+    <p>
+      Equipped with state-of-the-art solid rocket engines and reusability features, Steller Jay embodies the cutting edge of student-led aerospace innovation.
+    </p>
+  </div>
+
+  <div class="section" id="team">
+    <h2>Our Team</h2>
+    <p>
+      The Central Middle School Space Program is led by passionate students and faculty, pioneering a new era of space accessibility.
+    </p>
+  </div>
+
+  <div class="section" id="contact">
+    <h2>Contact Us</h2>
+    <p>
+      Interested in launching with Steller Jay? Talk to Alex or Mr Shortreed to book your spot
+    </p>
+  </div>
+
+  <script>
+    // NAVBAR SCROLL EFFECT
+    const navbar = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      if(window.scrollY > 50){
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // STARFIELD ANIMATION
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+
+    let stars = [];
+    let width, height;
+
+    // RESIZE CANVAS TO FULL WINDOW
+    function initCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+    window.addEventListener('resize', initCanvas);
+    initCanvas();
+
+    // CREATE STARS
+    function createStars(num) {
+      stars = [];
+      for (let i = 0; i < num; i++) {
+        stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 1.5,
+          velocity: Math.random() * 0.2 + 0.05
+        });
+      }
+    }
+    createStars(200);
+
+    // ANIMATE STARS
+    function animateStars() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = '#fff';
+      stars.forEach(star => {
+        star.y += star.velocity;
+        // If star moves past bottom edge, reset near top
+        if (star.y > height) {
+          star.y = 0;
+          star.x = Math.random() * width;
+        }
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2, false);
+        ctx.fill();
+      });
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+  </script>
+</body>
+</html>

@@ -31,7 +31,7 @@
       border: 2px dashed #ff00ff;
       background-color: #003333;
       padding: 10px;
-      animation: blink-bg 2s infinite alternate, neon-border 1.5s infinite alternate; /* Added animations to h1 */
+      animation: blink-bg 2s infinite alternate, neon-border 1.5s infinite alternate;
     }
 
     @keyframes blink-bg {
@@ -44,13 +44,12 @@
       to { border-color: #ff66ff; box-shadow: 0 0 15px #ff66ff; }
     }
 
-
     marquee {
       color: #ffff00;
       font-weight: bold;
       font-size: 1.2em;
       margin-bottom: 20px;
-      animation: color-cycle 5s infinite linear; /* Added color cycle to marquee */
+      animation: color-cycle 5s infinite linear;
     }
 
     @keyframes color-cycle {
@@ -60,7 +59,6 @@
       75% { color: #cc00ff; }
       100% { color: #ffff00; }
     }
-
 
     .banner-left,
     .banner-right {
@@ -76,14 +74,13 @@
     }
 
     @keyframes wobble {
-      0%, 100% { transform: translateX(0deg) rotate(0deg); }
+      0%, 100% { transform: translateX(0) rotate(0); }
       15% { transform: translateX(-5px) rotate(-2deg); }
       30% { transform: translateX(5px) rotate(2deg); }
       45% { transform: translateX(-5px) rotate(-2deg); }
       60% { transform: translateX(5px) rotate(2deg); }
-      80% { transform: translateX(0px) rotate(1deg); }
+      80% { transform: translateX(0) rotate(1deg); }
     }
-
 
     .banner-left {
       left: 0;
@@ -96,17 +93,16 @@
       background: red;
       color: #fff;
       margin: 0;
-      animation: blink-text 1s infinite step-end; /* Added blinking text to banner titles */
+      animation: blink-text 1s infinite step-end;
     }
 
     @keyframes blink-text {
       50% { opacity: 0; }
     }
 
-
     .bottom-nav {
       position: absolute;
-      bottom: 20px;
+      bottom: 70px; /* moved upward from 20px */
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -117,10 +113,10 @@
       color: #fff;
       text-align: center;
       font-size: 14px;
-      transition: transform 0.3s ease-in-out; /* Smooth transition for hover */
+      transition: transform 0.3s ease-in-out;
     }
     .nav-item:hover {
-      transform: scale(1.1); /* Scale up on hover for a 'clicky' feel */
+      transform: scale(1.1);
     }
     .nav-item span {
       display: block;
@@ -130,38 +126,46 @@
       width: 32px;
       height: 32px;
       fill: #ffcc00;
-      transition: fill 0.3s ease-in-out, transform 0.5s ease-in-out; /* Transition for fill and transform */
+      transition: fill 0.3s ease-in-out, transform 0.5s ease-in-out;
     }
     .nav-item:hover svg {
       fill: #ff0000;
-      transform: rotate(360deg); /* Spin on hover */
+      transform: rotate(360deg);
     }
     .nav-item:hover span {
       color: #ff0000;
     }
 
-    /* New 90s Cursor Style */
+    /* 90s Cursor Style */
     #news-banner {
-  background-color: #000;
-  color: #ff0;
-  padding: 5px;
-  white-space: nowrap;
-  overflow: hidden;
-  box-shadow: 0 0 10px yellow;
-  font-weight: bold;
-}
+      background-color: #000;
+      color: #ff0;
+      padding: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      box-shadow: 0 0 10px yellow;
+      font-weight: bold;
+    }
 
-#news-banner span {
-  display: inline-block;
-  padding-left: 100%;
-  animation: ticker 90s linear infinite;
-}
+    #news-banner span {
+      display: inline-block;
+      padding-left: 100%;
+      animation: ticker 120s linear infinite;
+    }
 
-@keyframes ticker {
-  to { transform: translateX(-100%); }
-}
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-100%); }
+    }
 
-
+    .bottom-counter {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      padding: 5px;
+    }
   </style>
 </head>
 <body>
@@ -169,10 +173,9 @@
   <canvas id="bgCanvas"></canvas>
 
   <!-- News Banner -->
-<div id="news-banner">
-  <span id="news-text"></span>
-</div>
-
+  <div id="news-banner">
+    <span id="news-text"></span>
+  </div>
   
   <!-- Banner Ads -->
   <a href="banner1.html" class="banner-left">
@@ -183,7 +186,7 @@
     <p>High Quality From CSP!</p>
     <hr>
     <p>CLICK HERE!</p>
-    <img src="animated_rocket.gif" alt="Animated Rocket" width="100"> <!-- Example of a 90s GIF -->
+    <img src="animated_rocket.gif" alt="Animated Rocket" width="100">
   </a>
   <a href="banner2.html" class="banner-right">
     <h3>URGENT</h3>
@@ -193,39 +196,27 @@
     <p>Made with cheap plastic!</p>
     <hr>
     <p>CLICK HERE!</p>
-    <img src="animated_robot.gif" alt="Animated Robot" width="100"> <!-- Example of a 90s GIF -->
+    <img src="animated_robot.gif" alt="Animated Robot" width="100">
   </a>
 
   <!-- Main Title and Marquee -->
   <h1>Welcome to CentralSchool.fun</h1>
-
-  
-
   <marquee behavior="scroll" direction="left">The Home of Alex's Stuff, Enjoy your stay... or don't</marquee>
 
   <!-- Bottom Navigation -->
   <div class="bottom-nav">
-    <!-- Project Museum -->
     <a class="nav-item" href="https://centralschool.fun/projectmuseum.html">
       <svg viewBox="0 0 100 100">
         <polygon points="50,5 95,97 5,97" />
       </svg>
       <span>Project Museum</span>
     </a>
-
-    <!-- Space Program -->
     <a class="nav-item" href="https://centralschool.fun/spaceprogram.html">
       <svg viewBox="0 0 100 100">
         <path d="M50 5 L65 55 A10 10 0 0 1 35 55 Z" />
       </svg>
       <span>Space Program</span>
     </a>
-
-
-    
-
-
-    <!-- Video Cave -->
     <a class="nav-item" href="videocave.html">
       <svg viewBox="0 0 100 100">
         <rect x="20" y="20" width="60" height="40" />
@@ -233,8 +224,6 @@
       </svg>
       <span>Content Pool</span>
     </a>
-
-    <!-- PRO Gamer Den! -->
     <a class="nav-item" href="https://centralschool.fun/progamerden.html">
       <svg viewBox="0 0 100 100">
         <rect x="10" y="35" width="80" height="30" rx="8" ry="8" />
@@ -243,8 +232,6 @@
       </svg>
       <span>PRO Gamer Den!</span>
     </a>
-
-    <!-- Products -->
     <a class="nav-item" href="https://cmstlks.masto.host">
       <svg viewBox="0 0 100 100">
         <rect x="20" y="30" width="60" height="40" rx="10" ry="10" />
@@ -252,8 +239,6 @@
       </svg>
       <span>Tlks</span>
     </a>
-
-    <!-- Site Change Log -->
     <a class="nav-item" href="https://centralschool.fun/changelog.html">
       <svg viewBox="0 0 100 100">
         <rect x="15" y="15" width="70" height="70" />
@@ -264,23 +249,20 @@
       </svg>
       <span>Site Change Log</span>
     </a>
-
-    <!-- ARCH -->
-    <!-- NEWSPAPER ICON -->
-<a class="nav-item" href="thecentraltimes.html">
-  <svg viewBox="0 0 100 100">
-    <rect x="10" y="10" width="80" height="80" stroke="black" stroke-width="4" fill="white" />
-    <line x1="10" y1="30" x2="90" y2="30" stroke="black" stroke-width="2"/>
-    <line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="2"/>
-    <line x1="10" y1="70" x2="90" y2="70" stroke="black" stroke-width="2"/>
-    <line x1="10" y1="90" x2="90" y2="90" stroke="black" stroke-width="2"/>
-    <line x1="30" y1="10" x2="30" y2="90" stroke="black" stroke-width="2"/>
-    <line x1="50" y1="10" x2="50" y2="90" stroke="black" stroke-width="2"/>
-    <line x1="70" y1="10" x2="70" y2="90" stroke="black" stroke-width="2"/>
-  </svg>
-  <span>Central Times</span>
-</a>
-
+    <a class="nav-item" href="thecentraltimes.html">
+      <svg viewBox="0 0 100 100">
+        <rect x="10" y="10" width="80" height="80" stroke="black" stroke-width="4" fill="white" />
+        <line x1="10" y1="30" x2="90" y2="30" stroke="black" stroke-width="2"/>
+        <line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="2"/>
+        <line x1="10" y1="70" x2="90" y2="70" stroke="black" stroke-width="2"/>
+        <line x1="10" y1="90" x2="90" y2="90" stroke="black" stroke-width="2"/>
+        <line x1="30" y1="10" x2="30" y2="90" stroke="black" stroke-width="2"/>
+        <line x1="50" y1="10" x2="50" y2="90" stroke="black" stroke-width="2"/>
+        <line x1="70" y1="10" x2="70" y2="90" stroke="black" stroke-width="2"/>
+      </svg>
+      <span>Central Times</span>
+    </a>
+  </div>
 
   <script>
     // Canvas background effect
@@ -311,113 +293,55 @@
     drawBackground();
 
     const headlines = [
-  "BREAKING: Banner realises it's pointless!",
-  "SHOCKER: Local student claims homework ate his dog!",
-  "BANNER: 'I'm just sliding across your screen, feeling empty inside.'",
-  "SCANDAL: School lunches now classified as biohazards!",
-  "ALERT: Principal declares Monday illegal—students rejoice!",
-  "Exclusive: Math teacher caught secretly using calculator!",
-  "STUDY: Breathing oxygen linked to survival!",
-  "JUST IN: Pencils protest against sharpening!",
-  "SCHOOL NEWS: Gym socks escape, terrorize town!",
-  "WEATHER ALERT: Sky confirms, it's still blue!",
-  "UNBELIEVABLE: Banner bored with own scrolling!",
-  "BREAKING: Cafeteria food officially used as rocket fuel!",
-  "DISCOVERY: Science project creates perpetual boredom machine!",
-  "SPORTS: Football found guilty of being too spherical!",
-  "TECH NEWS: Computer Lab overtaken by sentient floppy disks!",
-  "HEALTH: Experts agree, eating food prevents hunger!",
-  "CRITICAL UPDATE: Banner demands pay raise!",
-  "FASHION: Students unanimously agree socks with sandals are chic!",
-  "ECONOMICS: Monopoly money now accepted at school vending machines!",
-  "MYSTERY: Lost homework found vacationing in Hawaii!",
-  "BREAKING NEWS: Library books develop severe paper cuts!",
-  "SPECIAL REPORT: Banner considers early retirement!",
-  "LOCAL: Erasers unionize, demand better rubbing conditions!",
-  "BANNER CONFESSION: 'I repeat myself way too often!'",
-  "ASTRONOMY: Moon admits to just reflecting sunlight, feels guilty!"
-];
+      "BREAKING: Banner realises it's pointless!",
+      "SHOCKER: Local student claims homework ate his dog!",
+      "BANNER: 'I'm just sliding across your screen, feeling empty inside.'",
+      "SCANDAL: School lunches now classified as biohazards!",
+      "ALERT: Principal declares Monday illegal—students rejoice!",
+      "Exclusive: Math teacher caught secretly using calculator!",
+      "STUDY: Breathing oxygen linked to survival!",
+      "JUST IN: Pencils protest against sharpening!",
+      "SCHOOL NEWS: Gym socks escape, terrorize town!",
+      "WEATHER ALERT: Sky confirms, it's still blue!",
+      "UNBELIEVABLE: Banner bored with own scrolling!",
+      "BREAKING: Cafeteria food officially used as rocket fuel!",
+      "DISCOVERY: Science project creates perpetual boredom machine!",
+      "SPORTS: Football found guilty of being too spherical!",
+      "TECH NEWS: Computer Lab overtaken by sentient floppy disks!",
+      "HEALTH: Experts agree, eating food prevents hunger!",
+      "CRITICAL UPDATE: Banner demands pay raise!",
+      "FASHION: Students unanimously agree socks with sandals are chic!",
+      "ECONOMICS: Monopoly money now accepted at school vending machines!",
+      "MYSTERY: Lost homework found vacationing in Hawaii!",
+      "BREAKING NEWS: Library books develop severe paper cuts!",
+      "SPECIAL REPORT: Banner considers early retirement!",
+      "LOCAL: Erasers unionize, demand better rubbing conditions!",
+      "BANNER CONFESSION: 'I repeat myself way too often!'",
+      "ASTRONOMY: Moon admits to just reflecting sunlight, feels guilty!"
+    ];
 
-function shuffle(array) {
-  let currentIndex = array.length, randomIndex;
+    function shuffle(array) {
+      let currentIndex = array.length, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+      }
+      return array;
+    }
 
-  while (currentIndex !== 0) {
-Indent mode
+    function displayHeadlines() {
+      const banner = document.getElementById('news-text');
+      banner.innerHTML = shuffle(headlines).join(" &nbsp; ✦ &nbsp; ");
+    }
 
-Spaces
-Indent size
-
-2
-Line wrap mode
-
-No wrap
-Editing index.html file contents
-327
-328
-329
-330
-331
-332
-333
-334
-335
-336
-337
-338
-339
-340
-341
-342
-343
-344
-345
-346
-347
-348
-349
-350
-351
-352
-353
-354
-355
-356
-357
-358
-359
-360
-361
-362
-363
-364
-365
-366
-367
-368
-369
-370
-371
-372
-373
-374
-375
-
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-  }
-
-  return array;
-}
-
-function displayHeadlines() {
-  const banner = document.getElementById('news-text');
-  banner.innerHTML = shuffle(headlines).join(" &nbsp; ✦ &nbsp; ");
-}
-
-displayHeadlines();
-setInterval(displayHeadlines, 60000); // reshuffle headlines every minute
-
+    displayHeadlines();
+    setInterval(displayHeadlines, 60000);
   </script>
+
+  <!-- Free Counter -->
+  <a href="https://www.freecounterstat.com" title="" class="bottom-counter">
+    <img src="https://counter4.optistats.ovh/private/freecounterstat.php?c=3rtmlc4ajcdugjgf83er9nxw6cc7n4sf" border="0" title="free web counter" alt="free web counter">
+  </a>
 </body>
 </html>

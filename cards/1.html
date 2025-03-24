@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NFC Info Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin: 0.5rem 0;
+    }
+
+    p {
+      color: #555;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-btn {
+      background: #0077ff;
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 0.8rem 1.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .contact-btn:hover {
+      background: #005ecc;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="https://via.placeholder.com/100" alt="Avatar" class="avatar">
+    <h1>Alex Johnson</h1>
+    <p>Product Designer | Tech Enthusiast | Coffee Addict</p>
+    <button class="contact-btn" onclick="contactMe()">Contact Me</button>
+  </div>
+
+  <script>
+    function contactMe() {
+      window.location.href = "mailto:alex@example.com";
+    }
+  </script>
+</body>
+</html>

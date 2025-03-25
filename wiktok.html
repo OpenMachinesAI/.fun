@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="https://ih1.redbubble.net/image.1811822792.6690/raf,360x360,075,t,fafafa:ca443f4786.u1.jpg">
+
+  <meta charset="UTF-8">
+  <title>WikTok</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #000;
+      color: #fff;
+    }
+    #logo {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 999;
+    }
+    #logo img {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+    }
+    #card-container {
+      height: 100vh;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
+    .card {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+      padding: 20px;
+      background: #000;
+    }
+    .card img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      opacity: 0.6;
+    }
+    .overlay {
+      z-index: 1;
+      position: relative;
+    }
+    .info {
+      margin-bottom: 80px;
+    }
+    .info h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .info p {
+      font-size: 16px;
+    }
+    .sidebar {
+      position: absolute;
+      right: 10px;
+      bottom: 100px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .sidebar button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .sidebar img {
+      width: 30px;
+      height: 30px;
+    }
+    #detail-view {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: none;
+      flex-direction: column;
+      z-index: 100;
+    }
+    #back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 101;
+    }
+    #article-frame {
+      flex: 1;
+      width: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="logo">
+    <img src="https://ih1.redbubble.net/image.1811822792.6690/raf,360x360,075,t,fafafa:ca443f4786.u1.jpg" alt="WikTok Logo">
+  </div>
+
+  <div id="card-container"></div>
+
+  <div id="detail-view">
+    <button id="back-button">← Back</button>
+    <iframe id="article-frame"></iframe>
+  </div>
+
+  <script>
+    const cardContainer = document.getElementById('card-container');
+    const detailView = document.getElementById('detail-view');
+    const articleFrame = document.getElementById('article-frame');
+    const backButton = document.getElementById('back-button');
+
+    const introCards = [
+      {
+        title: 'Welcome to WikTok',
+        extract: 'Your daily dose of random knowledge, presented TikTok-style.',
+        thumbnail: { source: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Wikipedia-logo.png/800px-Wikipedia-logo.png' }
+      },
+      {
+        title: 'How It Works',
+        extract: 'Scroll to explore random Wikipedia articles. Tap any card to read the full entry.',
+        thumbnail: { source: 'https://cdn-icons-png.flaticon.com/512/1828/1828919.png' }
+      },
+      {
+        title: 'Share and Learn',
+        extract: 'Like, share, and dive into endless rabbit holes of fascinating info.',
+        thumbnail: { source: 'https://cdn-icons-png.flaticon.com/512/1057/1057242.png' }
+      }
+    ];
+
+    introCards.forEach(data => {
+      const card = createCard(data);
+      cardContainer.appendChild(card);
+    });
+
+    async function fetchRandomArticle() {
+      try {
+        const response = await fetch('https://en.wikipedia.org/api/rest_v1/page/random/summary');
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error fetching article:', error);
+        return null;
+      }
+    }
+
+    function createCard(article) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        ${article.thumbnail ? `<img src="${article.thumbnail.source}" alt="${article.title}">` : ''}
+        <div class="overlay">
+          <div class="info">
+            <h2>${article.title}</h2>
+            <p>${article.extract || 'No summary available.'}</p>
+          </div>
+        </div>
+        <div class="sidebar">
+          <button onclick="alert('Liked!')">❤️</button>
+          <button onclick="shareArticle('${encodeURIComponent(article.title)}')">
+            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828911.png" alt="Share">
+          </button>
+        </div>
+      `;
+      card.addEventListener('click', () => showDetailView(article));
+      return card;
+    }
+
+    function showDetailView(article) {
+      const articleUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(article.title.replace(/ /g, '_'))}`;
+      articleFrame.src = articleUrl;
+      detailView.style.display = 'flex';
+      cardContainer.style.display = 'none';
+    }
+
+    function shareArticle(title) {
+      const url = `https://en.wikipedia.org/wiki/${title}`;
+      navigator.clipboard.writeText(url);
+      alert('Article link copied to clipboard!');
+    }
+
+    backButton.addEventListener('click', () => {
+      detailView.style.display = 'none';
+      articleFrame.src = '';
+      cardContainer.style.display = 'block';
+    });
+
+    async function loadArticleCard() {
+      const article = await fetchRandomArticle();
+      if (article) {
+        const card = createCard(article);
+        cardContainer.appendChild(card);
+      }
+    }
+
+    for (let i = 0; i < 3; i++) {
+      loadArticleCard();
+    }
+
+    cardContainer.addEventListener('scroll', () => {
+      if (cardContainer.scrollTop + cardContainer.clientHeight >= cardContainer.scrollHeight - 100) {
+        loadArticleCard();
+      }
+    });
+  </script>
+</body>
+</html>

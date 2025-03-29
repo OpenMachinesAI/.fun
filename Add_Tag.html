@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NFC Card Auto Uploader</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #888888;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      max-width: 500px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    input, button {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-family: 'Poppins', sans-serif;
+    }
+    #writeButton {
+      background-color: #007bff;
+      color: white;
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="mainContainer">
+    <h1>NFC Card Generator 🌈</h1>
+
+    <form id="itemForm">
+      <input type="text" id="name" placeholder="Item Name" required /><br/>
+      <input type="text" id="category" placeholder="Category" required /><br/>
+      <input type="text" id="location" placeholder="Location" required /><br/>
+      <input type="text" id="note" placeholder="Quick Note" /><br/>
+      <input type="file" id="imageUpload" accept="image/*" /><br/>
+      <button type="submit">Generate & Upload</button>
+    </form>
+
+    <button id="writeButton">📲 Write to NFC Tag</button>
+
+    <div id="result" style="margin-top:20px;"></div>
+  </div>
+
+  <script>
+    const tokenBase64 = "Z2l0aHViX3BhdF8xMUE0RU9RTkEweWJkMzg5T1hlejFlX2FUTUh1aklrY0ljN0xoak0yYzMwNjM5dHl3czZTQUlpSlR3U0lYUFA5YjNON1BZM0FHU2liMjBzT3VI";
+    const token = atob(tokenBase64);
+    const repo = "OpenMachinesAI/.fun";
+    const branch = "main";
+    let latestLink = "";
+
+    if (/Android/i.test(navigator.userAgent) && "NDEFWriter" in window) {
+      document.getElementById('writeButton').style.display = 'block';
+    }
+
+    document.getElementById('itemForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const category = document.getElementById('category').value;
+      const location = document.getElementById('location').value;
+      const note = document.getElementById('note').value;
+      const imageFile = document.getElementById('imageUpload').files[0];
+
+      const code = Math.floor(1000 + Math.random() * 9000);
+      const filename = `${code}.html`;
+      const path = `cards/${filename}`;
+
+      let imageBase64 = "";
+      if (imageFile) {
+        const reader = new FileReader();
+        reader.onloadend = async function () {
+          imageBase64 = reader.result;
+          await generateAndUpload();
+        };
+        reader.readAsDataURL(imageFile);
+      } else {
+        await generateAndUpload();
+      }
+
+      async function generateAndUpload() {
+        const cardHTML = `
+        <html><head><link href='https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap' rel='stylesheet'><style>
+        body { background: #888888; margin:0; height:100vh; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Poppins', sans-serif; }
+        .card { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); margin-top: 20px; z-index:1; }
+        .popup { position: fixed; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); padding: 20px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); text-align: center; z-index: 1000; animation: slideUp 0.6s ease; }
+        .glow-box { width: 60px; height: 140px; margin: 20px auto; border-radius: 15px; background: white; position: relative; }
+        .glow-box::after { content: ''; position: absolute; inset: 0; border-radius: 15px; background: linear-gradient(90deg, #ff00ff, #ffff00, #00ffff); filter: blur(30px); opacity: 0.9; z-index: -1; }
+        @keyframes slideUp { from { bottom: -200px; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        @media (min-width: 768px) { .popup { top: 50%; bottom: auto; transform: translate(-50%, -50%); } }
+        </style></head><body>
+        <div class="popup" id="popup">
+          <h2>New Tag Scanned</h2>
+          <div class="glow-box"></div>
+          <button onclick="document.getElementById('popup').style.display='none';">View Information</button>
+        </div>
+        <div class="card">
+          ${imageBase64 ? `<img src="${imageBase64}" alt="${name}" style="width:100%; border-radius:12px;"/>` : ''}
+          <h2>${name}</h2>
+          <p><strong>Category:</strong> ${category}</p>
+          <p><strong>Location:</strong> ${location}</p>
+          <p><strong>Note:</strong> ${note}</p>
+        </div>
+        </body></html>
+        `;
+
+        const content = btoa(unescape(encodeURIComponent(cardHTML)));
+
+        const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+          method: "PUT",
+          headers: {
+            "Authorization": "token " + token,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: `Add NFC card ${filename}`,
+            content: content,
+            branch: branch
+          })
+        });
+
+        if (res.ok) {
+          latestLink = `https://openmachinesai.github.io/.fun/cards/${filename}`;
+          document.getElementById('result').innerHTML = `
+            ✅ Uploaded!<br/>
+            🔗 <a href="${latestLink}" target="_blank">${latestLink}</a><br/>
+            📱 Copy this link to your NFC tag!
+          `;
+        } else {
+          const error = await res.text();
+          document.getElementById('result').innerHTML = `❌ Error: ${error}`;
+        }
+      }
+
+    });
+
+    document.getElementById('writeButton').addEventListener('click', async () => {
+      if (!latestLink) {
+        alert("Please generate a card first.");
+        return;
+      }
+      try {
+        const ndef = new NDEFWriter();
+        await ndef.write(latestLink);
+        alert("✅ NFC Tag written successfully!");
+      } catch (error) {
+        alert("❌ NFC write failed: " + error);
+      }
+    });
+  </script>
+
+</body>
+</html>

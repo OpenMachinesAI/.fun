@@ -1,260 +1,377 @@
 {
   "videos": [
     {
+      "name": "Alex (the video)",
+      "tags": [
+        "sam",
+        "sam",
+        "sam"
+      ],
+      "creator": "Alex Rose",
+      "video_url": "vids/My Movie 24.mov"
+    },
+    {
       "name": "Don't your dare Abudel!",
-      "tags": ["memes"],
+      "tags": [
+        "memes"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/abudel.mp4"
     },
     {
       "name": "How old is cole?",
-      "tags": ["memes", "cole"],
+      "tags": [
+        "memes",
+        "cole"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/age and badge numbet.mp4"
     },
     {
       "name": "Spoofed Man Ruins the world?",
-      "tags": ["memes", "Central Avengers"],
+      "tags": [
+        "memes",
+        "Central Avengers"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/are these thing ruining everything.mp4"
     },
     {
       "name": "Cole's Crime",
-      "tags": ["cole", "memes"],
+      "tags": [
+        "cole",
+        "memes"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/cole level crime.mp4"
     },
     {
       "name": "This Billboard is hiding a dark secret",
-      "tags": ["LGBTQ"],
+      "tags": [
+        "LGBTQ"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/Hiding-Dark-Secrets.mp4"
     },
     {
       "name": "Advice on how not to land a rocket",
-      "tags": ["Space Program", "Eagle"],
+      "tags": [
+        "Space Program",
+        "Eagle"
+      ],
       "creator": "CSP Inc",
       "video_url": "vids/HowNotToLandEagle.mp4"
     },
     {
       "name": "The hardest minion edit",
-      "tags": ["minion"],
+      "tags": [
+        "minion"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/edit1.mp4"
     },
     {
       "name": "Low Taper Reed",
-      "tags": ["memes"],
+      "tags": [
+        "memes"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/low-taper-reed.mp4"
     },
     {
       "name": "Wanted for crimes",
-      "tags": ["Central Avengers"],
+      "tags": [
+        "Central Avengers"
+      ],
       "creator": "GamingMontage",
       "video_url": "vids/wanted.mp4"
     },
     {
       "name": "DIY Tutorial",
-      "tags": ["diy", "tutorial"],
+      "tags": [
+        "diy",
+        "tutorial"
+      ],
       "creator": "DIYGuru",
       "video_url": "https://example.com/diy_tutorial.mp4"
     },
     {
       "name": "Dave Shortreed: The Song",
-      "tags": ["music"],
+      "tags": [
+        "music"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/DAVE SHORTREED SONG.mp4"
     },
     {
       "name": "Un-named",
-      "tags": ["no-name"],
+      "tags": [
+        "no-name"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/20250303-0149-37.8664981.mp4"
     },
     {
       "name": "Snack Widow Chips",
-      "tags": ["Central Avengers"],
+      "tags": [
+        "Central Avengers"
+      ],
       "creator": "UnboxingPro",
       "video_url": "vids/SNACK WIDOWS.mp4"
     },
     {
       "name": "ARCH Industries Edit",
-      "tags": ["edit", "tech"],
+      "tags": [
+        "edit",
+        "tech"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/arch edit.mp4"
     },
     {
       "name": "Elon Ma: CEO OF SpaceY",
-      "tags": ["Space Program", "SpaceY"],
+      "tags": [
+        "Space Program",
+        "SpaceY"
+      ],
       "creator": "Elon MA",
       "video_url": "vids/ceo of spacey.mp4"
     },
     {
       "name": "Chrome Busters Be Like:",
-      "tags": ["ChromeBusters"],
+      "tags": [
+        "ChromeBusters"
+      ],
       "creator": "CBx Inc",
       "video_url": "vids/chrome busters.mp4"
     },
     {
       "name": "We ride the bus (Not Like US)",
-      "tags": ["music"],
+      "tags": [
+        "music"
+      ],
       "creator": "Central Records",
       "video_url": "vids/drake diss.mp4"
     },
     {
       "name": "Elon Musk Being Dumb, (Elon Ma is better)",
-      "tags": ["Elon"],
+      "tags": [
+        "Elon"
+      ],
       "creator": "Elon Musk",
       "video_url": "vids/elon being idiot.mp4"
     },
     {
       "name": "How to become student",
-      "tags": ["guide"],
+      "tags": [
+        "guide"
+      ],
       "creator": "Mr LongReed",
       "video_url": "vids/how to go to central.mp4"
     },
     {
       "name": "I Don't wanna go to school",
-      "tags": ["education"],
+      "tags": [
+        "education"
+      ],
       "creator": "EducationExpert",
       "video_url": "vids/i dont wanna go to school.mp4"
     },
     {
-      "name": "You sent this to my grandaughter 😡",
-      "tags": ["MR SHORTREED"],
+      "name": "You sent this to my grandaughter \ud83d\ude21",
+      "tags": [
+        "MR SHORTREED"
+      ],
       "creator": "Grandma420",
       "video_url": "vids/longreed messAGE.mp4"
     },
     {
       "name": "Mr Shortreed",
-      "tags": ["shortreed"],
+      "tags": [
+        "shortreed"
+      ],
       "creator": "Mr Shortreed",
       "video_url": "vids/mr shortreed.mp4"
     },
     {
       "name": "Blowtorch enrichment",
-      "tags": ["Enrichment", "Google Classroom"],
+      "tags": [
+        "Enrichment",
+        "Google Classroom"
+      ],
       "creator": "Enrichment",
       "video_url": "vids/play with  ablowtorch.mp4"
     },
     {
       "name": "Sam Edit be like:",
-      "tags": ["sam"],
+      "tags": [
+        "sam"
+      ],
       "creator": "Sam",
       "video_url": "vids/sam edit.mp4"
     },
     {
       "name": "Massive RizzGPT Be like:",
-      "tags": ["RizzGPT"],
+      "tags": [
+        "RizzGPT"
+      ],
       "creator": "Just another non existent company (JANEC INC)",
       "video_url": "vids/squid game.mp4"
     },
     {
       "name": "i am the squid game master",
-      "tags": ["games", "mr shortreed"],
+      "tags": [
+        "games",
+        "mr shortreed"
+      ],
       "creator": "Mr Shortreed",
       "video_url": "vids/the squid game master.mp4"
     },
     {
       "name": "Alex and Cole get explled",
-      "tags": ["Cole", "Alex"],
+      "tags": [
+        "Cole",
+        "Alex"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/alex and cole get expelled.mp4"
     },
     {
       "name": "Canadian Schools",
-      "tags": ["Songs", "Music"],
+      "tags": [
+        "Songs",
+        "Music"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/calfironia schools.mp4"
     },
     {
       "name": "Cole Bullying",
-      "tags": ["cole", "bullying"],
+      "tags": [
+        "cole",
+        "bullying"
+      ],
       "creator": "cole cam",
       "video_url": "vids/cole was elonmusk.mp4"
     },
     {
       "name": "Cute Valentines Day Vibes",
-      "tags": ["travel", "guide"],
+      "tags": [
+        "travel",
+        "guide"
+      ],
       "creator": "TravelGuide",
       "video_url": "vids/cute valtimse day vibes.mp4"
     },
     {
       "name": "Google Classroom Musical",
-      "tags": ["music", "classroom"],
+      "tags": [
+        "music",
+        "classroom"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/google classroom msucial.mp4"
     },
     {
       "name": "Mr Shortred: I used to run the school",
-      "tags": ["music"],
+      "tags": [
+        "music"
+      ],
       "creator": "Mr Shortreed",
       "video_url": "vids/i used to run the school.mp4"
     },
     {
       "name": "Wa Pa Central Style",
-      "tags": ["music", "songs"],
+      "tags": [
+        "music",
+        "songs"
+      ],
       "creator": "Mr Shortreed",
       "video_url": "vids/wa pa central style.mp4"
     },
     {
       "name": "Introducing Central Money (we have a problem)",
-      "tags": ["money", "enrichment"],
+      "tags": [
+        "money",
+        "enrichment"
+      ],
       "creator": "Money God 69420",
       "video_url": "vids/we got an issue.mp4"
     },
     {
       "name": "Pro at being an idiot",
-      "tags": ["Central Avengers"],
+      "tags": [
+        "Central Avengers"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/Alex Rose Idiot.mp4"
     },
     {
       "name": "Gpts got us fallin in love tonight!",
-      "tags": ["RizzGPP", "song", "music"],
+      "tags": [
+        "RizzGPP",
+        "song",
+        "music"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/GPT'S got us falling in love again.mp4"
     },
     {
       "name": "Chrome Busters theme song",
-      "tags": ["ChromeBusters"],
+      "tags": [
+        "ChromeBusters"
+      ],
       "creator": "CBx Inc",
       "video_url": "vids/busting theme.mp4"
     },
     {
       "name": "Sam Remix (Remix)",
-      "tags": ["Sam"],
+      "tags": [
+        "Sam"
+      ],
       "creator": "Sam Music Inc",
       "video_url": "vids/funnt.mp4"
     },
     {
       "name": "Ginger the russian spy",
-      "tags": ["ginger"],
+      "tags": [
+        "ginger"
+      ],
       "creator": "Dog",
       "video_url": "vids/ginger the russian spy.mp4"
     },
     {
       "name": "MR SHORTREED'S EMAIL SONG",
-      "tags": ["song", "music"],
+      "tags": [
+        "song",
+        "music"
+      ],
       "creator": "KSI",
       "video_url": "vids/in the thick of it.mp4"
     },
     {
       "name": "Shortreed Anime",
-      "tags": ["anime", "japan"],
+      "tags": [
+        "anime",
+        "japan"
+      ],
       "creator": "Alex Rose",
       "video_url": "vids/mr shortreed anime.mp4"
     },
     {
       "name": "Song of the summer",
-      "tags": ["song", "music"],
+      "tags": [
+        "song",
+        "music"
+      ],
       "creator": "Song of the summer",
       "video_url": "vids/song of the summer.mp4"
     },
     {
       "name": "Zuckerturd's  Rizz Scale",
-      "tags": ["memes"],
+      "tags": [
+        "memes"
+      ],
       "creator": "Mark Zuckerturd",
       "video_url": "vids/zuckerturd.mp4"
     }

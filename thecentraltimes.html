@@ -1,64 +1,286 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coming Soon!</title>
-    <style>
-        body {
-            background-color: yellow;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            color: #0000FF;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        h1 {
-            font-size: 50px;
-            margin-top: 100px;
-            text-shadow: 2px 2px 5px #FF0000;
-        }
-        p {
-            font-size: 24px;
-            color: #FF00FF;
-            text-shadow: 1px 1px 5px #FFFF00;
-        }
-        .blink {
-            animation: blink 1s infinite;
-        }
-        @keyframes blink {
-            50% {
-                opacity: 0;
-            }
-        }
-        marquee {
-            font-size: 30px;
-            color: #00FF00;
-            margin-top: 20px;
-        }
-        .footer {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 16px;
-            color: #00FFFF;
-        }
-      }
-        h4 {
-            font-size: 50px;
-            margin-top: 100px;
-            text-shadow: 2px 2px 5px black;
-        }
-    </style>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Central School News</title>
+  <style>
+    /* Body & Background */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Neue', cursive;
+      background: linear-gradient(135deg, #6a0dad, #0000ff);
+      color: #f0e6fa;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      font-size: 2.5em;
+      background: rgba(0,0,0,0.3);
+      border-bottom: 4px double #dda0dd;
+    }
+    /* Top featured section */
+    .featured-section {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .featured-video {
+      flex: 2;
+      background: #fff;
+      padding: 10px;
+      border: 4px solid #4b0082;
+      box-shadow: 5px 5px 0 #000;
+    }
+    .featured-video video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .featured-title {
+      margin-top: 10px;
+      font-size: 1.5em;
+      color: #4b0082;
+    }
+    .previous-videos {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .prev-card {
+      display: flex;
+      gap: 10px;
+      background: #f3e5f5;
+      padding: 5px;
+      border: 3px solid #4b0082;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .prev-card:hover { transform: scale(1.02); }
+    .prev-card img {
+      width: 100px;
+      height: 56px;
+      object-fit: cover;
+      border: 2px solid #4b0082;
+    }
+    .prev-card .prev-title {
+      font-size: 1em;
+      color: #4b0082;
+      align-self: center;
+    }
+    /* All videos grid */
+    .all-videos {
+      max-width: 1200px;
+      margin: 20px auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 15px;
+      padding: 0 20px 40px;
+    }
+    .video-card {
+      background-color: #f3e5f5;
+      border: 3px solid #4b0082;
+      padding: 10px;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .video-card:hover {
+      transform: scale(1.05);
+      box-shadow: 5px 5px 0 #000;
+    }
+    .video-card img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border: 4px solid #4b0082;
+    }
+    .video-card h2 {
+      margin: 10px 0 0;
+      font-size: 1.1em;
+      color: #4b0082;
+    }
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.5s;
+    }
+    .modal-window {
+      background: #ddd;
+      border: 2px solid #4b0082;
+      width: 80%;
+      max-width: 800px;
+      box-shadow: 5px 5px 0 #000;
+      animation: slideDown 0.5s ease-out;
+    }
+    .modal-header {
+      background: #4b0082;
+      color: #fff;
+      padding: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header button {
+      background: #e0d7f3;
+      border: 2px outset #fff;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    .modal-content {
+      padding: 10px;
+      background: #fff;
+    }
+    .modal-content video {
+      width: 100%;
+      height: auto;
+      max-height: 80vh;
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
 </head>
 <body>
-    <h1>Times will be here soon!</h1>
-    <p>CMS Times will be printed here weekly!</p>
-    <marquee behavior="scroll" direction="left">Exciting things are on the way!!!</marquee>
-    <p class="blink">Don't forget to bookmark this!</p>
-    <div class="footer">
-        <h4>CMS Times is not owned by ARCH but will be hosted here</h4>
+  <header>CSN</header>
+
+  <div class="featured-section">
+    <div class="featured-video" id="featured-video">
+      <video id="featured-player" controls>
+        <source id="featured-source" src="" type="video/mp4">
+        Your browser doesn’t support video.
+      </video>
+      <div class="featured-title" id="featured-title">Loading...</div>
     </div>
+    <div class="previous-videos" id="previous-videos">
+      <!-- JS will inject 3 previous clips here -->
+    </div>
+  </div>
+
+  <div class="all-videos" id="video-list">
+    <!-- JS will inject all clips here when you scroll -->
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span id="modal-title">Video Player</span>
+        <div>
+          <button id="fullscreen-btn">Full Screen</button>
+          <button id="close-btn">Close</button>
+        </div>
+      </div>
+      <div class="modal-content">
+        <video id="modal-video" controls>
+          <source id="video-source" src="" type="video/mp4">
+          Your browser doesn’t support video.
+        </video>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allVideos = [];
+    const featuredPlayer = document.getElementById('featured-player');
+    const featuredSource = document.getElementById('featured-source');
+    const featuredTitle = document.getElementById('featured-title');
+    const prevContainer = document.getElementById('previous-videos');
+    const videoList = document.getElementById('video-list');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalVideo = document.getElementById('modal-video');
+    const modalSource = document.getElementById('video-source');
+    const modalTitle = document.getElementById('modal-title');
+
+    async function fetchVideos() {
+      try {
+        const res = await fetch('https://salexai-funserver.hf.space/album/B0p532ODWH4KDMb');
+        const data = await res.json();
+        allVideos = data.videos;
+        setupFeatured(allVideos);
+        renderPrevious(allVideos.slice(1,4));
+        renderAll(allVideos);
+      } catch (e) {
+        console.error('Fetch failed:', e);
+      }
+    }
+
+    function setupFeatured(videos) {
+      const vid = videos[0];
+      const title = vid.caption?.trim() || 'Unnamed Clip';
+      featuredSource.src = vid.url;
+      featuredPlayer.load();
+      featuredTitle.textContent = title;
+    }
+
+    function renderPrevious(videos) {
+      prevContainer.innerHTML = '';
+      videos.forEach(vid => {
+        const title = vid.caption?.trim() || 'Unnamed Clip';
+        const thumb = vid.poster?.trim() || 'https://via.placeholder.com/100x56?text=No+Preview';
+        const card = document.createElement('div');
+        card.className = 'prev-card';
+        card.innerHTML = `
+          <img src="${thumb}" alt="thumb">
+          <div class="prev-title">${title}</div>
+        `;
+        card.addEventListener('click', () => {
+          featuredSource.src = vid.url;
+          featuredPlayer.load();
+          featuredTitle.textContent = title;
+        });
+        prevContainer.appendChild(card);
+      });
+    }
+
+    function renderAll(videos) {
+      videoList.innerHTML = '';
+      videos.forEach(vid => {
+        const title = vid.caption?.trim() || 'Unnamed Clip';
+        const thumb = vid.poster?.trim() || 'https://via.placeholder.com/320x180?text=No+Preview';
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.innerHTML = `
+          <img src="${thumb}" alt="thumb">
+          <h2>${title}</h2>
+        `;
+        card.addEventListener('click', () => openModal(title, vid.url));
+        videoList.appendChild(card);
+      });
+    }
+
+    function openModal(title, url) {
+      modalTitle.textContent = title;
+      modalSource.src = url;
+      modalVideo.load();
+      modalOverlay.style.display = 'flex';
+    }
+    document.getElementById('close-btn').addEventListener('click', () => {
+      modalVideo.pause();
+      modalOverlay.style.display = 'none';
+    });
+    document.getElementById('fullscreen-btn').addEventListener('click', () => {
+      if (modalVideo.requestFullscreen) modalVideo.requestFullscreen();
+      else if (modalVideo.webkitRequestFullscreen) modalVideo.webkitRequestFullscreen();
+      else if (modalVideo.msRequestFullscreen) modalVideo.msRequestFullscreen();
+    });
+
+    fetchVideos();
+  </script>
 </body>
 </html>

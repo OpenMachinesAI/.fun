@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Warning: Tab Virus</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .popup {
+      background: #222;
+      border: 2px solid red;
+      border-radius: 10px;
+      padding: 30px;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 0 20px red;
+    }
+    .popup h2 {
+      color: red;
+    }
+    .popup button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .yes {
+      background-color: darkred;
+      color: white;
+    }
+    .no {
+      background-color: gray;
+      color: white;
+    }
+  </style>
+  <script>
+    let tabCount = 5;
+
+    function unleashTabs() {
+      for (let i = 0; i < tabCount; i++) {
+        spawnTab();
+      }
+    }
+
+    function spawnTab() {
+      const insults = [
+        "Your CPU needs a retirement plan.",
+        "This Chromebook couldn't run Minesweeper.",
+        "Is this a potato or a computer?",
+        "I’ve seen calculators with more RAM.",
+        "Your specs are an insult to silicon.",
+        "Fan speed: 9000 RPM. Performance: 0.",
+        "This thing lags in Notepad.",
+        "Did your Chromebook come with Windows 95?",
+        "Your GPU just cried.",
+        "Storage: yes. Speed: no."
+      ];
+
+      const colors = ["red", "green", "blue", "purple", "yellow", "cyan", "orange"];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const features = `width=300,height=300,left=${Math.random()*screen.availWidth},top=${Math.random()*screen.availHeight}`;
+      const win = window.open("", "", features);
+      if (!win) return;
+
+      // Play a beep sound (base64)
+      const audio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=");
+      audio.play();
+
+      const insult = insults[Math.floor(Math.random() * insults.length)];
+
+      win.document.body.style.margin = 0;
+      win.document.body.style.height = "100vh";
+      win.document.body.style.display = "flex";
+      win.document.body.style.alignItems = "center";
+      win.document.body.style.justifyContent = "center";
+      win.document.body.style.fontSize = "20px";
+      win.document.body.style.textAlign = "center";
+      win.document.body.style.backgroundColor = color;
+      win.document.title = "TAB VIRUS ACTIVE";
+      win.document.body.innerHTML = `<div>${insult}</div>`;
+
+      // Flashing colors
+      setInterval(() => {
+        const newColor = colors[Math.floor(Math.random() * colors.length)];
+        win.document.body.style.backgroundColor = newColor;
+      }, 300);
+
+      // Bouncing
+      let dx = Math.random() > 0.5 ? 10 : -10;
+      let dy = Math.random() > 0.5 ? 10 : -10;
+      let x = win.screenX;
+      let y = win.screenY;
+
+      const bounceInterval = setInterval(() => {
+        if (win.closed) {
+          clearInterval(bounceInterval);
+          tabCount *= 2;
+          unleashTabs();
+          return;
+        }
+        x += dx;
+        y += dy;
+
+        if (x <= 0 || x + win.outerWidth >= screen.availWidth) dx *= -1;
+        if (y <= 0 || y + win.outerHeight >= screen.availHeight) dy *= -1;
+
+        try {
+          win.moveTo(x, y);
+        } catch (e) {
+          clearInterval(bounceInterval);
+        }
+      }, 50);
+    }
+  </script>
+</head>
+<body>
+  <div class="popup">
+    <h2>🚨 TAB VIRUS WARNING 🚨</h2>
+    <p>
+      Proceeding will crash your Chromebook with an unrelenting storm of browser tabs.<br>
+      Tabs will bounce, flash, insult your specs, and multiply like digital gremlins.<br>
+      This is your last chance to turn back.
+    </p>
+    <button class="yes" onclick="unleashTabs()">YES - Unleash Chaos</button>
+    <button class="no" onclick="alert('You have chosen peace... for now.')">NO - I Value My Life</button>
+  </div>
+</body>
+</html>

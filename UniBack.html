@@ -5,160 +5,90 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UniShare Admin Tool</title>
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 1em;
-      background-color: #f8f0ff;
-      color: #333;
-    }
-    h1 {
-      text-align: center;
-      color: #6a0dad;
-    }
-    .section {
-      background: white;
-      padding: 1em;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin-bottom: 1em;
-    }
-    label {
-      display: block;
-      margin-top: 0.5em;
-      font-weight: bold;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 0.5em;
-      margin-top: 0.3em;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      margin-top: 1em;
-      padding: 0.7em 1.5em;
-      background: #6a0dad;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .generated-url {
-      word-break: break-all;
-      background: #eee;
-      padding: 1em;
-      border-radius: 5px;
-      margin-top: 1em;
-    }
-    .list-builder {
-      margin-bottom: 2em;
-    }
-    .item-row {
-      border: 1px solid #ddd;
-      padding: 0.5em;
-      margin-bottom: 0.5em;
-      border-radius: 5px;
-    }
+    body { font-family: sans-serif; margin: 0; padding: 1em; background-color: #f8f0ff; color: #333; }
+    h1 { text-align: center; color: #6a0dad; }
+    .section { background: white; padding: 1em; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 1em; }
+    label { display: block; margin-top: 0.5em; font-weight: bold; }
+    input, textarea, select { width: 100%; padding: 0.5em; margin-top: 0.3em; border-radius: 5px; border: 1px solid #ccc; }
+    button { margin-top: 1em; padding: 0.7em 1.5em; background: #6a0dad; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    .item-row { border: 1px solid #ddd; padding: 0.5em; margin-bottom: 0.5em; border-radius: 5px; }
   </style>
 </head>
 <body>
   <h1>UniShare Admin Tool</h1>
 
   <div class="section">
-    <div class="list-builder">
-      <label>List Title:</label>
-      <input type="text" id="listTitle" placeholder="e.g. Field Trip Info" />
-
-      <div id="sections"></div>
-
-      <button onclick="addSection()">+ Add Section</button>
-      <button onclick="generate()">Publish</button>
-    </div>
-
-    <label>URL for Sharing:</label>
-    <div id="generated" class="generated-url"></div>
+    <label>List Title:</label>
+    <input type="text" id="listTitle" placeholder="e.g. Field Trip Info" />
+    <div id="sections"></div>
+    <button onclick="addSection()">+ Add Section</button>
+    <button onclick="generate()">Publish</button>
   </div>
 
   <script>
     function addSection() {
-      const container = document.createElement('div');
-      container.className = 'section';
-
-      const titleInput = document.createElement('input');
-      titleInput.placeholder = 'Section Title';
-
+      const container = document.createElement('div'); container.className = 'section';
+      const titleInput = document.createElement('input'); titleInput.placeholder = 'Section Title';
       const itemsContainer = document.createElement('div');
-      container.appendChild(titleInput);
-      container.appendChild(itemsContainer);
-
-      const addItemBtn = document.createElement('button');
-      addItemBtn.textContent = '+ Add Item';
-      addItemBtn.type = 'button';
+      container.append(titleInput, itemsContainer);
+      const addItemBtn = document.createElement('button'); addItemBtn.textContent = '+ Add Item'; addItemBtn.type = 'button';
       addItemBtn.onclick = () => addItem(itemsContainer);
-
       container.appendChild(addItemBtn);
       document.getElementById('sections').appendChild(container);
     }
 
     function addItem(container) {
-      const row = document.createElement('div');
-      row.className = 'item-row';
-
-      const title = document.createElement('input');
-      title.placeholder = 'Item Title';
-
-      const file = document.createElement('input');
-      file.type = 'file';
-
-      row.appendChild(title);
-      row.appendChild(file);
+      const row = document.createElement('div'); row.className = 'item-row';
+      const title = document.createElement('input'); title.placeholder = 'Item Title';
+      const file = document.createElement('input'); file.type = 'file';
+      row.append(title, file);
       container.appendChild(row);
     }
 
-   async function generate() {
-  const allSections = [];
-  const sectionDivs = document.querySelectorAll('#sections > .section');
+    async function generate() {
+      const allSections = [];
+      document.querySelectorAll('#sections > .section').forEach(sec => {
+        const sectionTitle = sec.querySelector('input').value || '';
+        const items = [];
+        sec.querySelectorAll('.item-row').forEach(row => {
+          const itemTitle = row.querySelector('input[type=text]').value || '';
+          const fileInput = row.querySelector('input[type=file]');
+          if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            items.push({ title: itemTitle, link: '' }); // placeholder
+            // we push placeholder and then read base64 asynchronously
+          }
+        });
+        allSections.push({ sectionTitle, items });
+      });
 
-  for (let sec of sectionDivs) {
-    const sectionTitle = sec.querySelector('input')?.value || '';
-    const items = [];
-
-    const rows = sec.querySelectorAll('.item-row');
-    for (let row of rows) {
-      const itemTitle = row.querySelector('input[type=text]')?.value || '';
-      const fileInput = row.querySelector('input[type=file]');
-      if (fileInput?.files.length > 0) {
-        const file = fileInput.files[0];
-        const base64 = await toBase64(file);
-        items.push({ title: itemTitle, link: base64 });
+      // Read files and convert to base64
+      for (let sec of allSections) {
+        for (let item of sec.items) {
+          const rows = [...document.querySelectorAll('.item-row')];
+          const match = rows.find(r => r.querySelector('input[type=text]').value === item.title);
+          const fileInput = match.querySelector('input[type=file]');
+          const base64 = await toBase64(fileInput.files[0]);
+          item.link = base64;
+        }
       }
+
+      const encoded = encodeURIComponent(JSON.stringify(allSections));
+      const param = `?generated=${encoded}`;
+
+      // Notify parent to store in its localStorage and update URL
+      window.parent.postMessage({ type: 'storeUniShareURL', url: param }, '*');
+
+      // Also update iframe URL without reload
+      history.pushState(null, '', param);
+      alert('✅ Sent to devices');
     }
-
-    allSections.push({ sectionTitle, items });
-  }
-
-  const encoded = encodeURIComponent(JSON.stringify(allSections));
-  const generatedParam = `?generated=${encoded}`;
-
-  // Save locally (optional)
-  localStorage.setItem("lastGeneratedURL", generatedParam);
-
-  // Send to parent page
-  window.parent.postMessage({ type: "unishareUpdate", url: generatedParam }, "*");
-
-  // Optional: update iframe address bar (if needed in iframe context)
-  history.pushState(null, "", generatedParam);
-
-  alert("✅ Sent to devices");
-}
 
     function toBase64(file) {
       return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
+        const reader = new FileReader(); reader.readAsDataURL(file);
         reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
+        reader.onerror = e => reject(e);
       });
     }
   </script>

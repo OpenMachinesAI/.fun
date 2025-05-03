@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>UniShare Admin Tool</title>
   <style>
     body {
@@ -44,15 +44,15 @@
       border-radius: 5px;
       cursor: pointer;
     }
-    .generated-url {
-      word-break: break-all;
-      background: #eee;
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #6a0dad;
+      color: white;
       padding: 1em;
-      border-radius: 5px;
-      margin-top: 1em;
-    }
-    .list-builder {
-      margin-bottom: 2em;
+      border-radius: 10px;
+      display: none;
     }
     .item-row {
       border: 1px solid #ddd;
@@ -66,23 +66,18 @@
   <h1>UniShare Admin Tool</h1>
 
   <div class="section">
-    <div class="list-builder">
-      <label>List Title:</label>
-      <input type="text" id="listTitle" placeholder="e.g. Field Trip Info" />
+    <label>List Title:</label>
+    <input type="text" id="listTitle" placeholder="e.g. Field Trip Info" />
 
-      <div id="sections"></div>
+    <div id="sections"></div>
 
-      <button onclick="addSection()">+ Add Section</button>
-      <button onclick="generate()">Publish</button>
-    </div>
-
-    <label>URL for Sharing:</label>
-    <div id="generated" class="generated-url"></div>
+    <button onclick="addSection()">+ Add Section</button>
+    <button onclick="generate()">Publish</button>
   </div>
 
-  <script>
-    const sections = [];
+  <div class="toast" id="toast">Sent to devices.</div>
 
+  <script>
     function addSection() {
       const container = document.createElement('div');
       container.className = 'section';
@@ -118,6 +113,15 @@
       container.appendChild(row);
     }
 
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.style.display = "block";
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 3000);
+    }
+
     async function generate() {
       const allSections = [];
       const sectionDivs = document.querySelectorAll('#sections > .section');
@@ -140,18 +144,22 @@
         allSections.push({ sectionTitle, items });
       }
 
-      // Prepare the JSON structure for URL
-      const encoded = encodeURIComponent(allSections.join('NEWLISTBREAK'));
-      const output = `${location.origin}${location.pathname}?generated=${encoded}`;
-      
-      // Send the generated URL to the parent iframe (if any)
-      const iframe = window.parent.document.querySelector('iframe');
-      if (iframe) {
-        iframe.contentWindow.postMessage({ type: 'updateURL', url: output }, '*');
+      const encoded = encodeURIComponent(JSON.stringify(allSections));
+      const newURL = `${location.origin}${location.pathname}?generated=${encoded}`;
+
+      // Update URL
+      if (window.top === window.self) {
+        history.replaceState(null, "", `?generated=${encoded}`);
+      } else {
+        // inside iframe - communicate via parent if needed
+        window.location.href = `?generated=${encoded}`;
       }
 
-      // Display notification to the user
-      document.getElementById('generated').textContent = 'Sent to devices: ' + output;
+      // Log to localStorage
+      localStorage.setItem('lastGeneratedURL', newURL);
+
+      // Notify
+      showToast("Sent to devices.");
     }
 
     function toBase64(file) {

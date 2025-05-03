@@ -163,27 +163,32 @@
       listViewDiv.style.display = 'block';
     }
 
-    // Load all listname parameters
-    for (const [key, value] of urlParams.entries()) {
-      try {
-        const decoded = decodeURIComponent(value);
-        const parsed = JSON.parse(decoded);
-        if (Array.isArray(parsed)) {
-          lists[key] = parsed;
-          const tile = document.createElement('div');
-          tile.className = 'list-tile';
-          tile.innerHTML = `<strong>${key}</strong><br>${parsed.length} sections`;
-          tile.onclick = () => showList(key);
-          overviewDiv.appendChild(tile);
-          showToast(`Loaded list: ${key}`);
+    // Load from single ?lists= parameter with NEWLISTBREAK separator
+    if (urlParams.has('lists')) {
+      const rawData = decodeURIComponent(urlParams.get('lists'));
+      const listStrings = rawData.split('NEWLISTBREAK');
+
+      listStrings.forEach((listStr, index) => {
+        try {
+          const parsed = JSON.parse(listStr);
+          if (Array.isArray(parsed)) {
+            const listName = `List ${index + 1}`;
+            lists[listName] = parsed;
+            const tile = document.createElement('div');
+            tile.className = 'list-tile';
+            tile.innerHTML = `<strong>${listName}</strong><br>${parsed.length} sections`;
+            tile.onclick = () => showList(listName);
+            overviewDiv.appendChild(tile);
+            showToast(`Loaded ${listName}`);
+          }
+        } catch (e) {
+          console.warn('Failed to parse list:', e);
         }
-      } catch (e) {
-        console.warn(`Failed to parse list ${key}:`, e);
-      }
+      });
     }
 
     if (Object.keys(lists).length === 0) {
-      overviewDiv.innerHTML = '<p style="padding:1em">No valid list data found in URL parameters.</p>';
+      overviewDiv.innerHTML = '<p style="padding:1em">No valid list data found in ?lists parameter.</p>';
     }
   </script>
 </body>

@@ -116,40 +116,42 @@
       container.appendChild(row);
     }
 
-    async function generate() {
-      const allSections = [];
-      const sectionDivs = document.querySelectorAll('#sections > .section');
+   async function generate() {
+  const allSections = [];
+  const sectionDivs = document.querySelectorAll('#sections > .section');
 
-      for (let sec of sectionDivs) {
-        const sectionTitle = sec.querySelector('input')?.value || '';
-        const items = [];
+  for (let sec of sectionDivs) {
+    const sectionTitle = sec.querySelector('input')?.value || '';
+    const items = [];
 
-        const rows = sec.querySelectorAll('.item-row');
-        for (let row of rows) {
-          const itemTitle = row.querySelector('input[type=text]')?.value || '';
-          const fileInput = row.querySelector('input[type=file]');
-          if (fileInput?.files.length > 0) {
-            const file = fileInput.files[0];
-            const base64 = await toBase64(file);
-            items.push({ title: itemTitle, link: base64 });
-          }
-        }
-
-        allSections.push({ sectionTitle, items });
+    const rows = sec.querySelectorAll('.item-row');
+    for (let row of rows) {
+      const itemTitle = row.querySelector('input[type=text]')?.value || '';
+      const fileInput = row.querySelector('input[type=file]');
+      if (fileInput?.files.length > 0) {
+        const file = fileInput.files[0];
+        const base64 = await toBase64(file);
+        items.push({ title: itemTitle, link: base64 });
       }
-
-      const encoded = encodeURIComponent(JSON.stringify(allSections));
-      const newURL = `${location.origin}${location.pathname}?generated=${encoded}`;
-
-      // Save to localStorage
-      localStorage.setItem("lastGeneratedURL", newURL);
-
-      // Push URL to address bar without reloading
-      history.pushState(null, "", `?generated=${encoded}`);
-
-      // Toast-like confirmation
-      alert("✅ Sent to devices");
     }
+
+    allSections.push({ sectionTitle, items });
+  }
+
+  const encoded = encodeURIComponent(JSON.stringify(allSections));
+  const generatedParam = `?generated=${encoded}`;
+
+  // Save locally (optional)
+  localStorage.setItem("lastGeneratedURL", generatedParam);
+
+  // Send to parent page
+  window.parent.postMessage({ type: "unishareUpdate", url: generatedParam }, "*");
+
+  // Optional: update iframe address bar (if needed in iframe context)
+  history.pushState(null, "", generatedParam);
+
+  alert("✅ Sent to devices");
+}
 
     function toBase64(file) {
       return new Promise((resolve, reject) => {

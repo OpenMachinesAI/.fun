@@ -1,0 +1,127 @@
+<!DOCTYPE html>  
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cole Game</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background-color: #f2f2f2;
+      padding: 30px;
+    }
+    #hangman-img {
+      width: 200px;
+      margin: 20px;
+    }
+    #word-display {
+      font-size: 2em;
+      letter-spacing: 10px;
+      margin: 20px;
+    }
+    #message {
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #333;
+    }
+    input[type="text"] {
+      font-size: 1em;
+      padding: 5px;
+      width: 60px;
+      text-align: center;
+    }
+    button {
+      padding: 5px 10px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ColeMan: Guess the Word!</h1>
+  <img id="hangman-img" src="https://www.centralschool.fun/sprites/costume2%20(2).svg" alt="Hangman Sprite" />
+  <div id="word-display">_ _ _ _ _</div>
+  <p>Guess a letter:</p>
+  <input type="text" id="guess-input" maxlength="1" />
+  <button onclick="makeGuess()">Guess</button>
+  <p id="message"></p>
+
+  <script>
+    const words = [
+      "balloon", "avocado", "blanket", "dolphin", "machine", "internet", "journal", "kingdom",
+      "learning", "notebook", "octagon", "pyramid", "quantum", "rainbow", "sandbox", "teacher",
+      "umbrella", "village", "whistle", "xylophone", "yogurt", "zealous", "awesome", "biscuit",
+      "caramel", "dynamic", "emerald", "freight", "glacier", "harvest", "iceberg", "justice",
+      "karaoke", "leopard", "marbles", "nectars", "optical", "panther", "quality", "railway",
+      "sapphire", "turbine", "unicorn", "voltage", "warrior", "xenon", "yellowish", "zeppelin"
+    ];
+    const sprites = [
+      "https://www.centralschool.fun/sprites/costume2%20(2).svg",
+      "https://www.centralschool.fun/sprites/costume3%20(2).svg",
+      "https://www.centralschool.fun/sprites/costume4%20(2).svg",
+      "https://www.centralschool.fun/sprites/costume5.svg",
+      "https://www.centralschool.fun/sprites/costume6.svg",
+      "https://www.centralschool.fun/sprites/costume7.svg",
+      "https://www.centralschool.fun/sprites/costume8.svg" // Fail image
+    ];
+
+    const chosenWord = words[Math.floor(Math.random() * words.length)];
+    let guessedLetters = Array(chosenWord.length).fill('_');
+    let wrongGuesses = 0;
+    const maxWrong = sprites.length - 1;
+
+    function updateDisplay() {
+      document.getElementById("word-display").textContent = guessedLetters.join(" ");
+      document.getElementById("hangman-img").src = sprites[wrongGuesses];
+    }
+
+    function makeGuess() {
+      const input = document.getElementById("guess-input");
+      const guess = input.value.toLowerCase();
+      input.value = '';
+
+      if (!guess.match(/[a-z]/i) || guess.length !== 1) {
+        document.getElementById("message").textContent = "Please enter a single letter.";
+        return;
+      }
+
+      if (guessedLetters.includes(guess)) {
+        document.getElementById("message").textContent = "You already guessed that letter.";
+        return;
+      }
+
+      let correct = false;
+      for (let i = 0; i < chosenWord.length; i++) {
+        if (chosenWord[i] === guess) {
+          guessedLetters[i] = guess;
+          correct = true;
+        }
+      }
+
+      if (!correct) {
+        wrongGuesses++;
+      }
+
+      updateDisplay();
+
+      if (guessedLetters.join('') === chosenWord) {
+        document.getElementById("message").textContent = "🎉 You guessed the word!";
+        disableInput();
+      } else if (wrongGuesses >= maxWrong) {
+        document.getElementById("message").textContent = `💀 Game Over! The word was "${chosenWord}".`;
+        updateDisplay();
+        disableInput();
+      } else {
+        document.getElementById("message").textContent = correct ? "Correct!" : "Wrong guess!";
+      }
+    }
+
+    function disableInput() {
+      document.getElementById("guess-input").disabled = true;
+    }
+
+    updateDisplay();
+  </script>
+
+</body>
+</html>

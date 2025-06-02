@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BADCAST 31</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    button, input {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin: 10px;
+      cursor: pointer;
+    }
+    #output {
+      max-width: 600px;
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+    #character-img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      margin-top: 20px;
+      border: 4px solid #fff;
+      border-radius: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>CMS PODCAST</h1>
+  <input id="topic" placeholder="Enter a podcast topic..." />
+  <button id="start">▶️ Start Podcast</button>
+  <div id="output"></div>
+  <img id="character-img" src="" alt="Character" />
+
+  <script>
+    const output = document.getElementById('output');
+    const startButton = document.getElementById('start');
+    const topicInput = document.getElementById('topic');
+    const imgEl = document.getElementById('character-img');
+
+    const assistantMessages = [];
+    let interval = null;
+    let topic = "";
+
+    const SYSTEM_PROMPT = `You are a model designed to generate unhinged storys using charcters Sam (the god of moistness), Cole (a tech genius kid), Alex (a robotics and rocket engineer), Josh (a fat ogre from the swamp who happens to be Cole's EA), Professer Musk (CEO of Tesla/SpaceX who creates disturbing ideas and stutters like 'uh yeah'). Output one line from one character. Format: [NAME] their dialogue. ONLY one line per character per response.`
+
+    const characterImages = {
+      SAM: "https://placekitten.com/200/200",
+      COLE: "https://placebear.com/200/200",
+      ALEX: "https://placebeard.it/200x200",
+      JOSH: "https://place-puppy.com/200x200",
+      MUSK: "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcTk0_tLLzT8w2DC5UbKXOO1Gop4jZsQqUS0UusrEo1HXjxWxjq8fDibmOL0GvS9gU6gHNPlxIT0mo3e92w"
+    };
+
+    function getVoicesMap() {
+      const voices = speechSynthesis.getVoices();
+      return {
+        SAM: voices.find(v => v.name.includes("Daniel")) || voices[0],
+        COLE: voices.find(v => v.name.includes("Google UK English Male")) || voices[1],
+        ALEX: voices.find(v => v.name.includes("Fred")) || voices[2],
+        JOSH: voices.find(v => v.name.includes("Junior")) || voices[3],
+        MUSK: voices.find(v => v.name.includes("Albert")) || voices[4],
+      };
+    }
+
+    async function fetchLine() {
+      const messages = [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: `The podcast topic is: "${topic}". Generate the next spoken words from a charcter. Do not use the same charcter twice in a row.` },
+        ...assistantMessages.map(content => ({ role: "assistant", content }))
+      ];
+
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer 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"
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: messages
+        })
+      });
+
+      const data = await res.json();
+      return data.choices[0].message.content;
+    }
+
+    function showCharacterImage(character) {
+      const src = characterImages[character.toUpperCase()];
+      if (src) {
+        imgEl.src = src;
+        imgEl.style.display = 'block';
+      } else {
+        imgEl.style.display = 'none';
+      }
+    }
+
+    function speak(text) {
+      const voices = getVoicesMap();
+      const match = text.match(/\[(.*?)\]/);
+      const char = match ? match[1].trim().toUpperCase() : "SAM";
+      const voice = voices[char] || speechSynthesis.getVoices()[0];
+
+      showCharacterImage(char);
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.voice = voice;
+      speechSynthesis.speak(utterance);
+    }
+
+    async function generateAndSpeak() {
+      const line = await fetchLine();
+      assistantMessages.push(line);
+      output.textContent += line + "\n";
+      speak(line);
+    }
+
+    startButton.onclick = () => {
+      if (interval) return;
+      topic = topicInput.value.trim() || "moisture-based propulsion systems";
+      generateAndSpeak();
+      interval = setInterval(generateAndSpeak, 8000);
+    };
+
+    speechSynthesis.onvoiceschanged = () => getVoicesMap();
+  </script>
+</body>
+</html>
+

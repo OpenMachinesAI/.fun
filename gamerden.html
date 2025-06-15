@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GamerDen Launcher</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    #channels {
+      display: flex;
+      overflow-x: auto;
+      padding: 20px;
+      gap: 20px;
+      scroll-snap-type: x mandatory;
+    }
+    .channel {
+      flex: 0 0 auto;
+      width: 120px;
+      text-align: center;
+      cursor: pointer;
+      scroll-snap-align: center;
+      transition: transform 0.3s;
+    }
+    .channel img {
+      width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.7);
+    }
+    .channel.selected {
+      transform: scale(1.2);
+    }
+    #games {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 20px;
+    }
+    .game-card {
+      background: #2a2a2a;
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .game-card:hover {
+      transform: translateY(-5px);
+    }
+    .game-card img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+    }
+    .game-card h4 {
+      margin: 10px 0;
+      font-size: 0.9rem;
+    }
+    .game-card a {
+      display: block;
+      padding: 10px;
+      background: #007acc;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 0 0 10px 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="channels"></div>
+  <div id="games"></div>
+
+  <script>
+    // Load JSON and initialize UI
+    fetch('index.json')
+      .then(r => r.json())
+      .then(data => {
+        const channelsEl = document.getElementById('channels');
+        const gamesEl    = document.getElementById('games');
+
+        data.forEach((chan, i) => {
+          const chDiv = document.createElement('div');
+          chDiv.className = 'channel';
+          chDiv.innerHTML = \`
+            <img src="\${chan.logo}" alt="\${chan.title}">
+            <div>\${chan.title}</div>
+          \`;
+          chDiv.addEventListener('click', () => {
+            // highlight selected
+            document.querySelectorAll('.channel').forEach(c=>c.classList.remove('selected'));
+            chDiv.classList.add('selected');
+            // populate games
+            gamesEl.innerHTML = '';
+            chan.games.forEach(g => {
+              const gDiv = document.createElement('div');
+              gDiv.className = 'game-card';
+              gDiv.innerHTML = \`
+                <img src="\${g.logo}" alt="\${g.title}">
+                <h4>\${g.title}</h4>
+                <a href="\${g.link}" target="_blank">Play</a>
+              \`;
+              gamesEl.appendChild(gDiv);
+            });
+          });
+          channelsEl.appendChild(chDiv);
+          // auto‑select first
+          if (i === 0) chDiv.click();
+        });
+      })
+      .catch(err => {
+        console.error('Failed to load index.json:', err);
+        document.body.innerHTML = '<p style="color:red; padding:20px;">Error loading games list.</p>';
+      });
+  </script>
+
+</body>
+</html>

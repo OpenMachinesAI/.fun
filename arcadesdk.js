@@ -1,5 +1,5 @@
 // This code i wrote is based on ScratchX Documentation And Examples
-// May not work fully
+// May not work fully (V1.1)
 
 (function() {
   var ext = {};
@@ -110,5 +110,12 @@
     url: 'https://centralschool.fun'
   };
 
-  ScratchExtensions.register('Coding Arcade SDK', descriptor, ext);
+  // Register extension for ScratchX, works when loaded from a URL
+  if (typeof ScratchExtensions !== 'undefined') {
+    ScratchExtensions.register('Coding Arcade SDK', descriptor, ext);
+  } else if (window.parent && window.parent.ScratchExtensions) {
+    window.parent.ScratchExtensions.register('Coding Arcade SDK', descriptor, ext);
+  } else {
+    console.error('ScratchExtensions API not found.');
+  }
 })();

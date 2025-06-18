@@ -1,5 +1,5 @@
 // This code i wrote is based on ScratchX Documentation And Examples
-// May not work fully (V1.1)
+// May not work fully (v1.2)
 
 (function() {
   var ext = {};
@@ -43,11 +43,10 @@
     }
   };
 
-  // Show Toast Animation. this is copied from the turbowarp toast plugin
+  // Show Toast Animation with sandbox fallback
   ext.show_toast = function(callback) {
+    // Create toast element
     const toast = document.createElement('div');
-
-    // Set content
     toast.innerHTML = (ticketCount >= 1)
       ? `<div style="font-size: 24px; font-weight: 500;">You Won:</div>
          <div style="font-size: 72px; font-weight: bold;">${ticketCount}</div>
@@ -73,26 +72,32 @@
       transition: 'opacity 0.5s ease',
       fontFamily: 'Arial, sans-serif',
       lineHeight: '1.4',
+      whiteSpace: 'pre-line'
     });
 
-    // Add to DOM
-    document.body.appendChild(toast);
+    // Attempt to inject into parent document (for URL-loaded scripts sandboxed in iframe)
+    let targetDoc;
+    try {
+      targetDoc = window.parent && window.parent.document;
+      if (targetDoc && targetDoc.body) {
+        targetDoc.body.appendChild(toast);
+      } else {
+        throw new Error('Parent body not accessible');
+      }
+    } catch (e) {
+      // Fallback: simple alert
+      alert(toast.innerText);
+      if (typeof callback === 'function') callback();
+      return;
+    }
 
-    // Animate in
-    setTimeout(() => {
-      toast.style.opacity = '1';
-    }, 50);
-
-    // Animate out and cleanup
+    // Animate in/out on the appended element
+    setTimeout(() => toast.style.opacity = '1', 50);
     setTimeout(() => {
       toast.style.opacity = '0';
       setTimeout(() => {
-        if (toast && toast.parentNode) {
-          toast.remove();
-        }
-        if (typeof callback === 'function') {
-          callback(); // notify Scratch it's done
-        }
+        if (toast.parentNode) toast.remove();
+        if (typeof callback === 'function') callback();
       }, 500);
     }, 3000);
   };

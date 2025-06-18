@@ -1,5 +1,6 @@
 // This code i wrote is based on ScratchX Documentation And Examples
-// May not work fully (v1.2)
+// May not work fully
+// Version 1.3
 
 (function() {
   var ext = {};
@@ -43,63 +44,31 @@
     }
   };
 
-  // Show Toast Animation with sandbox fallback
+  // Show Toast Animation via postMessage to parent window
   ext.show_toast = function(callback) {
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.innerHTML = (ticketCount >= 1)
-      ? `<div style="font-size: 24px; font-weight: 500;">You Won:</div>
-         <div style="font-size: 72px; font-weight: bold;">${ticketCount}</div>
-         <div style="font-size: 24px;">Tickets</div>`
-      : `<div style="font-size: 36px; font-weight: bold;">Better Luck Next Time</div>
-         <div style="font-size: 20px;">You don't have enough points</div>`;
+    // Prepare content and style
+    const html = (ticketCount >= 1)
+      ? `<div style="font-size:24px;font-weight:500;">You Won:</div>
+         <div style="font-size:72px;font-weight:bold;">${ticketCount}</div>
+         <div style="font-size:24px;">Tickets</div>`
+      : `<div style="font-size:36px;font-weight:bold;">Better Luck Next Time</div>
+         <div style="font-size:20px;">You don't have enough points</div>`;
+    const style = {
+      position:'fixed', top:'50%', left:'50%',
+      transform:'translate(-50%,-50%)', backgroundColor:'#fff', color:'#000',
+      border:'2px solid #000', padding:'32px', borderRadius:'20px',
+      textAlign:'center', boxShadow:'0 10px 30px rgba(0,0,0,0.3)',
+      zIndex:9999, opacity:0, transition:'opacity 0.5s ease',
+      fontFamily:'Arial, sans-serif', lineHeight:1.4
+    };
 
-    // Style the toast
-    Object.assign(toast.style, {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      backgroundColor: '#fff',
-      color: '#000',
-      border: '2px solid #000',
-      padding: '32px',
-      borderRadius: '20px',
-      textAlign: 'center',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-      zIndex: 9999,
-      opacity: '0',
-      transition: 'opacity 0.5s ease',
-      fontFamily: 'Arial, sans-serif',
-      lineHeight: '1.4',
-      whiteSpace: 'pre-line'
-    });
-
-    // Attempt to inject into parent document (for URL-loaded scripts sandboxed in iframe)
-    let targetDoc;
-    try {
-      targetDoc = window.parent && window.parent.document;
-      if (targetDoc && targetDoc.body) {
-        targetDoc.body.appendChild(toast);
-      } else {
-        throw new Error('Parent body not accessible');
-      }
-    } catch (e) {
-      // Fallback: simple alert
-      alert(toast.innerText);
-      if (typeof callback === 'function') callback();
-      return;
+    // Send toast details to parent context to render
+    if (window.parent) {
+      window.parent.postMessage({ type: 'EXT_TOAST', html, style }, '*');
     }
 
-    // Animate in/out on the appended element
-    setTimeout(() => toast.style.opacity = '1', 50);
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      setTimeout(() => {
-        if (toast.parentNode) toast.remove();
-        if (typeof callback === 'function') callback();
-      }, 500);
-    }, 3000);
+    // Always callback immediately
+    if (typeof callback === 'function') callback();
   };
 
   // blcoks and stuff
@@ -115,7 +84,7 @@
     url: 'https://centralschool.fun'
   };
 
-  // Register extension for ScratchX, works when loaded from a URL
+  // Register extension
   if (typeof ScratchExtensions !== 'undefined') {
     ScratchExtensions.register('Coding Arcade SDK', descriptor, ext);
   } else if (window.parent && window.parent.ScratchExtensions) {

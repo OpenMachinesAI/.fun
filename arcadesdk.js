@@ -17,12 +17,12 @@
 
   // Set total points
   ext.set_points = function(p) {
-    userPoints = parseInt(p);
+    userPoints = parseInt(p) || 0;
   };
 
   // Points per ticket
   ext.set_points_per_ticket = function(ppt) {
-    pointsPerTicket = parseInt(ppt);
+    pointsPerTicket = parseInt(ppt) || 1;
   };
 
   // figure shit out i guess
@@ -47,21 +47,15 @@
   ext.show_toast = function(callback) {
     const toast = document.createElement('div');
 
-    // Dynamic content
-    if (ticketCount >= 1) {
-      toast.innerHTML = `
-        <div style="font-size: 24px; font-weight: 500;">You Won:</div>
-        <div style="font-size: 72px; font-weight: bold;">${ticketCount}</div>
-        <div style="font-size: 24px;">Tickets</div>
-      `;
-    } else {
-      toast.innerHTML = `
-        <div style="font-size: 36px; font-weight: bold;">Better Luck Next Time</div>
-        <div style="font-size: 20px;">You don't have enough points</div>
-      `;
-    }
+    // Set content
+    toast.innerHTML = (ticketCount >= 1)
+      ? `<div style="font-size: 24px; font-weight: 500;">You Won:</div>
+         <div style="font-size: 72px; font-weight: bold;">${ticketCount}</div>
+         <div style="font-size: 24px;">Tickets</div>`
+      : `<div style="font-size: 36px; font-weight: bold;">Better Luck Next Time</div>
+         <div style="font-size: 20px;">You don't have enough points</div>`;
 
-    // Animation
+    // Style the toast
     Object.assign(toast.style, {
       position: 'fixed',
       top: '50%',
@@ -81,6 +75,7 @@
       lineHeight: '1.4',
     });
 
+    // Add to DOM
     document.body.appendChild(toast);
 
     // Animate in
@@ -92,8 +87,12 @@
     setTimeout(() => {
       toast.style.opacity = '0';
       setTimeout(() => {
-        toast.remove();
-        if (callback) callback();
+        if (toast && toast.parentNode) {
+          toast.remove();
+        }
+        if (typeof callback === 'function') {
+          callback(); // notify Scratch it's done
+        }
       }, 500);
     }, 3000);
   };

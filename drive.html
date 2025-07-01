@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scooter Guidance Assistant</title>
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --accent: #0066ff;
+      --throttle-on: #15c72e;
+      --brake-on: #d62828;
+      --inactive: #e0e0e0;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    #app {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+      font-size: 2rem;
+    }
+
+    section {
+      margin-bottom: 1.5rem;
+      background: var(--card);
+      padding: 1rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    #setup label {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    #cameraSelect,
+    #startBtn {
+      font-size: 1rem;
+      padding: 0.4rem 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+    }
+
+    #startBtn {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+
+    #startBtn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #feed {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 240px;
+      overflow: hidden;
+    }
+
+    video {
+      height: 100%;
+    }
+
+    #indicators {
+      display: flex;
+      justify-content: space-around;
+      gap: 1rem;
+    }
+
+    .indicator {
+      flex: 1;
+      text-align: center;
+      padding: 1rem 0;
+      font-size: 1.2rem;
+      border-radius: 0.8rem;
+      background: var(--inactive);
+      transition: background 0.3s;
+      user-select: none;
+    }
+
+    .indicator.active.throttle {
+      background: var(--throttle-on);
+      color: #fff;
+    }
+
+    .indicator.active.brake {
+      background: var(--brake-on);
+      color: #fff;
+    }
+
+    #directionDisplay {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    #jsonDisplay {
+      max-height: 260px;
+      overflow-y: auto;
+      background: #272727;
+      color: #e4e4e4;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      font-family: "Courier New", monospace;
+      font-size: 0.9rem;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Scooter Guidance Assistant</h1>
+
+    <!-- Camera setup -->
+    <section id="setup">
+      <label for="cameraSelect">Choose Camera:</label>
+      <select id="cameraSelect"></select>
+      <button id="startBtn" disabled>Start</button>
+    </section>
+
+    <!-- Live video feed -->
+    <section id="feed">
+      <video id="video" autoplay playsinline></video>
+    </section>
+
+    <!-- Throttle & Brake indicators -->
+    <section id="indicators">
+      <div id="throttleIndicator" class="indicator throttle">Throttle</div>
+      <div id="brakeIndicator" class="indicator brake">Brake</div>
+    </section>
+
+    <!-- Direction text -->
+    <section id="directionDisplay">
+      <p id="directionText">Waiting for instructions…</p>
+    </section>
+
+    <!-- JSON output -->
+    <section>
+      <div id="jsonDisplay">
+        <pre id="jsonOutput">{}</pre>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /***************** CONFIG *****************/
+    const GROQ_API_KEY = "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"; // demo key
+    const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+    const SYSTEM_PROMPT =
+      "You are a self driving eScooter You will be given a photo from the escooters camera. Please provide a 180 degree turning radious to turn the handel bars also provide a thrtlle value as true or false to tell if your clicking the thrtotle and a break value true of false\n\nUse Json";
+
+    /***************** CONSTANTS *****************/
+    const USER_IMAGE_LIMIT = 5; // Groq model supports up to 5 images
+    const MAX_MESSAGES = 30;    // Keep overall conversation context manageable
+
+    /***************** DOM *****************/
+    const cameraSelect = document.getElementById("cameraSelect");
+    const startBtn = document.getElementById("startBtn");
+    const video = document.getElementById("video");
+    const throttleIndicator = document.getElementById("throttleIndicator");
+    const brakeIndicator = document.getElementById("brakeIndicator");
+    const directionText = document.getElementById("directionText");
+    const jsonOutput = document.getElementById("jsonOutput");
+
+    /***************** STATE *****************/
+    let stream = null;
+    let captureTimer = null;
+    let frameCounter = 1;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const messageHistory = []; // { role, content }
+
+    /***************** CAMERA *****************/
+    async function listCameras() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const vids = devices.filter((d) => d.kind === "videoinput");
+        cameraSelect.innerHTML = "";
+        vids.forEach((d, i) => {
+          const opt = document.createElement("option");
+          opt.value = d.deviceId;
+          opt.textContent = d.label || `Camera ${i + 1}`;
+          cameraSelect.appendChild(opt);
+        });
+        startBtn.disabled = vids.length === 0;
+      } catch (err) {
+        console.error("enumerateDevices failed", err);
+      }
+    }
+
+    async function startStream() {
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: cameraSelect.value } },
+        audio: false,
+      });
+      video.srcObject = stream;
+      await new Promise((res) => (video.onloadedmetadata = res));
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      if (captureTimer) clearInterval(captureTimer);
+      captureTimer = setInterval(captureAndSend, 500);
+    }
+
+    /***************** HISTORY MANAGEMENT *****************/
+    function trimHistory() {
+      // Ensure only last MAX_MESSAGES kept
+      while (messageHistory.length > MAX_MESSAGES) messageHistory.shift();
+
+      // Ensure only last USER_IMAGE_LIMIT user messages retained
+      let userCount = messageHistory.reduce((n, m) => n + (m.role === "user" ? 1 : 0), 0);
+      if (userCount > USER_IMAGE_LIMIT) {
+        for (let i = 0; i < messageHistory.length && userCount > USER_IMAGE_LIMIT; i++) {
+          if (messageHistory[i].role === "user") {
+            messageHistory.splice(i, 1);
+            i--;
+            userCount--;
+          }
+        }
+      }
+    }
+
+    /***************** CAPTURE & SEND *****************/
+    function captureAndSend() {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL("image/jpeg", 0.7);
+      const userMsg = {
+        role: "user",
+        content: [
+          { type: "text", text: `input-${frameCounter}` },
+          { type: "image_url", image_url: { url: dataURL } },
+        ],
+      };
+      frameCounter += 1;
+      messageHistory.push(userMsg);
+      trimHistory();
+
+      const body = {
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          ...messageHistory,
+        ],
+        model: "meta-llama/llama-4-scout-17b-16e-instruct",
+        temperature: 1,
+        max_completion_tokens: 1024,
+        top_p: 1,
+        stream: false,
+        response_format: { type: "json_object" },
+        stop: null,
+      };
+
+      fetch(GROQ_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${GROQ_API_KEY}`,
+        },
+        body: JSON.stringify(body),
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then(processGroqResponse)
+        .catch((err) => console.error("Groq API", err));
+    }
+
+    /***************** HANDLE RESPONSE *****************/
+    function processGroqResponse(data) {
+      const msg = data.choices?.[0]?.message?.content || "{}";
+      let parsed;
+      try {
+        parsed = JSON.parse(msg);
+      } catch {
+        parsed = { error: "Invalid JSON from assistant" };
+      }
+      messageHistory.push({ role: "assistant", content: msg });
+      trimHistory();
+      updateUI(parsed);
+    }
+
+    /***************** UI & SPEECH *****************/
+    function updateUI(d) {
+      jsonOutput.textContent = JSON.stringify(d, null, 2);
+
+      // Direction cue
+      if (d.turn_radius !== undefined) {
+        const txt = angleToDir(d.turn_radius);
+        directionText.textContent = txt;
+        speak(txt);
+      }
+
+      // Indicators
+      throttleIndicator.classList.toggle("active", Boolean(d.throttle));
+      brakeIndicator.classList.toggle("active", Boolean(d.brake));
+    }
+
+    function angleToDir(a) {
+      a = Number(a) || 0;
+      const abs = Math.abs(a);
+      if (abs < 15) return "Continue straight";
+      if (abs < 45) return `Turn slightly ${a > 0 ? "right" : "left"}`;
+      if (abs < 90) return `Turn ${a > 0 ? "right" : "left"}`;
+      return `Make a sharp ${a > 0 ? "right" : "left"}`;
+    }
+
+    function speak(text) {
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 1;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+
+    /***************** INIT *****************/
+    startBtn.addEventListener("click", () => startStream().catch(console.error));
+    navigator.mediaDevices.addEventListener("devicechange", listCameras);
+    listCameras();
+  </script>
+</body>
+</html>

@@ -2,29 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Tori Flight Logger (Web Serial)</title>
+  <title>Tori Flight 2 Logger (Web Serial)</title>
   <style>
     body { font-family: sans-serif; padding: 1rem; }
     button { font-size: 1.2rem; padding: .5rem 1rem; margin: .5rem 0; }
-    #status { margin-top: 1rem; }
+    #status { margin-top: 1rem; color: #333; }
+    #warning { margin-top: 1rem; color: red; }
   </style>
 </head>
 <body>
   <h1>Tori Flight Logger</h1>
+  <div id="warning"></div>
+  <p>Press <strong>Connect</strong> and select your Arduino (or any serial device) from the list.</p>
   <button id="connect">Connect to Arduino</button>
   <button id="start" disabled>Start Sending</button>
   <div id="status">Disconnected</div>
 
   <script>
+    // Feature detection
+    if (!('serial' in navigator)) {
+      document.getElementById('warning').textContent =
+        'Web Serial API not supported in this browser. Currently only desktop Chrome (and some Android builds) support Web Serial.';
+      document.getElementById('connect').disabled = true;
+    }
+
     let port, writer;
 
     document.getElementById('connect').addEventListener('click', async () => {
       try {
-        // Request serial port
-        port = await navigator.serial.requestPort();
+        // Request connection to any serial device (empty filters)
+        port = await navigator.serial.requestPort({ filters: [] });
         await port.open({ baudRate: 9600 });
         writer = port.writable.getWriter();
-        document.getElementById('status').textContent = 'Serial connected';
+        document.getElementById('status').textContent = 'Serial connected to: ' + port.getInfo().usbVendorId + ':' + port.getInfo().usbProductId;
         document.getElementById('start').disabled = false;
       } catch (err) {
         document.getElementById('status').textContent = 'Error: ' + err;
@@ -32,11 +42,17 @@
     });
 
     document.getElementById('start').addEventListener('click', async () => {
-      // On iOS/Safari you need to request permission first
-      if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        let resp = await DeviceMotionEvent.requestPermission();
-        if (resp !== 'granted') {
-          document.getElementById('status').textContent = 'Motion permission denied';
+      // Motion permission on iOS
+      if (typeof DeviceMotionEvent !== 'undefined' &&
+          typeof DeviceMotionEvent.requestPermission === 'function') {
+        try {
+          let resp = await DeviceMotionEvent.requestPermission();
+          if (resp !== 'granted') {
+            document.getElementById('status').textContent = 'Motion permission denied';
+            return;
+          }
+        } catch (permErr) {
+          document.getElementById('status').textContent = 'Permission error: ' + permErr;
           return;
         }
       }
@@ -50,7 +66,6 @@
       let ax = e.accelerationIncludingGravity.x || 0;
       let ay = e.accelerationIncludingGravity.y || 0;
       let az = e.accelerationIncludingGravity.z || 0;
-      // Format to two decimals
       let packet = `as_${ax.toFixed(2)}_${ay.toFixed(2)}_${az.toFixed(2)}\n`;
       try {
         await writer.write(new TextEncoder().encode(packet));

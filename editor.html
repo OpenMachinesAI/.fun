@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GrapesJS Studio – Self Hosted</title>
+  <script src="https://unpkg.com/@grapesjs/studio-sdk/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@grapesjs/studio-sdk-plugins@latest/dist/iconifyComponent/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@grapesjs/studio-sdk-plugins@latest/dist/canvasGridMode/index.umd.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/@grapesjs/studio-sdk/dist/style.css"/>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="studio-editor" style="height: 100dvh"></div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectUrl = urlParams.get('project');
+
+    if (!projectUrl) {
+      alert('Missing ?project= parameter in URL');
+      throw new Error('Project URL missing');
+    }
+
+    GrapesJsStudioSDK.createStudioEditor({
+      root: '#studio-editor',
+      licenseKey: 'db1a79b6e9d04a36818d54814afee45de5ff838eb1c8474ca8e71b7def608b44',
+      theme: 'light',
+      project: {
+        type: 'web',
+        id: projectUrl
+      },
+      identity: {
+        id: 'selfhost-user'
+      },
+      storage: {
+        type: 'self',
+        onLoad: async () => {
+          const res = await fetch(projectUrl);
+          if (!res.ok) throw new Error('Failed to fetch project');
+          const project = await res.json();
+          return { project };
+        },
+        onSave: async ({ project }) => {
+          await fetch(`/save-project.php?project=${encodeURIComponent(projectUrl)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(project)
+          });
+        },
+        autosaveChanges: 100,
+        autosaveIntervalMs: 10000
+      },
+      assets: {
+        storageType: 'local'
+      },
+      plugins: [
+        StudioSdkPlugins_iconifyComponent.init(),
+        StudioSdkPlugins_canvasGridMode.init()
+      ]
+    });
+  </script>
+</body>
+</html>

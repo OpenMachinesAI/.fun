@@ -1,0 +1,22 @@
+[
+    {
+        "title": "🚀 Central Space Program – Official Site",
+        "url": "https://centralspaceprogram.example.com",
+        "description": "Explore launches, rockets, and STEM projects from Central Middle School. Join our next mission today!"
+    },
+    {
+        "title": "📡 Project Cloud – Balloon Experiments",
+        "url": "https://projectcloud.example.com",
+        "description": "Track our high-altitude balloon flights and see live telemetry from the stratosphere."
+    },
+    {
+        "title": "🛠 ChromeBusters – Chromebook Repair Crew",
+        "url": "https://chromebusters.example.com",
+        "description": "We fix and upgrade old Chromebooks so every student gets the tech they deserve."
+    },
+    {
+        "title": "🦅 Eagle 9 – EDF Rocket Development",
+        "url": "https://eagle9rockets.example.com",
+        "description": "Follow the progress of our Falcon 9-inspired electric ducted fan rocket, from liftoff to landing."
+    }
+]

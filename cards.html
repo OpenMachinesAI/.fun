@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Central Staff Trading Cards — 90s Neowebs Edition</title>
+  <title>Central Staff Trading Cards </title>
   <style>
     :root{
       --bg:#04132b; --ink:#fff; --accent:#9df; --panel:#0a1f45; --gold:#f2b84b; --ice:#8ee7ff;
@@ -236,7 +236,7 @@
           <div class="starburst" aria-hidden="true"></div>
           <div class="tagline">SEASON 1</div>
           <h4>Season 1 Pack</h4>
-          <div class="desc">10 random cards • Weighted odds • Duplicates possible • <b>Limit</b>: 1 per 30 days</div>
+          <div class="desc">10 random cards • Weighted odds • Duplicates possible • <b>Limit</b>: Only 1 Free Pack every 2 weeks</div>
           <!-- Live Estimated Delivery -->
           <div class="delivery-date" style="margin-top:4px;font-weight:bold;color:#ff0;"></div>
 
@@ -253,7 +253,7 @@
           <div class="starburst" aria-hidden="true"></div>
           <div class="tagline" style="background:linear-gradient(135deg,#8ee7ff,#fff);color:#022;">SEASON 2</div>
           <h4>Season 2 Pack</h4>
-          <div class="desc">10 random cards • All indexable • Duplicates possible • <b>Limit</b>: 1 per 30 days</div>
+          <div class="desc">10 random cards • All indexable • Duplicates possible • <b>Limit</b>: Only 1 Free Pack every 2 weeks </div>
           <!-- Live Estimated Delivery -->
           <div class="delivery-date" style="margin-top:4px;font-weight:bold;color:#ff0;"></div>
 
@@ -682,8 +682,8 @@
       }
       const gate=lastOk(email,season); 
       if(!gate.ok){ 
-        const next=new Date(gate.last+30*24*60*60*1000); 
-        msgEl.innerHTML=`Limit hit. Try again after <b>${next.toLocaleDateString()}</b>.`; 
+        const next=new Date(gate.last+14*24*60*60*1000); 
+        msgEl.innerHTML=`Limit hit. Try again after  <b>${next.toLocaleDateString()}</b>.`; 
         return; 
       }
       const pool = season===1? S1 : S2;

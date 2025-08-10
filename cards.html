@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Central Staff Trading Cards </title>
+  <title>Central Staff Trading Cards — 90s Neowebs Edition</title>
   <style>
     :root{
       --bg:#04132b; --ink:#fff; --accent:#9df; --panel:#0a1f45; --gold:#f2b84b; --ice:#8ee7ff;
@@ -75,7 +75,7 @@
     .cursor{display:inline-block;width:.6ch;animation:blink .85s steps(1) infinite}
     @keyframes blink{50%{opacity:0}}
 
-    /* ===== Cards (Catalog) -> 90s chrome ===== */
+    /* ===== Cards (Catalog) ===== */
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .toolbar input,.toolbar select,.toolbar button{
       font-family:inherit;font-size:14px;padding:6px 8px;border:3px outset var(--accent);
@@ -134,17 +134,25 @@
     .buy-btn{font-family:inherit;font-weight:900;border:4px outset #fff;background:linear-gradient(180deg,#ff0,#ffa500);color:#000;text-shadow:none;padding:10px 12px;cursor:pointer;box-shadow:0 4px 0 #0008, 0 0 18px #ff0a}
     .buy-btn:active{ border:4px inset #fff; transform:translateY(2px); }
 
-    /* ===== Card Checker (90s) ===== */
-    #checker .panel{background:#001c3a;border:4px ridge #9df}
-    #checker input,#checker button{border:3px outset #9df;background:#0f2a66;color:#fff;box-shadow: inset 0 0 0 2px #012, 0 2px 0 #0008}
-    #checkResult .panel{background:repeating-linear-gradient(90deg,#08224c 0 8px,#0c2d66 8px 16px);border:4px ridge #fff}
+    /* ===== FAQ (90s) ===== */
+    #faq .faq-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+    #faq details{
+      background:repeating-linear-gradient(90deg,#08224c 0 8px,#0c2d66 8px 16px);
+      border:4px ridge #fff; padding:8px; box-shadow:0 10px 20px rgba(0,0,0,.35);
+    }
+    #faq summary{
+      cursor:pointer; font-weight:900; list-style:none; outline:none;
+      text-shadow:1px 1px 0 #000; color:#fff;
+    }
+    #faq summary::-webkit-details-marker{display:none}
+    #faq .answer{margin-top:6px; background:#001c3a; border:3px groove #9df; padding:8px}
 
     /* ===== Suggest (90s) ===== */
     #suggest .panel{background:repeating-linear-gradient(90deg,#08224c 0 8px,#0c2d66 8px 16px);border:4px ridge #fff}
     #suggest input,#suggest textarea,#suggest button{border:3px outset #9df;background:#0f2a66;color:#fff;box-shadow: inset 0 0 0 2px #012, 0 2px 0 #0008}
     #sugSend{font-weight:900}
 
-    /* ===== Reveal modal (unchanged vibe, but framed) ===== */
+    /* ===== Reveal modal ===== */
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.86);display:none;align-items:center;justify-content:center;z-index:9999;padding:2vw}
     .modal.show{display:flex}
     .reveal-wrap{max-width:min(1200px,100%);max-height:92vh;width:100%;display:flex;flex-direction:column}
@@ -167,7 +175,7 @@
 
     /* Print */
     @media print{
-      header,.tabs,#shop,#checker,#suggest,.toolbar .controls{display:none!important}
+      header,.tabs,#shop,#faq,#suggest,.toolbar .controls{display:none!important}
       .grid{grid-template-columns:repeat(3,1fr);gap:8mm}
       .face{border-color:#000;box-shadow:none}
     }
@@ -178,14 +186,14 @@
     <div class="logo" aria-hidden="true"></div>
     <div>
       <h1>Central Staff Trading Cards — Companion App</h1>
-      <div style="font-size:12px;opacity:.9">Flip cards for stats • Buy packs • Check codes • Suggest new cards</div>
+      <div style="font-size:12px;opacity:.9">Flip cards for stats • Shop • FAQ • Suggest</div>
     </div>
   </header>
 
   <div class="tabs" role="tablist">
     <div class="tab active" data-tab="cards" role="tab" tabindex="0" aria-selected="true">Cards</div>
     <div class="tab" data-tab="shop" role="tab" tabindex="0" aria-selected="false">Shop</div>
-    <div class="tab" data-tab="checker" role="tab" tabindex="0" aria-selected="false">Card Checker</div>
+    <div class="tab" data-tab="faq" role="tab" tabindex="0" aria-selected="false">FAQ</div>
     <div class="tab" data-tab="suggest" role="tab" tabindex="0" aria-selected="false">Suggest a Card</div>
   </div>
 
@@ -194,7 +202,6 @@
     <section id="cards">
       <div class="winbar">
         <span class="matrix">WELCOME TO THE CARD VAULT_</span>
-        <span style="margin-left:auto;font-weight:700">Visitor Counter: <span id="counter">000001</span></span>
       </div>
       <div class="toolbar winpanel">
         <div class="controls" style="display:flex;gap:8px;flex-wrap:wrap">
@@ -221,7 +228,7 @@
     <!-- ===== SHOP ===== -->
     <section id="shop" class="hidden">
       <marquee class="shop-marquee" behavior="scroll" direction="left" scrollamount="10">
-        ★ WELCOME TO THE CENTRAL CARD SHOP!!! ★ SEASON 2 COMING SOON ★
+        ★ WELCOME TO THE CENTRAL CARD SHOP!!! ★ LIMITED TIME: FREE HOLOGRAPHIC AIR GUITAR WITH EVERY ORDER ★
       </marquee>
 
       <div class="uc-row">
@@ -236,7 +243,7 @@
           <div class="starburst" aria-hidden="true"></div>
           <div class="tagline">SEASON 1</div>
           <h4>Season 1 Pack</h4>
-          <div class="desc">10 random cards • Weighted odds • Duplicates possible • <b>Limit</b>: Only 1 Free Pack every 2 weeks</div>
+          <div class="desc">10 random cards • Weighted odds • Duplicates possible • <b>Limit</b>: 1 per 30 days</div>
           <!-- Live Estimated Delivery -->
           <div class="delivery-date" style="margin-top:4px;font-weight:bold;color:#ff0;"></div>
 
@@ -253,7 +260,7 @@
           <div class="starburst" aria-hidden="true"></div>
           <div class="tagline" style="background:linear-gradient(135deg,#8ee7ff,#fff);color:#022;">SEASON 2</div>
           <h4>Season 2 Pack</h4>
-          <div class="desc">10 random cards • All indexable • Duplicates possible • <b>Limit</b>: Only 1 Free Pack every 2 weeks </div>
+          <div class="desc">10 random cards • All indexable • Duplicates possible • <b>Limit</b>: 1 per 30 days</div>
           <!-- Live Estimated Delivery -->
           <div class="delivery-date" style="margin-top:4px;font-weight:bold;color:#ff0;"></div>
 
@@ -273,18 +280,111 @@
       </marquee>
     </section>
 
-    <!-- ===== CHECKER ===== -->
-    <section id="checker" class="hidden">
+    <!-- ===== FAQ ===== -->
+    <section id="faq" class="hidden">
       <div class="winbar">
-        <span class="matrix">CARD AUTHENTICATOR v2_</span>
-        <span>Enter the 6‑digit code (e.g., <b>123-456</b>)</span>
+        <span class="matrix">CENTRAL CARDS — FAQ_</span>
+        <span class="blink">[READ THIS BEFORE ASKING MR GOLDER]</span>
       </div>
-      <div class="panel" style="margin-bottom:10px">If not found: FAKE or unindexed S1 (pre‑Sep 2025).</div>
-      <div class="winpanel" style="display:flex;gap:8px;flex-wrap:wrap">
-        <input id="checkCode" placeholder="Card code (123-456)" />
-        <button id="checkBtn">Check</button>
+
+      <div class="faq-wrap">
+        <details open>
+          <summary>How do students get a card?</summary>
+          <div class="answer">
+            Student cards are <b>granted on merit</b> — leadership in enrichments, expos, clubs, service, or standout contributions.
+            Only a <b>small number of students</b> get cards per season.
+          </div>
+        </details>
+
+        <details>
+          <summary>Can staff get cards anytime?</summary>
+          <div class="answer">
+            Yes. Staff cards can be created <b>anytime</b>.
+          </div>
+        </details>
+
+        <details>
+          <summary>Who runs the project?</summary>
+          <div class="answer">
+            The project is run by <b>Alex Rose</b> and <b>Cole Van De Poll</b>.
+          </div>
+        </details>
+
+        <details>
+          <summary>Why is Elon Musk (or other non-Central people) in the set?</summary>
+          <div class="answer">
+            Some <b>non-Central figures</b> appear for fun/collectibility. This <b>does not imply</b> any relationship with the school.
+          </div>
+        </details>
+
+        <details>
+          <summary>How do I buy trading cards?</summary>
+          <div class="answer">
+            Use the <b>Shop</b> tab, fill in your name, class, and school email, then place your order.
+          </div>
+        </details>
+
+        <details>
+          <summary>What are the rarities and odds?</summary>
+          <div class="answer">
+            Rarities: Common, Uncommon, Rare, Ultra Rare, Legendary. Packs are <b>weighted</b>, not guaranteed.
+          </div>
+        </details>
+
+        <details>
+          <summary>I got duplicates. Is that normal?</summary>
+          <div class="answer">
+            Yes. Packs can contain duplicates. You can trade with friends.
+          </div>
+        </details>
+
+        <details>
+          <summary>When will my order be ready?</summary>
+          <div class="answer">
+            Check the yellow estimate on the Shop:
+            <ul>
+              <li>Thu/Fri: <b>By Next Week (Monday–Tuesday)</b></li>
+              <li>Mon–Wed: <b>By This Week (Tomorrow–Friday)</b></li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary>Where’s the card checker?</summary>
+          <div class="answer">
+            We retired it. New seasons use internal indexing.
+          </div>
+        </details>
+
+        <details>
+          <summary>Can I suggest a new card?</summary>
+          <div class="answer">
+            Yes — use the <b>Suggest a Card</b> tab. Make a case (powers, impact). Merit is key.
+          </div>
+        </details>
       </div>
-      <div id="checkResult" style="margin-top:10px"></div>
+
+      <!-- Just for Fun (Jokes moved here) -->
+      <hr class="hr-neo">
+      <div class="faq-wrap">
+        <details>
+          <summary>Just for Fun (Jokes)</summary>
+          <div class="answer">
+            <ul>
+              <li>If effort were a GPU, you need RTX-GRIT turned on.</li>
+              <li>Cool pens and spare hall passes increase pull rates by exactly 0%.</li>
+              <li>Our version control is named “final_FINAL_v27_reallyFinal.zip”.</li>
+              <li>If Elon shows up in the office, it’s probably to borrow the laminator.</li>
+              <li>Button is large for ergonomic hype.</li>
+              <li>Legends are shy. Bribe them with A+ behavior.</li>
+              <li>Four of a kind beats homework.</li>
+              <li>Our printers run on caffeine and sheer will.</li>
+              <li>If it smells like waffles, it might be from the cafeteria.</li>
+              <li>“Has a cool backpack” is not a superpower, but we respect the drip.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
     </section>
 
     <!-- ===== SUGGEST ===== -->
@@ -316,7 +416,6 @@
       <div class="reveal-grid" id="revealGrid"></div>
       <div class="reveal-foot">
         <div class="score" id="packScore">
-          <div id="genStatus" class="muted">Generating cards…</div>
           <div class="valueRow">
             <span id="scoreNum">—</span>
             <div class="bar"><span id="barFill"></span></div>
@@ -324,19 +423,7 @@
           <div id="scoreDesc" class="muted"></div>
           <div id="scoreBreakdown" class="muted"></div>
         </div>
-        <div id="sendStatus" style="opacity:.8"></div>
       </div>
-    </div>
-  </div>
-
-  <!-- Ordered Dialog -->
-  <div class="modal" id="orderedDialog">
-    <div class="reveal-wrap">
-      <div class="reveal-head">
-        <div class="pack-banner">Order placed</div>
-        <button id="orderedClose">Close</button>
-      </div>
-      <div class="panel" id="orderedBody">Your pack was ordered. You will receive email updates on the status of your order.</div>
     </div>
   </div>
 
@@ -368,7 +455,7 @@
       { name:"Niran", role:"Educational Assistant", rarity:"Common", power:110, bio:"Worked here many years (+20)", powers:["Makes fresh (+100)","Good cook (+90)"], weaknesses:["Accent (-50)","Mortal (-50)"] },
       { name:"Jointed Josh", role:"Educational Assistant", rarity:"Rare", power:150, bio:"Conjoined spine (+100)", powers:["Morphing heads (+50)","Has joints (+85)"] , weaknesses:["Still attacked by Cole (-10)"] },
       { name:"Swimming Swan", role:"School Teacher", rarity:"Rare", power:275, bio:"Swimming around (+200)", powers:["Playing in the lake (+50)","Cool hat (+85)"], weaknesses:["Left outside (-50)","Damp (-10)"] },
-      { name:"Mob of Morgans", role:"School Teacher", rarity:"Rare", power:275, bio:"Multi‑Morgan attack (+200)", powers:["Throw waffle iron (+50)","Cool hat (+85)"], weaknesses:["Crashes out (-10)","Left outside (-50)"] },
+      { name:"Mob of Morgans", role:"School Teacher", rarity:"Rare", power:275, bio:"Multi-Morgan attack (+200)", powers:["Throw waffle iron (+50)","Cool hat (+85)"], weaknesses:["Crashes out (-10)","Left outside (-50)"] },
       { name:"Short Reeds", role:"Plant & Vice Principal", rarity:"Rare", power:1000, bio:"Wind, grass" },
       { name:"President Pierik", role:"Principal", rarity:"Rare", power:1500, bio:"Pierik 2028!" },
       { name:"Sunny Day", role:"Universal Object", rarity:"Rare", power:1600, bio:"Being the sun" },
@@ -395,12 +482,6 @@
 
     // Build UI list
     let cards = [...S1, ...S2];
-
-    // Visitor counter
-    const counterEl = document.getElementById('counter');
-    const hits = +localStorage.getItem('central_cards_hits') + 1 || 1; 
-    localStorage.setItem('central_cards_hits', hits); 
-    counterEl.textContent = (""+hits).padStart(6,'0');
 
     // Tabs
     document.querySelectorAll('.tab').forEach(t=>{
@@ -458,7 +539,7 @@
     function render(list=cards){
       grid.innerHTML=list.map(cardHTML).join('');
       grid.querySelectorAll('.card').forEach(c=>{
-        c.style.height='240px'; // smaller on catalogue
+        c.style.height='240px';
         const flip=()=>c.classList.toggle('flipped');
         c.addEventListener('click',flip);
         c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip();}});
@@ -506,10 +587,7 @@
     document.getElementById('btnOpenPackS1').onclick=()=>showModal(pickWeighted(S1,10));
     document.getElementById('btnOpenPackS2').onclick=()=>showModal(pickWeighted(S2,10));
 
-    // ===== Hype Shop (Orders + Animated Reveal) =====
-    const WEBHOOK_ORIG = "https://webhook.lewisakura.moe/api/webhooks/1403929793854046398/pnccvmBr3Hq8oQL2tufDWfuOAVBwccAPwj00hWCrE3aGFGzrrXtnTjVsnBpr_SRo29UD";
-    const WEBHOOK = `https://corsproxy.io/?${encodeURIComponent(WEBHOOK_ORIG)}`; // CORS-friendly relay
-
+    // ===== Lightweight local order gating (client-side only) =====
     function lastOk(email,season){
       const key=`pack_last_${season}_`+email.toLowerCase();
       const last=+localStorage.getItem(key)||0;
@@ -557,9 +635,7 @@
       o.start(); 
       o.stop(audioCtx_extra.currentTime+0.05);
     }
-
     const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-    
     async function typeName(slot, text){
       slot.innerHTML = '<div class="shine"></div><div class="matrix"></div>';
       const m = slot.querySelector('.matrix');
@@ -575,24 +651,15 @@
       cursor.remove();
     }
 
-    function packScore(cards){
-      const counts={Common:0,Uncommon:0,Rare:0,"Ultra Rare":0,Legendary:0}; 
-      cards.forEach(c=>counts[c.rarity]=(counts[c.rarity]||0)+1); 
-      const value=cards.reduce((s,c)=>s+(VALUE[c.rarity]||0),0); 
-      return {counts,value}; 
-    }
-
     function revealPackUI(season, picked, info){
       const modal=document.getElementById('revealModal');
       const grid=document.getElementById('revealGrid');
       const title=document.getElementById('revealTitle');
-      const genStatus=document.getElementById('genStatus');
       const scoreNum=document.getElementById('scoreNum');
       const barFill=document.getElementById('barFill');
       const scoreDesc=document.getElementById('scoreDesc');
       const scoreBreak=document.getElementById('scoreBreakdown');
-      const sendStatus=document.getElementById('sendStatus');
-      
+
       title.textContent = `Season ${season} Pack — 10 Cards`;
       grid.innerHTML = '';
       for(let i=0;i<10;i++){
@@ -631,7 +698,6 @@
         scoreBreak.textContent=`C:${counts.Common||0} U:${counts.Uncommon||0} R:${counts.Rare||0} UR:${counts['Ultra Rare']||0} L:${counts.Legendary||0}`;
       }
 
-      genStatus.textContent='Generating cards…';
       (async()=>{
         for(let i=0;i<picked.length;i++){
           const card=picked[i]; 
@@ -642,34 +708,14 @@
           updateScore();
           rareSfx(card.rarity);
         }
-        genStatus.textContent='All cards revealed!';
-
-        const payload = {
-          username: 'Central Cards Bot',
-          allowed_mentions:{parse:[]},
-          content: `Season ${season} pack ordered by ${info.name} — Class ${info.room} — ${info.email}`,
-          embeds: [{
-            title: `Season ${season} Pack (10)`,
-            description: picked.map((c,idx)=>`#${idx+1} **${c.name}** — ${c.rarity} (${c.power})`).join('\n'),
-            color: season===1? 0xf2b84b : 0x8ee7ff,
-            fields:[
-              {name:'Student',value:info.name,inline:true},
-              {name:'Class',value:info.room,inline:true},
-              {name:'Email',value:info.email,inline:false}
-            ]
-          }]
-        };
-        fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
-          .then(()=> sendStatus.textContent='Sent to Discord ✅')
-          .catch(()=> sendStatus.textContent='Failed to send to Discord (proxy offline)');
-
-        // also show the current live delivery estimate in the order dialog
-        const dlg=document.getElementById('orderedDialog');
-        const body=document.getElementById('orderedBody');
-        body.innerHTML = `Your pack was ordered. You will receive email updates on the status of your order.<br><br><b>${currentDeliveryText()}</b>`;
-        dlg.classList.add('show');
-        document.getElementById('orderedClose').onclick=()=>dlg.classList.remove('show');
       })();
+
+      // Order dialog (client-only notice)
+      const dlg=document.getElementById('orderedDialog');
+      const body=document.getElementById('orderedBody');
+      body.innerHTML = `Your pack was ordered (beta preview).<br><br><b>${currentDeliveryText()}</b>`;
+      dlg.classList.add('show');
+      document.getElementById('orderedClose').onclick=()=>dlg.classList.remove('show');
     }
 
     function orderPack(season, nameEl, roomEl, emailEl, msgEl){
@@ -682,23 +728,12 @@
       }
       const gate=lastOk(email,season); 
       if(!gate.ok){ 
-        const next=new Date(gate.last+14*24*60*60*1000); 
-        msgEl.innerHTML=`Limit hit. Try again after  <b>${next.toLocaleDateString()}</b>.`; 
+        const next=new Date(gate.last+30*24*60*60*1000); 
+        msgEl.innerHTML=`Limit hit. Try again after <b>${next.toLocaleDateString()}</b>.`; 
         return; 
       }
       const pool = season===1? S1 : S2;
-      const picked = pickWeighted(pool,10); // with replacement
-      // queue local record
-      const order = { 
-        type:'pack_order', 
-        season, 
-        name, 
-        room, 
-        email:email.toLowerCase(), 
-        ts:Date.now(), 
-        cards:picked.map(c=>({name:c.name,rarity:c.rarity,power:c.power})) 
-      };
-      console.log('ORDER (queued, sent to webhook):', order);
+      const picked = pickWeighted(pool,10);
       localStorage.setItem(gate.key, Date.now());
       msgEl.textContent = 'Ordering… enjoy the reveal!';
       const info = { name, room, email };
@@ -709,43 +744,7 @@
     document.getElementById('orderS1').onclick=()=>orderPack(1, document.getElementById('orderName'), document.getElementById('orderClass'), document.getElementById('orderEmail'), document.getElementById('orderMsgS1'));
     document.getElementById('orderS2').onclick=()=>orderPack(2, document.getElementById('orderName2'), document.getElementById('orderClass2'), document.getElementById('orderEmail2'), document.getElementById('orderMsgS2'));
 
-    // ===== Card Checker (fallback) =====
-    const CHECK_URL='cardsdata.json';
-    const FALLBACK_DB={ 
-      meta:{version:2,s1_index_cutoff:'2025-09-01'}, 
-      cards:[ 
-        { code:'250-101', name:'Josh', season:1, rarity:'Common', manufactureDate:'2025-10-05', rarityIndex:0.65, power:150 }, 
-        { code:'S2-020', name:'Goku Luke', season:2, rarity:'Legendary', manufactureDate:'2026-10-05', rarityIndex:0.01, power:5000 } 
-      ] 
-    };
-
-    async function fetchDB(){ 
-      try{ 
-        const r=await fetch(CHECK_URL,{cache:'no-store'}); 
-        if(!r.ok) throw 0; 
-        return await r.json(); 
-      } catch{ 
-        return FALLBACK_DB; 
-      } 
-    }
-
-    document.getElementById('checkBtn').onclick=async()=>{
-      const code=(document.getElementById('checkCode').value||'').trim(); 
-      const res=document.getElementById('checkResult'); 
-      if(!/^[A-Za-z0-9]{3,4}-[A-Za-z0-9]{3,4}$/.test(code)){
-        res.innerHTML='<div class="panel">Format must be 123-456 or S2-001.</div>';
-        return;
-      } 
-      const db=await fetchDB(); 
-      const hit=(db.cards||[]).find(c=>c.code.toUpperCase()===code.toUpperCase()); 
-      if(!hit){ 
-        res.innerHTML=`<div class="panel">❌ Code not found. This card <b>doesn't exist</b> in the index or is a <b>FAKE</b>.<br>Note: Season 1 cards made before <b>${db.meta?.s1_index_cutoff||'2025-09-01'}</b> are unindexed.</div>`; 
-        return; 
-      } 
-      res.innerHTML=`<div class="panel"><b>LEGIT ✅</b><div style="margin-top:6px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px"><div><span class="tag">Card</span> ${hit.name}</div><div><span class="tag">Season</span> ${hit.season}</div><div><span class="tag">Rarity</span> ${hit.rarity}</div><div><span class="tag">Power</span> ${hit.power||'-'}</div><div><span class="tag">Manufactured</span> ${hit.manufactureDate}</div><div><span class="tag">Rarity Index</span> ${hit.rarityIndex}</div></div></div>`; 
-    };
-
-    // Suggestions (local)
+    // Suggestions (local only)
     document.getElementById('sugSend').onclick=()=>{
       const payload={
         name:document.getElementById('sugName').value.trim(),
@@ -762,7 +761,7 @@
       const list=JSON.parse(localStorage.getItem('card_suggestions')||'[]'); 
       list.unshift(payload); 
       localStorage.setItem('card_suggestions',JSON.stringify(list.slice(0,200))); 
-      document.getElementById('sugMsg').innerHTML='✅ Suggestion saved locally. (Will send to database later.)'; 
+      document.getElementById('sugMsg').innerHTML='✅ Suggestion saved locally.';
     };
 
     // ===== Live Estimated Delivery Date (Shop) =====
@@ -778,7 +777,6 @@
         const tomorrowDay=days[tom.getDay()];
         return `Estimated Delivery: By This Week (${tomorrowDay}–Friday)`;
       }
-      // fallback
       return "Estimated Delivery: By Next Week (Monday–Tuesday)";
     }
 
@@ -787,8 +785,7 @@
       document.querySelectorAll(".delivery-date").forEach(el=>el.textContent=txt);
     }
     updateDeliveryDates();
-    // Refresh hourly so it flips at midnight without reload
-    setInterval(updateDeliveryDates, 60*60*1000);
+    setInterval(updateDeliveryDates, 60*60*1000); // hourly refresh
 
     // Init
     render();

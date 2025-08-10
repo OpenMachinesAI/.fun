@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Central Staff Trading Cards — 90s Neowebs Edition</title>
+  <style>
+    :root{
+      --bg:#04132b; --ink:#fff; --accent:#9df; --panel:#0a1f45; --gold:#f2b84b; --ice:#8ee7ff;
+      --win-blue:#0b2a77; --win-mid:#123066; --win-dark:#07163a;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;color:var(--ink);
+      font-family:"Trebuchet MS","Comic Sans MS",Tahoma,Verdana,sans-serif;
+      background:
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="%23051632"/><rect x="0" y="0" width="8" height="8" fill="%230a1f45"/><rect x="8" y="8" width="8" height="8" fill="%230a1f45"/></svg>') repeat,
+        radial-gradient(circle at 20% -10%, #0ff2 0 240px, transparent 241px),
+        radial-gradient(circle at 120% 10%, #f0f2 0 260px, transparent 261px),
+        linear-gradient(180deg,#051632,#030b1c)
+    }
+
+    /* ===== 90s Header / Window Bar ===== */
+    header{
+      display:flex;gap:12px;align-items:center;padding:10px 12px;
+      background:linear-gradient(90deg,#0ff,#0bf,#90f,#f0f);
+      border-bottom:4px double #fff; box-shadow:0 6px 0 #0008, inset 0 -6px 0 #0004;
+    }
+    header .logo{
+      width:56px;height:56px;border-radius:50%;border:2px solid #fff;
+      box-shadow:0 0 10px #fff,0 0 20px #0ff;
+      background:
+        radial-gradient(circle at 30% 30%,#fff 0 8%,transparent 9%),
+        conic-gradient(from 0deg,#fff 0 10%,#0ff 10% 20%,#0bf 20% 30%,#90f 30% 40%,#f0f 40% 50%,#ff0 50% 60%,#0f0 60% 70%,#f90 70% 80%,#f00 80% 90%,#fff 90% 100%);
+    }
+    h1{margin:0;text-shadow:2px 2px 0 #000}
+
+    /* ===== Tabs -> 90s Buttons ===== */
+    .tabs{
+      display:flex;gap:6px;flex-wrap:wrap;padding:8px;
+      background:linear-gradient(180deg,var(--win-mid),var(--win-dark));
+      border-bottom:4px ridge var(--accent);
+    }
+    .tab{
+      cursor:pointer;border:3px outset var(--accent);padding:8px 12px;
+      background:linear-gradient(#2a65ff,#0b2a77);font-weight:700;
+      text-shadow:1px 1px 0 #000; color:#fff;
+    }
+    .tab.active{outline:3px solid #fff}
+    .tab:focus{outline:3px dotted #fff}
+
+    main{padding:12px}
+    .hidden{display:none!important}
+
+    /* ===== Global 90s Utilities ===== */
+    .winpanel{
+      background:repeating-linear-gradient(90deg,#0a1f45 0 8px,#102a58 8px 16px);
+      border:4px ridge #9df; padding:8px; box-shadow:0 10px 20px rgba(0,0,0,.35);
+    }
+    .winbar{
+      display:flex;justify-content:space-between;align-items:center;gap:12px;
+      padding:6px 8px;margin:8px 0;
+      border:4px groove #fff;background:linear-gradient(180deg,#123066,#031336);
+      box-shadow:inset 0 0 18px #000a,0 0 12px #09f8;
+      font-weight:900;
+    }
+    .hr-neo{
+      height:6px;margin:10px 0;border:0;
+      background:linear-gradient(90deg,transparent,#0ff,#f0f,transparent);
+      box-shadow:0 0 18px #0ff, 0 0 18px #f0f inset;
+    }
+    .matrix{font-family:"Lucida Console", Monaco, monospace; color:#9eff9e; text-shadow:0 0 6px #0f0; font-weight:800; font-size:clamp(12px,2.4vw,18px);} 
+    .blink{ animation: blink90s 1s steps(1) infinite; }
+    @keyframes blink90s{ 50%{ opacity:0; } }
+    .cursor{display:inline-block;width:.6ch;animation:blink .85s steps(1) infinite}
+    @keyframes blink{50%{opacity:0}}
+
+    /* ===== Cards (Catalog) -> 90s chrome ===== */
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .toolbar input,.toolbar select,.toolbar button{
+      font-family:inherit;font-size:14px;padding:6px 8px;border:3px outset var(--accent);
+      background:#102a58;color:#fff;box-shadow: inset 0 0 0 2px #012, 0 2px 0 #0008;
+    }
+    .grid{display:grid;gap:12px;margin-top:12px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+
+    .card{position:relative;height:100%;perspective:1200px}
+    .card-inner{position:absolute;inset:0;transition:transform .8s;transform-style:preserve-3d}
+    .card.flipped .card-inner{transform:rotateY(180deg)}
+    .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;border:4px ridge var(--accent);
+      overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,.45), inset 0 0 22px rgba(255,255,255,.08)}
+    .front{display:grid;grid-template-rows:auto 1fr auto;
+      background:radial-gradient(circle at 50% 35%, rgba(255,255,255,.12), rgba(255,255,255,0) 40%),
+                 linear-gradient(180deg,#123066,#0a1f45)}
+    .front .nameRow{display:flex;align-items:flex-end;gap:8px;padding:8px}
+    .front .bigName{font-weight:900;font-size:clamp(16px,3.5vw,24px);line-height:.85;text-shadow:2px 2px 0 #000}
+    .front .role{margin-left:8px;opacity:.9}
+    .rarity-badge{margin-left:auto;font-size:10px;padding:3px 7px;border-radius:10px;background:#2e7bff;border:1px solid #fff}
+    .pts{position:absolute;top:6px;right:8px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#0008;color:#fff;font-weight:900;border:3px solid #fff;box-shadow:0 0 10px #0ff}
+    .avatar{width:68%;aspect-ratio:1/1;justify-self:center;align-self:center;border-radius:8px;border:3px solid #fff;background:linear-gradient(135deg,#8dd,#79f);
+      display:grid;place-items:center;font-size:clamp(18px,5vw,34px);font-weight:900;color:#05224a;text-shadow:0 1px 0 #fff8}
+
+    .back{transform:rotateY(180deg);background:linear-gradient(180deg,#0e2857,#0a1f45);padding:10px}
+    .statGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
+    .panel{background:rgba(0,0,0,.25);border:2px groove var(--accent);padding:6px}
+    .tag{display:inline-block;padding:2px 6px;border:1px solid var(--accent);background:#102a58;font-size:10px;margin-right:4px}
+
+    /* ===== SHOP (90s theme) ===== */
+    #shop{
+      background:
+        repeating-linear-gradient(45deg,#0b1d3f 0 12px,#0f2a66 12px 24px),
+        radial-gradient(circle at 15% 10%, #0ff3 0 120px, transparent 121px),
+        radial-gradient(circle at 85% 20%, #f0f3 0 140px, transparent 141px);
+      border: 6px ridge #9df;padding: 12px;
+      box-shadow: inset 0 0 0 4px #012, 0 0 40px #08f;
+    }
+    .shop-marquee{
+      display:block;padding:6px 10px;margin:0 0 10px 0;border:4px groove #fff;
+      background:linear-gradient(90deg,#ff0,#0f0,#0ff,#f0f,#ff0);
+      color:#000;font-weight:900;text-shadow:none;
+    }
+    .uc-row{display:flex;gap:10px;align-items:center;background:#001c3a;border:4px ridge #f2b84b;padding:6px 8px;margin:8px 0;box-shadow: inset 0 0 18px #000a;font-weight:700}
+    .uc-icon{width:32px;height:32px;border-radius:4px;background:conic-gradient(from 0deg,#ff0 0 25%,#000 0 50%,#ff0 0 75%,#000 0 100%);border:2px solid #000}
+
+    .shop-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:10px}
+    .product{position:relative;background:var(--panel);border:6px ridge #fff;padding:12px;box-shadow:0 10px 20px rgba(0,0,0,.35);overflow:hidden}
+    .product h4{margin:0 0 6px 0;font-size:22px;letter-spacing:1px;text-shadow:2px 2px 0 #000, 0 0 10px #0ff}
+    .product .desc{font-size:13px;opacity:.95}
+    .product .actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:8px}
+    .product .tagline{position:absolute;top:-28px;right:-32px;transform:rotate(35deg);background:linear-gradient(135deg,#ff0,#ffa500);color:#000;border:2px solid #000;text-shadow:none;box-shadow:0 0 12px #000a;padding:8px 50px;font-weight:900;letter-spacing:2px}
+    .starburst{position:absolute;width:160px;height:160px;top:-50px;left:-50px;opacity:.15;background:radial-gradient(circle, #fff 0 30%, transparent 31%),conic-gradient(#0ff 0 10%, transparent 10% 20%, #f0f 20% 30%, transparent 30% 40%, #ff0 40% 50%, transparent 50% 60%, #0f0 60% 70%, transparent 70% 80%, #f90 80% 90%, transparent 90% 100%);filter: blur(0.5px);animation: spin 12s linear infinite}
+    @keyframes spin{ to{ transform: rotate(360deg);} }
+
+    #shop input{background:#002a66;color:#fff;border:3px outset #9df;box-shadow: inset 0 0 0 2px #012, 0 2px 0 #0008}
+    .buy-btn{font-family:inherit;font-weight:900;border:4px outset #fff;background:linear-gradient(180deg,#ff0,#ffa500);color:#000;text-shadow:none;padding:10px 12px;cursor:pointer;box-shadow:0 4px 0 #0008, 0 0 18px #ff0a}
+    .buy-btn:active{ border:4px inset #fff; transform:translateY(2px); }
+
+    /* ===== Card Checker (90s) ===== */
+    #checker .panel{background:#001c3a;border:4px ridge #9df}
+    #checker input,#checker button{border:3px outset #9df;background:#0f2a66;color:#fff;box-shadow: inset 0 0 0 2px #012, 0 2px 0 #0008}
+    #checkResult .panel{background:repeating-linear-gradient(90deg,#08224c 0 8px,#0c2d66 8px 16px);border:4px ridge #fff}
+
+    /* ===== Suggest (90s) ===== */
+    #suggest .panel{background:repeating-linear-gradient(90deg,#08224c 0 8px,#0c2d66 8px 16px);border:4px ridge #fff}
+    #suggest input,#suggest textarea,#suggest button{border:3px outset #9df;background:#0f2a66;color:#fff;box-shadow: inset 0 0 0 2px #012, 0 2px 0 #0008}
+    #sugSend{font-weight:900}
+
+    /* ===== Reveal modal (unchanged vibe, but framed) ===== */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.86);display:none;align-items:center;justify-content:center;z-index:9999;padding:2vw}
+    .modal.show{display:flex}
+    .reveal-wrap{max-width:min(1200px,100%);max-height:92vh;width:100%;display:flex;flex-direction:column}
+    .reveal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+    .pack-banner{background:linear-gradient(90deg, var(--gold), #ff8); color:#222; font-weight:900; padding:6px 10px; border-radius:8px;border:2px solid #000}
+    .reveal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(100px,14vw,160px),1fr));gap:10px;overflow:auto;padding:4px}
+    .slot{aspect-ratio:63/88;border:3px dashed #89f;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.04);position:relative;overflow:hidden}
+    .slot.revealed{border-style:solid}
+    .slot .shine{position:absolute; inset:-100% -100%; background:linear-gradient(120deg, transparent 40%, rgba(255,255,255,.5) 50%, transparent 60%); transform:rotate(15deg); animation: shine 1.5s linear infinite; opacity:.35}
+    @keyframes shine {to{transform:translateX(200%) rotate(15deg)}}
+    .reveal-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+    .score{font-weight:900}
+    .muted{opacity:.85;font-size:12px}
+    .valueRow{display:grid;grid-template-columns:48px 1fr;align-items:center;gap:8px;margin-top:6px}
+    #scoreNum{font-size:18px;font-weight:900}
+    .bar{height:12px;border-radius:999px;background:linear-gradient(90deg,#f33,#f90,#ff0,#3f3,#3cf,#a3f);box-shadow:inset 0 0 6px rgba(0,0,0,.6);overflow:hidden}
+    .bar>span{display:block;height:100%;background:linear-gradient(90deg,rgba(255,255,255,.8),rgba(255,255,255,.15));mix-blend:overlay;width:0%}
+    #scoreDesc{margin-top:4px}
+    #scoreBreakdown{margin-top:2px}
+
+    /* Print */
+    @media print{
+      header,.tabs,#shop,#checker,#suggest,.toolbar .controls{display:none!important}
+      .grid{grid-template-columns:repeat(3,1fr);gap:8mm}
+      .face{border-color:#000;box-shadow:none}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo" aria-hidden="true"></div>
+    <div>
+      <h1>Central Staff Trading Cards — Companion App</h1>
+      <div style="font-size:12px;opacity:.9">Flip cards for stats • Buy packs • Check codes • Suggest new cards</div>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-tab="cards" role="tab" tabindex="0" aria-selected="true">Cards</div>
+    <div class="tab" data-tab="shop" role="tab" tabindex="0" aria-selected="false">Shop</div>
+    <div class="tab" data-tab="checker" role="tab" tabindex="0" aria-selected="false">Card Checker</div>
+    <div class="tab" data-tab="suggest" role="tab" tabindex="0" aria-selected="false">Suggest a Card</div>
+  </div>
+
+  <main>
+    <!-- ===== CARDS ===== -->
+    <section id="cards">
+      <div class="winbar">
+        <span class="matrix">WELCOME TO THE CARD VAULT_</span>
+        <span style="margin-left:auto;font-weight:700">Visitor Counter: <span id="counter">000001</span></span>
+      </div>
+      <div class="toolbar winpanel">
+        <div class="controls" style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="search" placeholder="Search name or role…" />
+          <select id="rarityFilter">
+            <option value="">All rarities</option>
+            <option>Common</option>
+            <option>Uncommon</option>
+            <option>Rare</option>
+            <option>Ultra Rare</option>
+            <option>Legendary</option>
+          </select>
+          <button id="sortName">Sort: Name</button>
+          <button id="sortPower">Sort: Power</button>
+          <button id="btnOpenPackS1">Open Demo S1 (x10)</button>
+          <button id="btnOpenPackS2">Open Demo S2 (x10)</button>
+          <button id="btnPrint">Print Sheet</button>
+        </div>
+      </div>
+      <hr class="hr-neo">
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <!-- ===== SHOP ===== -->
+    <section id="shop" class="hidden">
+      <marquee class="shop-marquee" behavior="scroll" direction="left" scrollamount="10">
+        ★ WELCOME TO THE CENTRAL CARD SHOP!!! ★ SEASON 2 COMING SOON ★
+      </marquee>
+
+      <div class="uc-row">
+        <div class="uc-icon" aria-hidden="true"></div>
+        <div>UNDER CONSTRUCTION — New packs dropping soon! <span class="blink">[CHECK BACK OFTEN]</span></div>
+      </div>
+
+      <hr class="hr-neo">
+
+      <div class="shop-cards">
+        <div class="product" id="prodS1">
+          <div class="starburst" aria-hidden="true"></div>
+          <div class="tagline">SEASON 1</div>
+          <h4>Season 1 Pack</h4>
+          <div class="desc">10 random cards • Weighted odds • Duplicates possible • <b>Limit</b>: 1 per 30 days</div>
+          <!-- Live Estimated Delivery -->
+          <div class="delivery-date" style="margin-top:4px;font-weight:bold;color:#ff0;"></div>
+
+          <div class="actions">
+            <input id="orderName" placeholder="Student full name" />
+            <input id="orderClass" placeholder="Classroom # (e.g., 205)" />
+            <input id="orderEmail" placeholder="School email" />
+            <button id="orderS1" class="buy-btn">💾 Order S1 Pack</button>
+          </div>
+          <div id="orderMsgS1" style="margin-top:6px"></div>
+        </div>
+
+        <div class="product" id="prodS2">
+          <div class="starburst" aria-hidden="true"></div>
+          <div class="tagline" style="background:linear-gradient(135deg,#8ee7ff,#fff);color:#022;">SEASON 2</div>
+          <h4>Season 2 Pack</h4>
+          <div class="desc">10 random cards • All indexable • Duplicates possible • <b>Limit</b>: 1 per 30 days</div>
+          <!-- Live Estimated Delivery -->
+          <div class="delivery-date" style="margin-top:4px;font-weight:bold;color:#ff0;"></div>
+
+          <div class="actions">
+            <input id="orderName2" placeholder="Student full name" />
+            <input id="orderClass2" placeholder="Classroom # (e.g., 205)" />
+            <input id="orderEmail2" placeholder="School email" />
+            <button id="orderS2" class="buy-btn">🛒 Order S2 Pack</button>
+          </div>
+          <div id="orderMsgS2" style="margin-top:6px"></div>
+        </div>
+      </div>
+
+      <hr class="hr-neo">
+      <marquee class="shop-marquee" behavior="alternate" scrollamount="8">
+        ✨ TIP: Use your school email so we can send you updates! ✨
+      </marquee>
+    </section>
+
+    <!-- ===== CHECKER ===== -->
+    <section id="checker" class="hidden">
+      <div class="winbar">
+        <span class="matrix">CARD AUTHENTICATOR v2_</span>
+        <span>Enter the 6‑digit code (e.g., <b>123-456</b>)</span>
+      </div>
+      <div class="panel" style="margin-bottom:10px">If not found: FAKE or unindexed S1 (pre‑Sep 2025).</div>
+      <div class="winpanel" style="display:flex;gap:8px;flex-wrap:wrap">
+        <input id="checkCode" placeholder="Card code (123-456)" />
+        <button id="checkBtn">Check</button>
+      </div>
+      <div id="checkResult" style="margin-top:10px"></div>
+    </section>
+
+    <!-- ===== SUGGEST ===== -->
+    <section id="suggest" class="hidden">
+      <div class="winbar">
+        <span class="matrix">SUGGEST-A-CARD_</span>
+        <span class="blink">[NEW SEASONS LOADING]</span>
+      </div>
+      <div class="panel" style="margin-bottom:10px">Suggest a card for future seasons.</div>
+      <div class="winpanel" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+        <input id="sugName" placeholder="Staff name" />
+        <input id="sugRole" placeholder="Role / Subject" />
+        <textarea id="sugPowers" placeholder="Powers (comma separated)"></textarea>
+        <textarea id="sugWeak" placeholder="Weaknesses (comma separated)"></textarea>
+        <input id="sugWhy" placeholder="Why they deserve a card" />
+        <button id="sugSend">Send Suggestion</button>
+      </div>
+      <div id="sugMsg" style="margin-top:8px"></div>
+    </section>
+  </main>
+
+  <!-- ===== Reveal Modal ===== -->
+  <div class="modal" id="revealModal">
+    <div class="reveal-wrap">
+      <div class="reveal-head">
+        <div class="pack-banner" id="revealTitle">Opening Pack…</div>
+        <button id="closeReveal">Close</button>
+      </div>
+      <div class="reveal-grid" id="revealGrid"></div>
+      <div class="reveal-foot">
+        <div class="score" id="packScore">
+          <div id="genStatus" class="muted">Generating cards…</div>
+          <div class="valueRow">
+            <span id="scoreNum">—</span>
+            <div class="bar"><span id="barFill"></span></div>
+          </div>
+          <div id="scoreDesc" class="muted"></div>
+          <div id="scoreBreakdown" class="muted"></div>
+        </div>
+        <div id="sendStatus" style="opacity:.8"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ordered Dialog -->
+  <div class="modal" id="orderedDialog">
+    <div class="reveal-wrap">
+      <div class="reveal-head">
+        <div class="pack-banner">Order placed</div>
+        <button id="orderedClose">Close</button>
+      </div>
+      <div class="panel" id="orderedBody">Your pack was ordered. You will receive email updates on the status of your order.</div>
+    </div>
+  </div>
+
+  <!-- Demo Booster Modal -->
+  <div class="modal" id="modal">
+    <div class="reveal-wrap">
+      <div class="reveal-head">
+        <h3>Demo Booster Results</h3>
+        <button id="modalClose">Close</button>
+      </div>
+      <div class="reveal-grid" id="modalGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Catalogue =====
+    const S1 = [
+      { name:"Josh", role:"Educational Assistant", rarity:"Common", power:150, bio:"Beard attack (+100)", powers:["Imagination (+50)","Has Rizz (+85)"], weaknesses:["Lack of hair (-50)","Mortal (-10)"] },
+      { name:"Swan", role:"School Teacher", rarity:"Common", power:275, bio:"Portable classroom (+200)", powers:["Connection to the land (+50)"], weaknesses:["Left outside (-50)"] },
+      { name:"Morgan", role:"School Teacher", rarity:"Common", power:210, bio:"Kindness (+100)", powers:["Imagination (+50)","Sigma (+85)"], weaknesses:["Crashes out (-75)","Eats waffles (-10)"] },
+      { name:"Shortreed", role:"Vice Principal", rarity:"Rare", power:548, bio:"Almost Boss (+400)", powers:["Cool guy (+200)","Sigma boy (+8)"] , weaknesses:["Always in meetings (-60)"] },
+      { name:"Pierik", role:"Principal", rarity:"Rare", power:535, bio:"Boss (+500)", powers:["Rizzed up the kids (+25)"] , weaknesses:["Leaves office often (-100)"] },
+      { name:"Sunny", role:"School Teacher", rarity:"Uncommon", power:400, bio:"Excited about learning (+50)", powers:["Listens to music (+90)"] , weaknesses:["Boring classes (-50)"] },
+      { name:"Chantelle", role:"Office Assistant", rarity:"Common", power:250, bio:"Stapler attack (+50)", powers:["Late slip Rizz (+200)"] , weaknesses:["Stuck with phone (-90)"] },
+      { name:"Serena", role:"Office Assistant", rarity:"Common", power:250, bio:"Lost-and-found (+50)", powers:["Teacher helper (+200)","Information bank (+90)"] , weaknesses:["Stuck with phone (-90)"] },
+      { name:"Golder", role:"Enrichment Teacher", rarity:"Uncommon", power:400, bio:"Wooden saw attack (+200)", powers:["3D printed spinner (+150)","He got talent! (+90)","Very nice (+60)"] , weaknesses:["Kids ask for everything (-50)","Eats waffles (-50)"] },
+      { name:"Mr Pask", role:"Gym Teacher", rarity:"Common", power:130, bio:"Gym ball attack (+50)", powers:["Has lots of fun stuff (+100)","Gym teacher! (+90)"], weaknesses:["Loud voice (-50)","Makes me run around (-50)"] },
+      { name:"Ms Gray", role:"Learning Support", rarity:"Common", power:140, bio:"Special room (+50)", powers:["Feeds cereal (+100)","Owns microwave (+90)"], weaknesses:["Loud voice (-50)","Eats waffles (-50)"] },
+      { name:"Niran", role:"Educational Assistant", rarity:"Common", power:110, bio:"Worked here many years (+20)", powers:["Makes fresh (+100)","Good cook (+90)"], weaknesses:["Accent (-50)","Mortal (-50)"] },
+      { name:"Jointed Josh", role:"Educational Assistant", rarity:"Rare", power:150, bio:"Conjoined spine (+100)", powers:["Morphing heads (+50)","Has joints (+85)"] , weaknesses:["Still attacked by Cole (-10)"] },
+      { name:"Swimming Swan", role:"School Teacher", rarity:"Rare", power:275, bio:"Swimming around (+200)", powers:["Playing in the lake (+50)","Cool hat (+85)"], weaknesses:["Left outside (-50)","Damp (-10)"] },
+      { name:"Mob of Morgans", role:"School Teacher", rarity:"Rare", power:275, bio:"Multi‑Morgan attack (+200)", powers:["Throw waffle iron (+50)","Cool hat (+85)"], weaknesses:["Crashes out (-10)","Left outside (-50)"] },
+      { name:"Short Reeds", role:"Plant & Vice Principal", rarity:"Rare", power:1000, bio:"Wind, grass" },
+      { name:"President Pierik", role:"Principal", rarity:"Rare", power:1500, bio:"Pierik 2028!" },
+      { name:"Sunny Day", role:"Universal Object", rarity:"Rare", power:1600, bio:"Being the sun" },
+      { name:"Mr Good", role:"School Teacher", rarity:"Common", power:300, bio:"Joyful teacher" },
+      { name:"Katie", role:"Educational Assistant", rarity:"Common", power:320, bio:"Very nice (+100)" },
+      { name:"Huneda", role:"Educational Assistant", rarity:"Common", power:300, bio:"Sits on cart (+100)" },
+      { name:"Cold Cole", role:"Frozen Student", rarity:"Ultra Rare", power:4000, bio:"Ice blast" }
+    ];
+
+    const S2 = [
+      { name:"Golder Bar", role:"Exploratory Teacher / Gold", rarity:"Rare", power:1600, bio:"Made of gold" },
+      { name:"Pask Pasta", role:"Gym Teacher / Noodle", rarity:"Rare", power:1600, bio:"Yummy" },
+      { name:"Gray Matter", role:"Part of your brain", rarity:"Rare", power:1600, bio:"Smart" },
+      { name:"Jocky Josh", role:"Educational Assistant", rarity:"Ultra Rare", power:1500, bio:"CHICKEN JOCKY!" },
+      { name:"Shorter Shortreed", role:"v1ft Vice Principal", rarity:"Ultra Rare", power:8000, bio:"SHORT. Like a small child" },
+      { name:"Snowy Swan", role:"Grade 8 Teacher", rarity:"Ultra Rare", power:6000, bio:"Playing in the snow" },
+      { name:"Goku Luke", role:"Educational Assistant", rarity:"Legendary", power:5000, bio:"Has hair (+100)" },
+      { name:"Elon Musk", role:"Classroom Teacher", rarity:"Legendary", power:1000, bio:"The Dogefather" }
+    ];
+
+    // Weights & values
+    const WEIGHTS = { "Common":60, "Uncommon":25, "Rare":12, "Ultra Rare":2, "Legendary":1 };
+    const VALUE   = { "Common":1,  "Uncommon":2,  "Rare":4,  "Ultra Rare":7, "Legendary":10 };
+
+    // Build UI list
+    let cards = [...S1, ...S2];
+
+    // Visitor counter
+    const counterEl = document.getElementById('counter');
+    const hits = +localStorage.getItem('central_cards_hits') + 1 || 1; 
+    localStorage.setItem('central_cards_hits', hits); 
+    counterEl.textContent = (""+hits).padStart(6,'0');
+
+    // Tabs
+    document.querySelectorAll('.tab').forEach(t=>{
+      t.onclick=()=>{
+        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+        document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+        t.classList.add('active');
+        document.getElementById(t.dataset.tab).classList.remove('hidden');
+      };
+      t.addEventListener('keydown',e=>{
+        if(e.key==='Enter'||e.key===' '){e.preventDefault();t.click();}
+      });
+    });
+
+    // Helpers
+    const grid = document.getElementById('grid');
+    const search = document.getElementById('search');
+    const rarityFilter = document.getElementById('rarityFilter');
+    const badgeColor=r=>r==="Legendary"?"#e63":r==="Ultra Rare"?"#6cf":r==="Rare"?"#f2b84b":r==="Uncommon"?"#7cffa6":"#2e7bff";
+    const initials=name=>name.split(/\s+/).map(n=>n[0]).slice(0,2).join('').toUpperCase();
+
+    function cardHTML(card){
+      return `
+      <div class="card" data-name="${card.name}" data-role="${card.role}" data-rarity="${card.rarity}" data-power="${card.power}" tabindex="0" role="button">
+        <div class="card-inner">
+          <div class="face front">
+            <div class="nameRow">
+              <div class="bigName">${card.name}</div>
+              <div class="role">${card.role}</div>
+              <div class="rarity-badge" style="background:${badgeColor(card.rarity)}">${card.rarity}</div>
+            </div>
+            <div class="avatar">${initials(card.name)}</div>
+            <div class="pts">${card.power}</div>
+          </div>
+          <div class="face back">
+            <div class="panel" style="margin-bottom:6px">
+              <span class="tag">Bio</span> ${card.bio||'—'}
+            </div>
+            <div class="statGrid">
+              <div class="panel">
+                <b>Powers</b>
+                <div>${(card.powers||[]).map(p=>`• ${p}`).join('<br>')}</div>
+              </div>
+              <div class="panel">
+                <b>Weaknesses</b>
+                <div>${(card.weaknesses||[]).map(w=>`• ${w}`).join('<br>')}</div>
+              </div>
+            </div>
+            <div style="position:absolute;bottom:8px;right:8px;font-size:10px;opacity:.75">Click to flip ↺</div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function render(list=cards){
+      grid.innerHTML=list.map(cardHTML).join('');
+      grid.querySelectorAll('.card').forEach(c=>{
+        c.style.height='240px'; // smaller on catalogue
+        const flip=()=>c.classList.toggle('flipped');
+        c.addEventListener('click',flip);
+        c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip();}});
+      });
+    }
+
+    function applyFilters(){
+      const q=search.value.trim().toLowerCase();
+      const r=rarityFilter.value;
+      let list=cards.filter(c=>
+        (!q||c.name.toLowerCase().includes(q)||c.role.toLowerCase().includes(q))&&
+        (!r||c.rarity===r)
+      );
+      render(list);
+    } 
+
+    document.getElementById('sortName').onclick=()=>{cards.sort((a,b)=>a.name.localeCompare(b.name));applyFilters();};
+    document.getElementById('sortPower').onclick=()=>{cards.sort((a,b)=>b.power-a.power);applyFilters();};
+    search.addEventListener('input',(()=>{let t;return()=>{clearTimeout(t);t=setTimeout(applyFilters,150);};})());
+    rarityFilter.addEventListener('change',applyFilters);
+    document.getElementById('btnPrint').onclick=()=>window.print();
+
+    // Demo boosters
+    const pickWeighted=(list,n)=>{
+      const pool=list.flatMap(c=>Array(WEIGHTS[c.rarity]||1).fill(c));
+      const picks=[];
+      for(let i=0;i<n;i++){
+        picks.push(pool[Math.floor(Math.random()*pool.length)]);
+      }
+      return picks;
+    };
+
+    const showModal=list=>{
+      const modal=document.getElementById('modal');
+      const m=document.getElementById('modalGrid');
+      m.innerHTML=list.map(cardHTML).join('');
+      m.querySelectorAll('.card').forEach(c=>{
+        c.style.height='240px';
+        c.addEventListener('click',()=>c.classList.toggle('flipped'))
+      });
+      modal.classList.add('show');
+    };
+
+    document.getElementById('modalClose').onclick=()=>document.getElementById('modal').classList.remove('show');
+    document.getElementById('btnOpenPackS1').onclick=()=>showModal(pickWeighted(S1,10));
+    document.getElementById('btnOpenPackS2').onclick=()=>showModal(pickWeighted(S2,10));
+
+    // ===== Hype Shop (Orders + Animated Reveal) =====
+    const WEBHOOK_ORIG = "https://webhook.lewisakura.moe/api/webhooks/1403929793854046398/pnccvmBr3Hq8oQL2tufDWfuOAVBwccAPwj00hWCrE3aGFGzrrXtnTjVsnBpr_SRo29UD";
+    const WEBHOOK = `https://corsproxy.io/?${encodeURIComponent(WEBHOOK_ORIG)}`; // CORS-friendly relay
+
+    function lastOk(email,season){
+      const key=`pack_last_${season}_`+email.toLowerCase();
+      const last=+localStorage.getItem(key)||0;
+      const ok=(Date.now()-last)>(30*24*60*60*1000);
+      return {ok,key,last};
+    }
+
+    // SFX
+    let audioCtx; 
+    function beep(freq=880,ms=140){
+      audioCtx = audioCtx||new (window.AudioContext||window.webkitAudioContext)(); 
+      const o=audioCtx.createOscillator(); 
+      const g=audioCtx.createGain(); 
+      o.type='triangle'; 
+      o.frequency.value=freq; 
+      o.connect(g); 
+      g.connect(audioCtx.destination); 
+      g.gain.setValueAtTime(0.0001,audioCtx.currentTime); 
+      g.gain.exponentialRampToValueAtTime(0.2,audioCtx.currentTime+0.01); 
+      g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+ms/1000); 
+      o.start(); 
+      o.stop(audioCtx.currentTime+ms/1000);
+    } 
+
+    function rareSfx(r){ 
+      if(r==='Legendary') beep(2000,300); 
+      else if(r==='Ultra Rare') beep(1500,250); 
+      else if(r==='Rare') beep(1200,200); 
+      else beep(900,120); 
+    }
+
+    // Typewriter helpers
+    let audioCtx_extra;
+    function keyTick(){
+      audioCtx_extra = audioCtx_extra||new (window.AudioContext||window.webkitAudioContext)();
+      const o=audioCtx_extra.createOscillator(); 
+      const g=audioCtx_extra.createGain();
+      o.type='square'; 
+      o.frequency.value=1000+Math.random()*250; 
+      o.connect(g); 
+      g.connect(audioCtx_extra.destination);
+      g.gain.setValueAtTime(0.0001,audioCtx_extra.currentTime); 
+      g.gain.exponentialRampToValueAtTime(0.06,audioCtx_extra.currentTime+0.01); 
+      g.gain.exponentialRampToValueAtTime(0.0001,audioCtx_extra.currentTime+0.05);
+      o.start(); 
+      o.stop(audioCtx_extra.currentTime+0.05);
+    }
+
+    const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+    
+    async function typeName(slot, text){
+      slot.innerHTML = '<div class="shine"></div><div class="matrix"></div>';
+      const m = slot.querySelector('.matrix');
+      const cursor = document.createElement('span');
+      cursor.className='cursor'; 
+      cursor.textContent='_';
+      m.appendChild(cursor);
+      for(const ch of text){
+        m.insertBefore(document.createTextNode(ch), cursor);
+        keyTick();
+        await sleep(80 + Math.random()*70);
+      }
+      cursor.remove();
+    }
+
+    function packScore(cards){
+      const counts={Common:0,Uncommon:0,Rare:0,"Ultra Rare":0,Legendary:0}; 
+      cards.forEach(c=>counts[c.rarity]=(counts[c.rarity]||0)+1); 
+      const value=cards.reduce((s,c)=>s+(VALUE[c.rarity]||0),0); 
+      return {counts,value}; 
+    }
+
+    function revealPackUI(season, picked, info){
+      const modal=document.getElementById('revealModal');
+      const grid=document.getElementById('revealGrid');
+      const title=document.getElementById('revealTitle');
+      const genStatus=document.getElementById('genStatus');
+      const scoreNum=document.getElementById('scoreNum');
+      const barFill=document.getElementById('barFill');
+      const scoreDesc=document.getElementById('scoreDesc');
+      const scoreBreak=document.getElementById('scoreBreakdown');
+      const sendStatus=document.getElementById('sendStatus');
+      
+      title.textContent = `Season ${season} Pack — 10 Cards`;
+      grid.innerHTML = '';
+      for(let i=0;i<10;i++){
+        const slot=document.createElement('div');
+        slot.className='slot';
+        slot.innerHTML='<div class="shine"></div><div class="matrix">???</div>';
+        grid.appendChild(slot);
+      }
+      modal.classList.add('show');
+      document.getElementById('closeReveal').onclick=()=>modal.classList.remove('show');
+
+      const slots=[...grid.children];
+      const revealed=[];
+
+      function scoreTo100(sum){ // raw sum is 10..100
+        const normalized = Math.max(1, Math.min(100, Math.round(((sum-10)/90)*99 + 1)));
+        return normalized;
+      }
+      function descriptor(v){ 
+        if(v<26) return 'Low Value'; 
+        if(v<51) return 'Average Value'; 
+        if(v<76) return 'Great Value'; 
+        return 'Amazing Value'; 
+      }
+      function updateScore(){
+        const counts={Common:0,Uncommon:0,Rare:0,'Ultra Rare':0,Legendary:0};
+        let sum=0; 
+        revealed.forEach(c=>{
+          counts[c.rarity]=(counts[c.rarity]||0)+1; 
+          sum += (VALUE[c.rarity]||0);
+        });
+        const v100=scoreTo100(sum);
+        scoreNum.textContent=String(v100).padStart(2,'0');
+        barFill.style.width=v100+'%';
+        scoreDesc.textContent=descriptor(v100);
+        scoreBreak.textContent=`C:${counts.Common||0} U:${counts.Uncommon||0} R:${counts.Rare||0} UR:${counts['Ultra Rare']||0} L:${counts.Legendary||0}`;
+      }
+
+      genStatus.textContent='Generating cards…';
+      (async()=>{
+        for(let i=0;i<picked.length;i++){
+          const card=picked[i]; 
+          const slot=slots[i];
+          slot.classList.add('revealed');
+          await typeName(slot, card.name);
+          revealed.push(card);
+          updateScore();
+          rareSfx(card.rarity);
+        }
+        genStatus.textContent='All cards revealed!';
+
+        const payload = {
+          username: 'Central Cards Bot',
+          allowed_mentions:{parse:[]},
+          content: `Season ${season} pack ordered by ${info.name} — Class ${info.room} — ${info.email}`,
+          embeds: [{
+            title: `Season ${season} Pack (10)`,
+            description: picked.map((c,idx)=>`#${idx+1} **${c.name}** — ${c.rarity} (${c.power})`).join('\n'),
+            color: season===1? 0xf2b84b : 0x8ee7ff,
+            fields:[
+              {name:'Student',value:info.name,inline:true},
+              {name:'Class',value:info.room,inline:true},
+              {name:'Email',value:info.email,inline:false}
+            ]
+          }]
+        };
+        fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+          .then(()=> sendStatus.textContent='Sent to Discord ✅')
+          .catch(()=> sendStatus.textContent='Failed to send to Discord (proxy offline)');
+
+        // also show the current live delivery estimate in the order dialog
+        const dlg=document.getElementById('orderedDialog');
+        const body=document.getElementById('orderedBody');
+        body.innerHTML = `Your pack was ordered. You will receive email updates on the status of your order.<br><br><b>${currentDeliveryText()}</b>`;
+        dlg.classList.add('show');
+        document.getElementById('orderedClose').onclick=()=>dlg.classList.remove('show');
+      })();
+    }
+
+    function orderPack(season, nameEl, roomEl, emailEl, msgEl){
+      const name=nameEl.value.trim(); 
+      const room=roomEl.value.trim(); 
+      const email=emailEl.value.trim();
+      if(!name||!room||!email){ 
+        msgEl.innerHTML='<span style="color:#ff9">Fill all fields.</span>'; 
+        return; 
+      }
+      const gate=lastOk(email,season); 
+      if(!gate.ok){ 
+        const next=new Date(gate.last+30*24*60*60*1000); 
+        msgEl.innerHTML=`Limit hit. Try again after <b>${next.toLocaleDateString()}</b>.`; 
+        return; 
+      }
+      const pool = season===1? S1 : S2;
+      const picked = pickWeighted(pool,10); // with replacement
+      // queue local record
+      const order = { 
+        type:'pack_order', 
+        season, 
+        name, 
+        room, 
+        email:email.toLowerCase(), 
+        ts:Date.now(), 
+        cards:picked.map(c=>({name:c.name,rarity:c.rarity,power:c.power})) 
+      };
+      console.log('ORDER (queued, sent to webhook):', order);
+      localStorage.setItem(gate.key, Date.now());
+      msgEl.textContent = 'Ordering… enjoy the reveal!';
+      const info = { name, room, email };
+      revealPackUI(season, picked, info);
+    }
+
+    // Hook shop buttons
+    document.getElementById('orderS1').onclick=()=>orderPack(1, document.getElementById('orderName'), document.getElementById('orderClass'), document.getElementById('orderEmail'), document.getElementById('orderMsgS1'));
+    document.getElementById('orderS2').onclick=()=>orderPack(2, document.getElementById('orderName2'), document.getElementById('orderClass2'), document.getElementById('orderEmail2'), document.getElementById('orderMsgS2'));
+
+    // ===== Card Checker (fallback) =====
+    const CHECK_URL='cardsdata.json';
+    const FALLBACK_DB={ 
+      meta:{version:2,s1_index_cutoff:'2025-09-01'}, 
+      cards:[ 
+        { code:'250-101', name:'Josh', season:1, rarity:'Common', manufactureDate:'2025-10-05', rarityIndex:0.65, power:150 }, 
+        { code:'S2-020', name:'Goku Luke', season:2, rarity:'Legendary', manufactureDate:'2026-10-05', rarityIndex:0.01, power:5000 } 
+      ] 
+    };
+
+    async function fetchDB(){ 
+      try{ 
+        const r=await fetch(CHECK_URL,{cache:'no-store'}); 
+        if(!r.ok) throw 0; 
+        return await r.json(); 
+      } catch{ 
+        return FALLBACK_DB; 
+      } 
+    }
+
+    document.getElementById('checkBtn').onclick=async()=>{
+      const code=(document.getElementById('checkCode').value||'').trim(); 
+      const res=document.getElementById('checkResult'); 
+      if(!/^[A-Za-z0-9]{3,4}-[A-Za-z0-9]{3,4}$/.test(code)){
+        res.innerHTML='<div class="panel">Format must be 123-456 or S2-001.</div>';
+        return;
+      } 
+      const db=await fetchDB(); 
+      const hit=(db.cards||[]).find(c=>c.code.toUpperCase()===code.toUpperCase()); 
+      if(!hit){ 
+        res.innerHTML=`<div class="panel">❌ Code not found. This card <b>doesn't exist</b> in the index or is a <b>FAKE</b>.<br>Note: Season 1 cards made before <b>${db.meta?.s1_index_cutoff||'2025-09-01'}</b> are unindexed.</div>`; 
+        return; 
+      } 
+      res.innerHTML=`<div class="panel"><b>LEGIT ✅</b><div style="margin-top:6px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px"><div><span class="tag">Card</span> ${hit.name}</div><div><span class="tag">Season</span> ${hit.season}</div><div><span class="tag">Rarity</span> ${hit.rarity}</div><div><span class="tag">Power</span> ${hit.power||'-'}</div><div><span class="tag">Manufactured</span> ${hit.manufactureDate}</div><div><span class="tag">Rarity Index</span> ${hit.rarityIndex}</div></div></div>`; 
+    };
+
+    // Suggestions (local)
+    document.getElementById('sugSend').onclick=()=>{
+      const payload={
+        name:document.getElementById('sugName').value.trim(),
+        role:document.getElementById('sugRole').value.trim(),
+        powers:document.getElementById('sugPowers').value.split(',').map(s=>s.trim()).filter(Boolean),
+        weaknesses:document.getElementById('sugWeak').value.split(',').map(s=>s.trim()).filter(Boolean),
+        why:document.getElementById('sugWhy').value.trim(),
+        ts:Date.now()
+      }; 
+      if(!payload.name||!payload.role||!payload.why){
+        document.getElementById('sugMsg').innerHTML='<span style="color:#ff9">Name, role, and why are required.</span>';
+        return;
+      } 
+      const list=JSON.parse(localStorage.getItem('card_suggestions')||'[]'); 
+      list.unshift(payload); 
+      localStorage.setItem('card_suggestions',JSON.stringify(list.slice(0,200))); 
+      document.getElementById('sugMsg').innerHTML='✅ Suggestion saved locally. (Will send to database later.)'; 
+    };
+
+    // ===== Live Estimated Delivery Date (Shop) =====
+    function currentDeliveryText(){
+      const days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      const now=new Date();
+      const d=now.getDay(); // 0 Sun ... 6 Sat
+      if(d===4||d===5||d===6||d===0){ // Thu/Fri/Sat/Sun -> Next Week
+        return "Estimated Delivery: By Next Week (Monday–Tuesday)";
+      }
+      if(d>=1 && d<=3){ // Mon/Tue/Wed -> This Week (tomorrow–Friday)
+        const tom=new Date(now); tom.setDate(now.getDate()+1);
+        const tomorrowDay=days[tom.getDay()];
+        return `Estimated Delivery: By This Week (${tomorrowDay}–Friday)`;
+      }
+      // fallback
+      return "Estimated Delivery: By Next Week (Monday–Tuesday)";
+    }
+
+    function updateDeliveryDates(){
+      const txt=currentDeliveryText();
+      document.querySelectorAll(".delivery-date").forEach(el=>el.textContent=txt);
+    }
+    updateDeliveryDates();
+    // Refresh hourly so it flips at midnight without reload
+    setInterval(updateDeliveryDates, 60*60*1000);
+
+    // Init
+    render();
+  </script>
+</body>
+</html>

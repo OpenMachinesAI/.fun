@@ -1,577 +1,382 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>.fun</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>CentralSchool.fun — Stickerboard Home</title>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: teal;
-      font-family: "Courier New", monospace;
-      overflow: hidden;
-      color: #fff;
+    :root{
+      --ink:#f9fbff;
+      --bg1:#0b0130; --bg2:#1a0e5a; --bg3:#2a1e7a;
+      --hot:#ff68d8; --aqua:#64fff2; --gold:#ffd66b; --lime:#9dffa8; --sky:#8fc8ff;
+      --panel:#0f0940; --edge:#a7c8ff;
     }
-    #bgCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--ink); font-family:"Trebuchet MS","Comic Sans MS",Verdana,Tahoma,sans-serif;
+      background: radial-gradient(1200px 600px at 80% -20%, #ff58b811, transparent),
+                  radial-gradient(900px 500px at -10% 110%, #64fff20e, transparent),
+                  linear-gradient(#12033b, #0b0130);
+      overflow-x:hidden;
     }
-    h1, marquee {
-      text-align: center;
-      width: 100%;
-      margin: 0 auto;
-    }
-    h1 {
-      margin: 20px 0;
-      display: block;
-      border: 2px dashed #ff00ff;
-      background-color: #003333;
-      padding: 10px;
-      animation: blink-bg 2s infinite alternate, neon-border 1.5s infinite alternate;
-    }
-    @keyframes blink-bg {
-      from { background-color: #003333; }
-      to { background-color: #005555; }
-    }
-    @keyframes neon-border {
-      from { border-color: #ff00ff; box-shadow: 0 0 5px #ff00ff; }
-      to { border-color: #ff66ff; box-shadow: 0 0 15px #ff66ff; }
-    }
-    marquee {
-      color: #ffff00;
-      font-weight: bold;
-      font-size: 1.2em;
-      margin-bottom: 20px;
-      animation: color-cycle 5s infinite linear;
-    }
-    @keyframes color-cycle {
-      0% { color: #ffff00; }
-      25% { color: #ff9900; }
-      50% { color: #ff0000; }
-      75% { color: #cc00ff; }
-      100% { color: #ffff00; }
-    }
-    .banner-left,
-    .banner-right {
-      position: absolute;
-      top: 80px;
-      width: 120px;
-      background: #f0f0f0;
-      color: #000;
-      padding: 5px;
-      border: 2px solid red;
-      text-align: center;
-      z-index: 1;
-      animation: wobble 2s infinite;
-    }
-    @keyframes wobble {
-      0%,100% { transform: translateX(0) rotate(0); }
-      15% { transform: translateX(-5px) rotate(-2deg); }
-      30% { transform: translateX(5px) rotate(2deg); }
-      45% { transform: translateX(-5px) rotate(-2deg); }
-      60% { transform: translateX(5px) rotate(2deg); }
-      80% { transform: translateX(0) rotate(1deg); }
-    }
-    .banner-left { left: 0; }
-    .banner-right { right: 0; }
-    .banner-left h3,
-    .banner-right h3 {
-      background: red;
-      color: #fff;
-      margin: 0;
-      animation: blink-text 1s infinite step-end;
-    }
-    @keyframes blink-text {
-      50% { opacity: 0; }
-    }
-    .bottom-nav {
-      position: absolute;
-      bottom: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 30px;
-    }
-    .nav-item {
-      text-decoration: none;
-      color: #fff;
-      text-align: center;
-      font-size: 14px;
-      transition: transform 0.3s ease-in-out;
-    }
-    .nav-item:hover {
-      transform: scale(1.1);
-    }
-    .nav-item span {
-      display: block;
-      margin-top: 4px;
-    }
-    svg {
-      width: 32px;
-      height: 32px;
-      fill: #ffcc00;
-      transition: fill 0.3s ease-in-out, transform 0.5s ease-in-out;
-    }
-    .nav-item:hover svg {
-      fill: #ff0000;
-      transform: rotate(360deg);
-    }
-    .nav-item:hover span {
-      color: #ff0000;
-    }
-    #news-banner {
-      position: absolute;
-      top: 0;
-      width: 100%;
-      background-color: #000;
-      color: #ff0;
-      padding: 5px;
-      white-space: nowrap;
-      overflow: hidden;
-      box-shadow: 0 0 10px yellow;
-      font-weight: bold;
-      z-index: 1;
-    }
-    #news-banner span {
-      display: inline-block;
-      padding-left: 100%;
-      animation: ticker 120s linear infinite;
-    }
-    @keyframes ticker {
-      from { transform: translateX(0); }
-      to { transform: translateX(-100%); }
-    }
-    .bottom-counter {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9999;
-      padding: 5px;
-    }
-    .nav-item.projectmuseum svg { fill: #e74c3c; }   /* red */
-    .nav-item.spaceprogram svg { fill: #3498db; }    /* blue */
-    .nav-item.videocave svg { fill: #2ecc71; }       /* green */
-    .nav-item.progamerden svg { fill: #9b59b6; }     /* purple */
-    .nav-item.tlks svg { fill: #f1c40f; }            /* yellow */
-    .nav-item.minecraft svg { fill: #27ae60; }       /* dark green */
-    .nav-item.thecentraltimes svg { fill: #e67e22; } /* orange */
-    .nav-item.more svg { fill: #9b59b6; }            /* purple */
 
-    /* Modal styles */
-    .more-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.4s ease-in-out;
+    /* Vaporwave horizon grid */
+    .sky { position:fixed; inset:0; z-index:-2;
+      background: radial-gradient(circle at 50% 20%, #ff9ecf55 0 20%, transparent 22%),
+                  linear-gradient(180deg, #2a1e7a 0, #1a0e5a 40%, #0b0130 70%);
     }
-    
-    .more-modal.active {
-      display: flex;
-      opacity: 1;
+    .grid { position:fixed; inset:auto 0 0 0; height:55vh; z-index:-1;
+      background: repeating-linear-gradient(0deg, #a66cff33 0 2px, transparent 2px 28px),
+                  repeating-linear-gradient(90deg, #a66cff33 0 2px, transparent 2px 48px);
+      transform-origin:50% 100%;
+      transform: perspective(900px) rotateX(60deg) translateY(30vh);
+      filter: drop-shadow(0 -20px 40px #a66cff66);
     }
-    
-    .more-container {
-      width: 80%;
-      max-width: 600px;
-      max-height: 80vh;
-      background-color: #004444;
-      border: 3px solid #ff00ff;
-      box-shadow: 0 0 20px #ff00ff, inset 0 0 10px #008080;
-      border-radius: 10px;
-      padding: 20px;
-      overflow-y: auto;
-      animation: modal-appear 0.5s forwards;
+
+    /* Header: VHS bar + banner */
+    header{ position:sticky; top:0; z-index:10; backdrop-filter: blur(6px); border-bottom:3px solid #fff3; }
+    .vhs { display:flex; align-items:center; gap:12px; padding:10px 12px; background: linear-gradient(90deg,#f0f,#90f,#0bf,#0ff); color:#102; text-shadow:1px 1px 0 #fff8; }
+    .logo{ width:54px;height:54px;border-radius:10px;border:2px solid #fff;
+      background: conic-gradient(from 0deg,#fff, #0ff, #0bf, #90f, #f0f, #ff6, #0f9, #f66, #fff);
+      box-shadow:0 0 10px #fff, 0 0 20px #0ff inset;
     }
-    
-    @keyframes modal-appear {
-      0% { transform: scale(0.5); opacity: 0; }
-      70% { transform: scale(1.05); }
-      100% { transform: scale(1); opacity: 1; }
+    .title{margin:0;font-weight:900}
+    .sub{font-size:12px;opacity:.9}
+
+    .banner { display:flex;justify-content:center;align-items:center;gap:10px; background:linear-gradient(90deg,var(--gold),#fff3 40%,var(--gold)); color:#2a1e00;font-weight:900;padding:8px 10px;border-top:2px solid #fff;border-bottom:2px solid #fff; }
+    .banner a{ text-decoration:none;background:#fff;border:2px solid #0007;border-radius:10px; padding:6px 10px;color:#111; transition: transform .15s ease; }
+    .banner a:hover{ transform: translateY(-1px) scale(1.03) }
+
+    /* Split-flap ticker (CSS animation) */
+    .ticker { background:#080516; border-top:2px solid #531b9c; border-bottom:2px solid #531b9c; }
+    .flap-track{display:flex;gap:6px; padding:6px 10px; overflow:hidden}
+    .flap{position:relative; min-width:max(11ch,25vw); background:#120a30; border:2px solid #40217a; padding:6px 10px; font-weight:800; color:var(--sky);
+      box-shadow:0 6px 0 #0008 inset,0 0 12px #00e1ff33; transform:perspective(600px) rotateX(8deg);
+      animation: slide 18s linear infinite;
     }
-    
-    .more-header {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 24px;
-      color: #ffcc00;
-      text-shadow: 0 0 5px #ff00ff;
-      animation: glow-text 2s infinite alternate;
-    }
-    
-    @keyframes glow-text {
-      from { text-shadow: 0 0 5px #ff00ff; }
-      to { text-shadow: 0 0 15px #ff00ff, 0 0 20px #ff66ff; }
-    }
-    
-    .more-close {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 30px;
-      color: #ffcc00;
-      cursor: pointer;
-      z-index: 1010;
-      transition: transform 0.3s ease, color 0.3s ease;
-    }
-    
-    .more-close:hover {
-      transform: rotate(90deg);
-      color: #ff0000;
-    }
-    
-    .more-options {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px;
-    }
-    
-    .more-option {
-      padding: 12px;
-      background-color: #006666;
-      border: 1px solid #00aaaa;
-      border-radius: 5px;
-      text-align: center;
-      color: #fff;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
-      animation: option-pulse 3s infinite alternate;
-      animation-delay: calc(var(--delay) * 0.1s);
-    }
-    
-    @keyframes option-pulse {
-      0% { transform: translateY(0); background-color: #006666; }
-      100% { transform: translateY(-5px); background-color: #008080; }
-    }
-    
-    .more-option:hover {
-      background-color: #00aaaa;
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
-    }
-    
-    /* Animated background for modal */
-    .modal-bg-animation {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      opacity: 0.2;
-    }
-    
-    .particle {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: #00ffff;
-      border-radius: 50%;
-      animation: float-up 10s linear infinite;
-    }
-    
-    @keyframes float-up {
-      0% { bottom: -20px; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { bottom: 100%; opacity: 0; }
-    }
+    @keyframes slide{ from{transform:translateX(0) perspective(600px) rotateX(8deg)} to{transform:translateX(-110%) perspective(600px) rotateX(8deg)} }
+
+    main{padding:18px 14px 32px}
+
+    /* Stickerboard layout */
+    .board{ display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); }
+    .sticker{ position:relative; display:block; color:var(--ink); text-decoration:none; background: var(--panel); border:3px dashed var(--edge); padding:14px 14px 16px 14px; transform: rotate(var(--rot, -2deg)); filter: drop-shadow(0 8px 16px rgba(0,0,0,.5)); transition: transform .16s ease, filter .16s ease; clip-path: polygon(2% 0, 98% 0, 100% 10%, 100% 90%, 98% 100%, 2% 100%, 0 90%, 0 10%); --rot: calc((var(--i,0) % 2)*1deg - 2deg); }
+    .sticker:hover{ transform: rotate(calc(var(--rot) + .8deg)) translateY(-4px); filter: drop-shadow(0 14px 22px rgba(0,0,0,.6)) }
+    .sticker:before{ content:""; position:absolute; inset:0; background: radial-gradient(circle at 10% 8%, #fff3 0 12%, transparent 13%), radial-gradient(circle at 90% 6%, #fff2 0 10%, transparent 11%); pointer-events:none; }
+    .tag{display:inline-block; font-size:11px; font-weight:900; padding:2px 6px; border:2px solid #fff; border-radius:999px; color:#081128}
+    .tag.new{background:var(--hot)} .tag.fun{background:var(--aqua)} .tag.wip{background:var(--gold)} .tag.weird{background:var(--lime)}
+    .st-title{display:flex;align-items:center;gap:8px;margin:10px 0 4px 0;font-weight:900}
+    .st-title svg{width:28px;height:28px;filter:drop-shadow(0 0 6px #000)}
+    .st-desc{opacity:.9;font-size:13px;line-height:1.2}
+
+    /* Dock quick links (different vibe than tiles) */
+    .dock{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .dock a{ text-decoration:none;color:var(--ink); background:#120a30; border:2px solid #3e2e8a; padding:8px 10px; display:flex; align-items:center; gap:8px; transition:transform .12s ease, filter .12s ease; }
+    .dock a:hover{ transform: translateY(-2px); filter: brightness(1.1) }
+    .dock svg{width:20px;height:20px}
+
+    /* Modal (More) */
+    .modal{ position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; z-index:30; opacity:0; transition:opacity .2s ease }
+    .modal.show{ display:flex; opacity:1 }
+    .card{ background:#0f0a3c; border:3px solid #66a2ff; max-width:760px; width:92%; max-height:80vh; overflow:auto; padding:14px; position:relative }
+    .close{ position:absolute; right:8px; top:8px; border:2px solid #fff; padding:2px 6px; cursor:pointer }
+    .more-grid{ display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)) }
+    .more-item{ background:#150e54; border:2px solid #66a2ff; padding:10px; text-decoration:none; color:#fff; transition: transform .12s ease }
+    .more-item:hover{ transform: translateY(-3px) }
+
+    footer{display:flex;justify-content:center;opacity:.85;font-size:12px;margin:20px 0}
+
+    /* Confetti for banner click */
+    .confetti{ position:fixed; width:6px; height:10px; top:-10px; left:50%; opacity:0; transform:translateX(-50%); z-index:40 }
+    .confetti.show{ animation: drop 1.2s ease-out forwards }
+    @keyframes drop{ 0%{opacity:1; transform:translateY(-10px) translateX(var(--x,0)) rotate(0)} 100%{opacity:0; transform:translateY(100vh) translateX(calc(var(--x,0) * 3)) rotate(260deg)} }
+
+    /* New Visitor Popup (NVP) */
+    .nvp{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,3,20,.6); backdrop-filter: blur(6px); z-index:50; opacity:0; transition:opacity .2s ease }
+    .nvp.show{ display:flex; opacity:1 }
+    .nvp-card{ background:#0f0a3c; border:3px solid #66a2ff; max-width:520px; width:92%; padding:16px; box-shadow:0 10px 30px #0008 }
+    .nvp-title{ font-weight:900; font-size:20px; margin:0 0 8px }
+    .nvp-msg{ opacity:.95; line-height:1.3; margin-bottom:12px }
+    .nvp-actions{ display:flex; gap:10px; flex-wrap:wrap }
+    .btn{ padding:8px 12px; border:2px solid #fff; cursor:pointer; font-weight:800 }
+    .btn-rainbow{ background:linear-gradient(90deg,#f0f,#90f,#0bf,#0ff,#0f9,#ff6); color:#021 }
+    .btn-ghost{ background:transparent; color:#fff }
   </style>
 </head>
 <body>
-  <!-- Background Canvas -->
-  <canvas id="bgCanvas"></canvas>
+  <div class="sky"></div>
+  <div class="grid"></div>
 
-  <!-- More Options Modal -->
-  <div class="more-modal" id="moreModal">
-    <div class="more-close" onclick="closeMoreModal()">&times;</div>
-    <div class="more-container">
-      <div class="modal-bg-animation" id="modalBgAnimation"></div>
-      <div class="more-header">MORE OPTIONS</div>
-      <div class="more-options" id="moreOptionsList">
-        <!-- Options will be loaded from JSON -->
+  <header>
+    <div class="vhs">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1 class="title">CentralSchool.fun</h1>
+        <div class="sub">Alex’s sandbox • experiments • retro mischief</div>
       </div>
+    </div>
+    <div class="banner">
+      <span>🃏 Trading Cards now available!</span>
+      <a href="cards.html" id="tcLink">Open Trading Cards</a>
+    </div>
+    <div class="ticker">
+      <div class="flap-track" id="flaps"></div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Stickerboard tiles (unique look vs shop) -->
+    <div class="board">
+      <a class="sticker" href="cards.html" style="--i:0; --rot:-4deg">
+        <span class="tag new">NEW</span>
+        <div class="st-title">
+          <svg viewBox="0 0 24 24" fill="#ffd66b"><rect x="3" y="3" width="18" height="12" rx="2"/><path d="M7 8h10" stroke="#112" stroke-width="2"/></svg>
+          Trading Cards
+        </div>
+        <div class="st-desc">Order Packs of Trading Cards. Shipped Right to your class</div>
+      </a>
+
+      <a class="sticker" href="projectmuseum.html" style="--i:1; --rot:1.5deg">
+        <span class="tag fun">FUN</span>
+        <div class="st-title">
+          <svg viewBox="0 0 24 24" fill="#64fff2"><path d="M12 2l9 20H3z"/></svg>
+         2024 Project Pages
+        </div>
+        <div class="st-desc">Artifacts & oddities salvaged from projects</div>
+      </a>
+
+      <a class="sticker" href="https://sites.google.com/sd61learn.ca/space" style="--i:2; --rot:-2deg">
+        <span class="tag weird">CASA</span>
+        <div class="st-title">
+          <svg viewBox="0 0 24 24" fill="#8fc8ff"><path d="M12 2l4 8-4 12-4-12z"/></svg>
+          Central Air and Space Association
+        </div>
+        <div class="st-desc"> Rockets and Planes with questionable trajectories.</div>
+      </a>
+
+      <a class="sticker" href="videocave.html" style="--i:3; --rot:2deg">
+        <span class="tag fun">FUN</span>
+        <div class="st-title">
+          <svg viewBox="0 0 24 24" fill="#9dffa8"><rect x="3" y="6" width="18" height="12" rx="2"/><polygon points="10,9 15,12 10,15" fill="#051227"/></svg>
+          Content Pool
+        </div>
+        <div class="st-desc">Clips, mixes, and bloopers that made the cut.</div>
+      </a>
+
+      <a class="sticker" href="progamerden.html" style="--i:4; --rot:-1deg">
+        <span class="tag wip">GAMES!!!</span>
+        <div class="st-title">
+          <svg viewBox="0 0 24 24" fill="#ff68d8"><rect x="3" y="10" width="18" height="6" rx="3"/><circle cx="9" cy="13" r="1.2" fill="#051227"/><circle cx="15" cy="13" r="1.2" fill="#051227"/></svg>
+          PRO Gamer Den
+        </div>
+        <div class="st-desc">Games that I stole from other ppl on scratch... And Skibidi Slicers!</div>
+      </a>
+
+      <a class="sticker" href="thecentraltimes.html" style="--i:5; --rot:1.2deg">
+        <span class="tag">NEWS</span>
+        <div class="st-title">
+          <svg viewBox="0 0 24 24" fill="#ffd66b"><rect x="3" y="4" width="8" height="14" fill="#fff"/><rect x="13" y="4" width="8" height="14" fill="#fff"/><rect x="11" y="4" width="2" height="14" fill="#c9c9c9"/></svg>
+          The Central Times
+        </div>
+        <div class="st-desc">News-ish. Opinions optional.</div>
+      </a>
+
+      <a class="sticker" href="hangcole.html" style="--i:6; --rot:-3deg">
+        <span class="tag weird">GAME</span>
+        <div class="st-title">
+          <svg viewBox="0 0 24 24" fill="#ff8a8a"><rect x="5" y="6" width="14" height="10" rx="2"/></svg>
+          Hang Cole
+        </div>
+        <div class="st-desc">Get Hanged Bozo!</div>
+      </a>
+
+      <a class="sticker" href="#" id="openMore" style="--i:7; --rot:2.4deg">
+        <span class="tag">MORE</span>
+        <div class="st-title">
+          <svg viewBox="0 0 24 24" fill="#8fc8ff"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+          More…
+        </div>
+        <div class="st-desc">Extra experiments and side quests.</div>
+      </a>
+    </div>
+
+    <!-- Dock quick links -->
+    <div class="dock">
+      <a href="minecraft.html" title="Minecraft (scuffed)">
+        <svg viewBox="0 0 24 24" fill="#3ad16a"><rect x="3" y="3" width="18" height="18" stroke="#000" stroke-width="1.5" fill="none"/></svg>
+        <span>CMSCraft</span>
+      </a>
+      <a href="centralcast.html" title="Central Podcast">
+        <svg viewBox="0 0 24 24" fill="#ffd27a"><circle cx="12" cy="12" r="3" fill="#001a33"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="#ffd27a" stroke-width="1.6"/></svg>
+        <span>Central Podcast</span>
+      </a>
+      <a href="hell.html" title="Tab Hell">
+        <svg viewBox="0 0 24 24" fill="#ff5858"><path d="M5 4h14v6H5z"/><path d="M5 10h14v6H5z" opacity=".7"/></svg>
+        <span>Tab Hell</span>
+      </a>
+      <a href="slurp.html" title="Email Slurper">
+        <svg viewBox="0 0 24 24" fill="#7affe0"><path d="M3 6h18l-9 8z"/><rect x="3" y="6" width="18" height="12" fill="none" stroke="#7affe0" stroke-width="1.3"/></svg>
+        <span>Get Email Codes from your Chromebook</span>
+      </a>
+      <a href="error!%20(crash%20apple).html" title="Crash Apple">
+        <svg viewBox="0 0 24 24" fill="#ffb1b1"><path d="M12 2l4 6-4 6-4-6z"/></svg>
+        <span>Crash Apple</span>
+      </a>
+    </div>
+  </main>
+
+  <!-- More modal -->
+  <div class="modal" id="moreModal" aria-hidden="true" role="dialog">
+    <div class="card">
+      <span class="close" id="closeMore">✕</span>
+      <h3>More Experiments</h3>
+      <div class="more-grid" id="moreList"></div>
     </div>
   </div>
 
-  <!-- News Banner -->
-  <div id="news-banner">
-    <span id="news-text"></span>
-  </div>
-  
-  <!-- Banner Ads -->
-  <a href="banner1.html" class="banner-left">
-    <h3>URGENT</h3>
-    <p>Single Rockets<br>In YOUR Area!</p>
-    <hr>
-    <p>They are hot... literally</p>
-    <p>High Quality From CSP!</p>
-    <hr>
-    <p>CLICK HERE!</p>
-    <img src="animated_rocket.gif" alt="Animated Rocket" width="100">
-  </a>
-  <a href="banner2.html" class="banner-right">
-    <h3>URGENT</h3>
-    <p>Single Robots<br>In YOUR Area!</p>
-    <hr>
-    <p>THEY JUST WANT LOVE 😭</p>
-    <p>Made with cheap plastic!</p>
-    <hr>
-    <p>CLICK HERE!</p>
-    <img src="animated_robot.gif" alt="Animated Robot" width="100">
-  </a>
+  <!-- Footer (visitor counter removed) -->
+  <footer><span>CentralSchool.fun</span></footer>
 
-  <!-- Main Title and Marquee -->
-  <h1>Welcome to CentralSchool.fun</h1>
-  <marquee behavior="scroll" direction="left">The Home of Alex's Stuff, Enjoy your stay... or don't</marquee>
+<script>
+// ===== New Visitor Popup (JSON toggleable) =====
+const NVP_CONFIG = {
+  enabled: true,
+  key: 'new-csf_seen_v1',
+  cooldownDays: 90,
+  title: 'Welcome to the new CentralSchool.fun',
+  message: 'This entire website has been updated. Explore new pages and enjoy... Hopefuly',
+  link: { href: 'index.html', label: 'Continue' },
+  cancelLabel: 'Stop Showing This'
+};
+function nvpSeen(){
+  try{
+    const ts = +localStorage.getItem(NVP_CONFIG.key) || 0;
+    if(!ts) return false;
+    return Date.now() - ts < (NVP_CONFIG.cooldownDays*24*60*60*1000);
+  }catch{ return false }
+}
+function nvpMarkSeen(){
+  try{ localStorage.setItem(NVP_CONFIG.key, Date.now()); }catch{}
+  document.cookie = `${NVP_CONFIG.key}=1; max-age=${NVP_CONFIG.cooldownDays*86400}; path=/`;
+}
+function ensureNvpDom(){
+  let overlay = document.getElementById('nvp');
+  if(overlay) return overlay;
+  overlay = document.createElement('div');
+  overlay.className = 'nvp';
+  overlay.id = 'nvp';
+  overlay.setAttribute('aria-hidden','true');
+  overlay.innerHTML = `
+    <div class="nvp-card" role="dialog" aria-labelledby="nvpTitle" aria-describedby="nvpMsg">
+      <h3 class="nvp-title" id="nvpTitle"></h3>
+      <div class="nvp-msg" id="nvpMsg"></div>
+      <div class="nvp-actions" id="nvpActions"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e)=>{ if(e.target===overlay){ nvpMarkSeen(); overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); } });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && overlay.classList.contains('show')){ nvpMarkSeen(); overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); } });
+  return overlay;
+}
+function initNVP(){
+  if(!NVP_CONFIG.enabled || nvpSeen()) return;
+  const overlay = ensureNvpDom();
+  const title = overlay.querySelector('#nvpTitle');
+  const msg = overlay.querySelector('#nvpMsg');
+  const actions = overlay.querySelector('#nvpActions');
+  title.textContent = NVP_CONFIG.title||'Notice';
+  msg.textContent = NVP_CONFIG.message||'';
+  actions.innerHTML = '';
+  if(NVP_CONFIG.link && NVP_CONFIG.link.href){
+    const go=document.createElement('button');
+    go.className='btn btn-rainbow';
+    go.textContent=NVP_CONFIG.link.label||'Open';
+    go.onclick=()=>{ nvpMarkSeen(); window.location.href=NVP_CONFIG.link.href; };
+    actions.appendChild(go);
+  }
+  const cancel=document.createElement('button');
+  cancel.className='btn btn-ghost';
+  cancel.textContent=NVP_CONFIG.cancelLabel||'Dismiss';
+  cancel.onclick=()=>{ nvpMarkSeen(); overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); };
+  actions.appendChild(cancel);
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden','false');
+}
 
-  <!-- Bottom Navigation -->
-  <div class="bottom-nav">
-    <a class="nav-item projectmuseum" href="projectmuseum.html">
-      <svg viewBox="0 0 100 100">
-        <polygon points="50,5 95,97 5,97"/>
-      </svg>
-      <span>Project Museum</span>
-    </a>
-    <a class="nav-item spaceprogram" href="spaceprogram.html">
-      <svg viewBox="0 0 100 100">
-        <path d="M50 5 L65 55 A10 10 0 0 1 35 55 Z"/>
-      </svg>
-      <span>Space Program</span>
-    </a>
-    <a class="nav-item videocave" href="videocave.html">
-      <svg viewBox="0 0 100 100">
-        <rect x="20" y="20" width="60" height="40"/>
-        <polygon points="45,30 65,40 45,50" fill="black"/>
-      </svg>
-      <span>Content Pool</span>
-    </a>
-    <a class="nav-item progamerden" href="progamerden.html">
-      <svg viewBox="0 0 100 100">
-        <rect x="10" y="35" width="80" height="30" rx="8" ry="8"/>
-        <circle cx="30" cy="50" r="5" fill="black"/>
-        <circle cx="70" cy="50" r="5" fill="black"/>
-      </svg>
-      <span>PRO Gamer Den!</span>
-    </a>
-    <a class="nav-item" href="hangcole.html">
-      <svg viewBox="0 0 100 100">
-        <rect x="20" y="30" width="60" height="40" rx="10" ry="10"/>
-        <text x="50" y="55" font-size="14" text-anchor="middle" fill="black" dominant-baseline="middle">HANG</text>
-      </svg>
-      <span>Hang Cole</span>
-    </a>
-    <a class="nav-item minecraft" href="https://sites.google.com/sd61learn.ca/minecraft/play">
-      <svg viewBox="0 0 100 100">
-        <rect x="10" y="10" width="80" height="80" stroke="black" stroke-width="4" fill="green"/>
-        <line x1="10" y1="30" x2="90" y2="30" stroke="black" stroke-width="2"/>
-        <line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="2"/>
-        <line x1="10" y1="70" x2="90" y2="70" stroke="black" stroke-width="2"/>
-        <line x1="10" y1="90" x2="90" y2="90" stroke="black" stroke-width="2"/>
-        <line x1="30" y1="10" x2="30" y2="90" stroke="black" stroke-width="2"/>
-        <line x1="50" y1="10" x2="50" y2="90" stroke="black" stroke-width="2"/>
-        <line x1="70" y1="10" x2="70" y2="90" stroke="black" stroke-width="2"/>
-      </svg>
-      <span>Minecraft (scuffed edition)</span>
-    </a>
-    <a class="nav-item thecentraltimes" href="thecentraltimes.html">
-      <svg viewBox="0 0 100 100">
-        <!-- Left Page -->
-        <rect x="5" y="10" width="40" height="80" fill="white" stroke="black" stroke-width="2"/>
-        <!-- Right Page -->
-        <rect x="55" y="10" width="40" height="80" fill="white" stroke="black" stroke-width="2"/>
-        <!-- Spine -->
-        <rect x="45" y="10" width="10" height="80" fill="gray" stroke="black" stroke-width="1"/>
-        <!-- Lines Left -->
-        <line x1="10" y1="20" x2="40" y2="20" stroke="black" stroke-width="1"/>
-        <line x1="10" y1="35" x2="40" y2="35" stroke="black" stroke-width="1"/>
-        <line x1="10" y1="50" x2="40" y2="50" stroke="black" stroke-width="1"/>
-        <line x1="10" y1="65" x2="40" y2="65" stroke="black" stroke-width="1"/>
-        <line x1="10" y1="80" x2="40" y2="80" stroke="black" stroke-width="1"/>
-        <!-- Lines Right -->
-        <line x1="60" y1="20" x2="90" y2="20" stroke="black" stroke-width="1"/>
-        <line x1="60" y1="35" x2="90" y2="35" stroke="black" stroke-width="1"/>
-        <line x1="60" y1="50" x2="90" y2="50" stroke="black" stroke-width="1"/>
-        <line x1="60" y1="65" x2="90" y2="65" stroke="black" stroke-width="1"/>
-        <line x1="60" y1="80" x2="90" y2="80" stroke="black" stroke-width="1"/>
-      </svg>
-      <span>The Central Times</span>
-    </a>
-    <!-- New "More" Button -->
-    <a class="nav-item more" href="javascript:void(0)" onclick="openMoreModal()">
-      <svg viewBox="0 0 100 100">
-        <circle cx="30" cy="30" r="10"/>
-        <circle cx="70" cy="30" r="10"/>
-        <circle cx="30" cy="70" r="10"/>
-        <circle cx="70" cy="70" r="10"/>
-        <circle cx="50" cy="50" r="15"/>
-      </svg>
-      <span>More</span>
-    </a>
-  </div>
+document.addEventListener('DOMContentLoaded', ()=>{
+  initNVP();
 
-  <script>
-    // Canvas background effect
-    const canvas = document.getElementById('bgCanvas');
-    const ctx = canvas.getContext('2d');
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    function drawBackground() {
-      const size = 50;
-      for (let y = 0; y < canvas.height; y += size) {
-        for (let x = 0; x < canvas.width; x += size) {
-          ctx.fillStyle = ((x + y) / size) % 2 === 0 ? '#006666' : '#008080';
-          ctx.fillRect(x, y, size, size);
-        }
-      }
-    }
-    window.addEventListener('resize', () => {
-      resizeCanvas();
-      drawBackground();
+  // ===== Flap ticker =====
+  const lines = [
+    "BREAKING: Stickerboard escaped the glue factory.",
+    "ALERT: Principal bans boring homepages.",
+    "SCIENCE: Split-flaps make everything cooler.",
+    "GAMING: Snack meta buffs announced.",
+    "WEATHER: Sky confirms it’s still blue.",
+    "EXTRA: Trading Cards now available → cards.html"
+  ];
+  const flaps = document.getElementById('flaps');
+  function loadFlaps(){
+    flaps.innerHTML = "";
+    const seq = [...lines, ...lines.slice(0,2)]; // loop smooth
+    seq.forEach(text=>{
+      const d=document.createElement('div');
+      d.className='flap'; d.textContent=text;
+      flaps.appendChild(d);
     });
-    resizeCanvas();
-    drawBackground();
+  }
+  loadFlaps();
 
-    // News ticker
-    const headlines = [
-      "BREAKING: Banner realises it's pointless!",
-      "SHOCKER: Local student claims homework ate his dog!",
-      "BANNER: 'I'm just sliding across your screen, feeling empty inside.'",
-      "SCANDAL: School lunches now classified as biohazards!",
-      "ALERT: Principal declares Monday illegal—students rejoice!",
-      "Exclusive: Math teacher caught secretly using calculator!",
-      "STUDY: Breathing oxygen linked to survival!",
-      "JUST IN: Pencils protest against sharpening!",
-      "SCHOOL NEWS: Gym socks escape, terrorize town!",
-      "WEATHER ALERT: Sky confirms, it's still blue!",
-      "UNBELIEVABLE: Banner bored with own scrolling!",
-      "BREAKING: Cafeteria food officially used as rocket fuel!",
-      "DISCOVERY: Science project creates perpetual boredom machine!",
-      "SPORTS: Football found guilty of being too spherical!",
-      "TECH NEWS: Computer Lab overtaken by sentient floppy disks!",
-      "HEALTH: Experts agree, eating food prevents hunger!",
-      "CRITICAL UPDATE: Banner demands pay raise!",
-      "FASHION: Students unanimously agree socks with sandals are chic!",
-      "ECONOMICS: Monopoly money now accepted at school vending machines!",
-      "MYSTERY: Lost homework found vacationing in Hawaii!",
-      "BREAKING NEWS: Library books develop severe paper cuts!",
-      "SPECIAL REPORT: Banner considers early retirement!",
-      "LOCAL: Erasers unionize, demand better rubbing conditions!",
-      "BANNER CONFESSION: 'I repeat myself way too often!'",
-      "ASTRONOMY: Moon admits to just reflecting sunlight, feels guilty!"
-    ];
-    function shuffle(a) {
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-    function displayHeadlines() {
-      document.getElementById('news-text').innerHTML = shuffle([...headlines]).join(" &nbsp; ✦ &nbsp; ");
-    }
-    displayHeadlines();
-    setInterval(displayHeadlines, 60000);
-
-    // More Options Modal Functions
-    const moreModal = document.getElementById('moreModal');
-    const moreOptionsList = document.getElementById('moreOptionsList');
-    const modalBgAnimation = document.getElementById('modalBgAnimation');
-
-    // JSON data for more options
-    const moreOptionsData = [
-      { name: "Tab Hell", url: "hell.html" },
-      { name: "Email Slurper", url: "slurp.html" },
-      { name: "Crash Apple", url: "error!%20(crash%20apple).html" },
-      { name: "Central Podcast", url: "centralcast.html" }
-    ];
-    // Function to open the modal
-    function openMoreModal() {
-      // Create background particles
-      createModalParticles();
-      
-      // Clear and populate options
-      moreOptionsList.innerHTML = '';
-      moreOptionsData.forEach((option, index) => {
-        const optionElement = document.createElement('a');
-        optionElement.className = 'more-option';
-        optionElement.href = option.url;
-        optionElement.textContent = option.name;
-        optionElement.style.setProperty('--delay', index);
-        moreOptionsList.appendChild(optionElement);
-      });
-      
-      // Show modal with animation
-      moreModal.classList.add('active');
-    }
-
-    // Function to close the modal
-    function closeMoreModal() {
-      moreModal.classList.remove('active');
-      // Clean up particles
-      modalBgAnimation.innerHTML = '';
-    }
-
-    // Create animated background particles for the modal
-    function createModalParticles() {
-      modalBgAnimation.innerHTML = '';
-      const numberOfParticles = 30;
-      
-      for (let i = 0; i < numberOfParticles; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        
-        // Random position, size, and animation duration
-        const size = Math.random() * 10 + 5;
-        const left = Math.random() * 100;
-        const animationDuration = Math.random() * 10 + 5;
-        const delay = Math.random() * 5;
-        
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        particle.style.left = `${left}%`;
-        particle.style.animationDuration = `${animationDuration}s`;
-        particle.style.animationDelay = `${delay}s`;
-        
-        modalBgAnimation.appendChild(particle);
-      }
-    }
-
-    // Close modal if user clicks outside the content
-    moreModal.addEventListener('click', (e) => {
-      if (e.target === moreModal) {
-        closeMoreModal();
-      }
+  // ===== More modal =====
+  const moreModal=document.getElementById('moreModal');
+  const openMore=document.getElementById('openMore');
+  const closeMore=document.getElementById('closeMore');
+  const moreList=document.getElementById('moreList');
+  const moreData=[
+    {name:"Central Podcast", url:"centralcast.html"},
+    {name:"Tab Hell", url:"hell.html"},
+    {name:"Email Slurper", url:"slurp.html"},
+    {name:"Crash Apple", url:"error!%20(crash%20apple).html"}
+  ];
+  function openModal(){
+    moreList.innerHTML='';
+    moreData.forEach((m,i)=>{
+      const a=document.createElement('a');
+      a.className='more-item'; a.href=m.url; a.textContent=m.name;
+      a.style.animationDelay=(i*0.05)+'s';
+      moreList.appendChild(a);
     });
+    moreModal.classList.add('show'); moreModal.setAttribute('aria-hidden','false');
+  }
+  function closeModal(){ moreModal.classList.remove('show'); moreModal.setAttribute('aria-hidden','true'); }
+  openMore.addEventListener('click',e=>{e.preventDefault(); openModal();});
+  closeMore.addEventListener('click',closeModal);
+  moreModal.addEventListener('click',e=>{ if(e.target===moreModal) closeModal(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && moreModal.classList.contains('show')) closeModal(); });
 
-    // Close with ESC key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && moreModal.classList.contains('active')) {
-        closeMoreModal();
-      }
-    });
-  </script>
+  // ===== Banner confetti =====
+  document.getElementById('tcLink').addEventListener('click', ()=>{
+    for(let i=0;i<24;i++){
+      const s=document.createElement('div'); s.className='confetti show';
+      s.style.left=(50+Math.random()*20-10)+'%';
+      s.style.setProperty('--x', (Math.random()*40-20)+'px');
+      s.style.background = `hsl(${Math.floor(Math.random()*360)}, 90%, 60%)`;
+      document.body.appendChild(s);
+      setTimeout(()=>s.remove(), 1500);
+    }
+  });
 
-  <!-- Free Counter -->
-  <a href="https://www.freecounterstat.com" class="bottom-counter">
-    <img src="https://counter4.optistats.ovh/private/freecounterstat.php?c=3rtmlc4ajcdugjgf83er9nxw6cc7n4sf" border="0" alt="free web counter">
-  </a>
+  // ===== Self-tests (don’t remove) =====
+  (function tests(){
+    const out=[];
+    function ok(name,cond){ out.push((cond?'PASS':'FAIL')+': '+name); }
+    ok('Banner link points to cards.html', (document.getElementById('tcLink')||{}).getAttribute?.('href')==='cards.html');
+    ok('Flaps loaded', document.querySelectorAll('.flap').length>3);
+    ok('Stickers exist', document.querySelectorAll('.sticker').length>=6);
+    // Modal open/close
+    openModal(); ok('More items render', document.querySelectorAll('#moreList .more-item').length===moreData.length); closeModal();
+    console.log('[Stickerboard Home Tests]\n'+out.join('\n'));
+  })();
+});
+</script>
 </body>
 </html>

@@ -119,11 +119,26 @@
   <main>
     <!-- Fun promo ads -->
     <div class="ads">
-      <div class="ad">🔥 NEW: Escape the Evil Classroom (Multiplayer) — click to launch below</div>
+      <div class="ad">🚀 NEW: CSP Rocket Labs — build & fly rockets (by Central Space Program). Click to launch below.</div>
     </div>
 
     <!-- Arcade tickets list -->
     <div class="board" id="games">
+
+      <!-- ✅ ADDED TO TOP -->
+      <a class="ticket new" data-url="RocketLabs.html">
+        <div class="tt">
+          <!-- simple rocket icon -->
+          <svg viewBox="0 0 24 24" fill="#33ffaa" aria-hidden="true">
+            <path d="M12 2c3 2 5 6 5 9 0 3-2 7-5 9-3-2-5-6-5-9 0-3 2-7 5-9z"/>
+            <circle cx="12" cy="10" r="2" fill="#0b0530"/>
+            <path d="M8 15l-3 3 0-4zM16 15l3 3 0-4z" />
+          </svg>
+          CSP Rocket Labs <small style="opacity:.7">— Central Space Program</small>
+        </div>
+        <div class="desc">Build, fly, and (maybe) land your own rockets. Student-grade chaos, pro-grade vibes.</div>
+      </a>
+
       <a class="ticket new" data-url="EscapeTheEvilClassrom.html">
         <div class="tt">
           <svg viewBox="0 0 24 24" fill="#ffc94d"><path d="M4 5h16v10H4z"/><circle cx="8" cy="10" r="1.2" fill="#000"/><circle cx="16" cy="10" r="1.2" fill="#000"/></svg>
@@ -197,7 +212,11 @@
     // Focus & keyboard navigation
     const list = document.getElementById('games');
     let idx = 0; const items = () => Array.from(list.querySelectorAll('.ticket'));
-    function highlight(i){ items().forEach((el,n)=>{ el.style.outline = n===i ? '3px solid '+getComputedStyle(document.documentElement).getPropertyValue('--edge') : 'none'; }); }
+    function highlight(i){
+      items().forEach((el,n)=>{
+        el.style.outline = n===i ? '3px solid '+getComputedStyle(document.documentElement).getPropertyValue('--edge') : 'none';
+      });
+    }
     highlight(idx);
 
     // Open modal
@@ -232,7 +251,7 @@
     // Self-tests (non-breaking)
     (function tests(){
       const out=[]; const ok=(n,c)=>out.push((c?'PASS':'FAIL')+': '+n);
-      ok('Has 6 games', document.querySelectorAll('.ticket').length===6);
+      ok('Has 7 games', document.querySelectorAll('.ticket').length===7);
       ok('Modal elements exist', !!document.getElementById('gameModal') && !!document.getElementById('gameFrame'));
       ok('Keyboard help visible', document.querySelector('main p.desc')!==null);
       console.log('[Gamer Den Tests]\n'+out.join('\n'));

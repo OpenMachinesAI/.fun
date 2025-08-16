@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Central School • Hub (Neocities 90s)</title>
+  <style>
+    /* 90s Neocities neon aesthetic blended with Google-like minimal layout + rainbow animations & glow */
+    :root{
+      --bg:#050014;
+      --panel:#12072a;
+      --accent1:#ff6ec7;
+      --accent2:#7ae7ff;
+      --accent3:#ffd166;
+      --ink:#eaf3ff;
+      --muted:#b8c1d9;
+      --glass:rgba(255,255,255,0.04);
+      --radius:14px;
+      --gap:18px;
+      font-family: 'Press Start 2P', 'Courier New', monospace;
+    }
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:radial-gradient(800px 400px at 10% 10%, rgba(255,74,199,0.06), transparent),
+      radial-gradient(800px 400px at 90% 90%, rgba(122,231,255,0.04), transparent), var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased}
+
+    /* animated background blobs */
+    .bg-blob{position:fixed;pointer-events:none;z-index:0;filter:blur(48px);opacity:0.9;mix-blend-mode:screen}
+    .blob1{width:520px;height:520px;left:-120px;top:-80px;background:linear-gradient(135deg,var(--accent1),var(--accent2));animation:blobMove1 18s ease-in-out infinite}
+    .blob2{width:420px;height:420px;right:-120px;bottom:-100px;background:linear-gradient(135deg,var(--accent3),var(--accent2));animation:blobMove2 22s ease-in-out infinite}
+    @keyframes blobMove1{0%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(28px) rotate(8deg)}100%{transform:translateY(0) rotate(0deg)}}
+    @keyframes blobMove2{0%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-32px) rotate(-6deg)}100%{transform:translateY(0) rotate(0deg)}}
+
+    /* Center Google-like layout */
+    .container{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;position:relative;z-index:2}
+    .brand{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:20px}
+
+    /* big rainbow logo with glow */
+    .logo-big{width:420px;height:128px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:900;color:var(--ink);background:linear-gradient(90deg,#0000,#0000);position:relative;overflow:hidden;transform:skewX(-6deg);}
+    .logo-big::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#ff0066,#ff7a00,#ffd400,#5cff00,#00e1ff,#7a00ff,#ff00c8);background-size:280% 100%;animation:rainbowShift 8s linear infinite;opacity:0.28;mix-blend-mode:screen}
+    .logo-big .text{position:relative;padding:8px 18px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,255,255,0.92));color:#081225;font-weight:900;box-shadow:0 18px 50px rgba(122,231,255,0.07), 0 0 40px rgba(255,110,199,0.06)}
+    @keyframes rainbowShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+    .tagline{color:var(--muted);font-size:13px}
+
+    /* Search area */
+    .search-wrap{width:100%;max-width:980px;margin-top:12px;display:flex;flex-direction:column;align-items:center;gap:12px}
+    .search-box{display:flex;align-items:center;width:100%;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;box-shadow:0 18px 60px rgba(2,6,25,0.7);border:1px solid rgba(255,255,255,0.04)}
+    .search-input{flex:1;padding:18px 20px;border-radius:12px;border:2px solid rgba(255,255,255,0.04);background:linear-gradient(180deg,#ffffff,#f5f7ff);font-size:18px;color:#012;outline:none;transition:box-shadow .12s,border-color .12s,transform .06s}
+    .search-input:focus{box-shadow:0 10px 40px rgba(122,231,255,0.16);border-color:var(--accent2);transform:translateY(-2px)}
+    .search-buttons{display:flex;gap:10px;margin-left:14px}
+    .btn{padding:12px 16px;border-radius:12px;border:0;font-weight:800;cursor:pointer}
+    .btn-go{background:linear-gradient(90deg,var(--accent1),var(--accent3));color:#041825;box-shadow:0 10px 30px rgba(255,110,199,0.08), 0 0 30px rgba(255,110,199,0.04);transition:filter .2s}
+    .btn-go:hover{filter:drop-shadow(0 0 20px rgba(255,110,199,0.25))}
+    .btn-lucky{background:linear-gradient(90deg,#ffffff66,#e6f7ff33);color:var(--panel);font-weight:700}
+
+    /* mini menus container */
+    .menus{display:flex;gap:12px;margin-top:16px;justify-content:center;flex-wrap:wrap}
+
+    .menu{position:relative;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;min-width:140px;display:flex;align-items:center;gap:10px;transition:transform .12s}
+    .menu:hover{transform:translateY(-6px)}
+    .menu .m-label{font-weight:900;color:var(--accent3);letter-spacing:0.4px}
+    .menu .m-emoji{font-size:20px}
+
+    /* dropdown panel (hidden until hover) */
+    .menu-panel{position:absolute;top:calc(100% + 12px);left:0;right:auto;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:10px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 20px 60px rgba(2,6,25,0.7);overflow:hidden;max-height:0;opacity:0;transform:translateY(-6px);transition:all .28s cubic-bezier(.2,.9,.2,1);z-index:5;width:320px}
+    .menu:hover .menu-panel{max-height:420px;opacity:1;transform:translateY(0)}
+
+    .menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+    .menu-item{padding:8px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.03);font-weight:700;color:var(--muted);display:flex;gap:10px;align-items:center;text-decoration:none}
+    .menu-item:hover{color:#081225;background:linear-gradient(90deg,var(--accent2),var(--accent1));filter:drop-shadow(0 12px 28px rgba(122,231,255,0.06));}
+
+    /* arrow pointer */
+    .menu-panel::before{content:'';position:absolute;top:-8px;left:20px;width:16px;height:16px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));transform:rotate(45deg);border-left:1px solid rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.04)}
+
+    /* make the 'My Class' open classroom.google.com directly */
+    .menu.myclass{min-width:200px}
+
+    /* responsive */
+    @media (max-width:720px){
+      .menu-panel{left:50%;transform:translateX(-50%) translateY(-6px);width:88vw}
+      .menu{min-width:48%;justify-content:center}
+    }
+
+    /* footer */
+    .footer{position:fixed;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:18px;color:var(--muted);font-size:13px;z-index:3}
+    .footer a{color:var(--accent2);text-decoration:none;font-weight:700}
+
+  </style>
+</head>
+<body>
+
+  <div class="bg-blob blob1"></div>
+  <div class="bg-blob blob2"></div>
+
+  <main class="container">
+    <div class="brand">
+      <div class="logo-big"><div class="text">CentralHub</div></div>
+      <div class="tagline">Search Across Central and the Web</div>
+    </div>
+
+    <div class="search-wrap">
+      <div class="search-box">
+        <form id="searchForm" action="https://www.google.com/search" method="get" target="_blank" style="display:flex;flex:1;gap:12px;align-items:center">
+          <input id="searchInput" name="q" class="search-input" placeholder="Search Google or type a site (try 'eagle 9')" autocomplete="off" />
+          <div class="search-buttons">
+            <button class="btn btn-go" type="submit">Search</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Mini menus that expand on hover into up to 6 options -->
+      <div class="menus">
+        <!-- Fun -->
+        <div class="menu" aria-haspopup="true">
+          <div class="m-emoji">🕹️</div>
+          <div class="m-label">Fun</div>
+          <div class="menu-panel">
+            <div class="menu-grid">
+              <a class="menu-item" href="https://www.centralschool.fun/hangcole.html">HangMan (With Cole)</a>
+              <a class="menu-item" href="https://www.centralschool.fun/progamerden.html">Play Central Games</a>
+              <a class="menu-item" href="https://neal.fun/">Play Web Games</a>
+              <a class="menu-item" href="https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb">Watch Central Videos</a>
+              <a class="menu-item" href="https://www.centralschool.fun/cards.html">Order Trading Cards</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Educational -->
+        <div class="menu" aria-haspopup="true">
+          <div class="m-emoji">📚</div>
+          <div class="m-label">Educational</div>
+          <div class="menu-panel">
+            <div class="menu-grid">
+              <a class="menu-item" href="https://central.sd61.bc.ca/">Central's Website</a>
+              <a class="menu-item" href="https://www.centralschool.fun/thecentraltimes.html">Central Times</a>
+              <a class="menu-item" href="https://studentconnect.sd61.bc.ca/">Student Connect</a>
+              <a class="menu-item" href="https://bced.vretta.com/#/en/bced-landing/fsa/secure">Foundational Skills Assessment (FSA)</a>
+              <a class="menu-item" href="https://www.awinfosys.com/SurveyFull1/central/main/access.asp">Student Learning Survey
+</a>
+              <a class="menu-item" href="https://drive.google.com/drive/my-drive">Google Drive</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support -->
+        <div class="menu" aria-haspopup="true">
+          <div class="m-emoji">🛠️</div>
+          <div class="m-label">Support</div>
+          <div class="menu-panel">
+            <div class="menu-grid">
+              <a class="menu-item" href="https://sites.google.com/sd61learn.ca/cbusters/home">ChromeBusters</a>
+              <a class="menu-item" href="https://mail.google.com/mail/?view=cm&to=dshortreed@sd61learn.ca">Contact Mr Shortreed</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- My Class (opens Google Classroom) -->
+        <div class="menu myclass" aria-haspopup="false" onclick="openClassroom()" role="button">
+          <div class="m-emoji">🏫</div>
+          <div class="m-label">My Class</div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <div class="footer">
+    <a href="/links.html">Links</a>
+    <a href="/help.html">Help</a>
+    <a href="#" id="clearCookie">Clear</a>
+  </div>
+
+  <script>
+    // Removed saving/profile cookies as requested — UI only
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      // focus search with '/'
+      document.addEventListener('keydown', e=>{ if(e.key==='/' && document.activeElement.tagName !== 'INPUT'){ e.preventDefault(); document.getElementById('searchInput').focus(); }});
+
+      // Accessibility: allow tapping a menu on mobile to toggle panel
+      document.querySelectorAll('.menu[aria-haspopup="true"]').forEach(menu => {
+        let opened = false;
+        // on click toggle (mobile)
+        menu.addEventListener('click', (e) => {
+          // don't trigger click when clicking a menu-item link
+          if (e.target.closest('.menu-item')) return;
+          opened = !opened;
+          const panel = menu.querySelector('.menu-panel');
+          if (opened) {
+            panel.style.maxHeight = panel.scrollHeight + 'px';
+            panel.style.opacity = 1;
+            panel.style.transform = 'translateY(0)';
+            // ensure panel visible on small screens
+            ensureVisible(menu);
+          } else {
+            panel.style.maxHeight = '0';
+            panel.style.opacity = 0;
+            panel.style.transform = 'translateY(-6px)';
+            restoreScroll(menu);
+          }
+        });
+        // close when clicking outside
+        document.addEventListener('click', (e)=>{
+          if (!menu.contains(e.target)) {
+            opened = false;
+            const panel = menu.querySelector('.menu-panel');
+            panel.style.maxHeight = '0'; panel.style.opacity = 0; panel.style.transform = 'translateY(-6px)';
+            restoreScroll(menu);
+          }
+        });
+
+        // hover behavior: compute visibility after hover triggers CSS panel
+        menu.addEventListener('mouseenter', ()=>{ setTimeout(()=>ensureVisible(menu),90); });
+        menu.addEventListener('mouseleave', ()=>{ setTimeout(()=>restoreScroll(menu),90); });
+      });
+
+    });
+
+    function ensureVisible(menu){
+      try{
+        const panel = menu.querySelector('.menu-panel');
+        if(!panel) return;
+        // if panel is collapsed, temporarily expand to measure
+        const prevMax = panel.style.maxHeight;
+        const prevOp = panel.style.opacity;
+        const isCollapsed = getComputedStyle(panel).opacity === '0' || parseFloat(getComputedStyle(panel).maxHeight) === 0;
+        if(isCollapsed){
+          panel.style.maxHeight = panel.scrollHeight + 'px';
+          panel.style.opacity = 1;
+          panel.style.transform = 'translateY(0)';
+        }
+
+        const rect = panel.getBoundingClientRect();
+        const padding = 24; // comfortable space from bottom
+        const over = rect.bottom - (window.innerHeight - padding);
+        if(over > 8){
+          // smooth scroll by the amount needed
+          window.scrollBy({ top: over + padding, left: 0, behavior: 'smooth' });
+          // save how much we scrolled for this menu so we can reverse it later
+          menu.dataset.scrolled = (over + padding).toString();
+        } else {
+          menu.dataset.scrolled = '0';
+        }
+
+        // restore collapsed state if we temporarily changed it
+        if(isCollapsed){
+          panel.style.maxHeight = prevMax;
+          panel.style.opacity = prevOp;
+          panel.style.transform = 'translateY(-6px)';
+        }
+      }catch(e){/* ignore measurement errors */}
+    }
+
+    function restoreScroll(menu){
+      try{
+        const sc = parseFloat(menu.dataset.scrolled || '0');
+        if(sc && !isNaN(sc) && Math.abs(sc) > 4){
+          window.scrollBy({ top: -sc, left: 0, behavior: 'smooth' });
+          menu.dataset.scrolled = '0';
+        }
+      }catch(e){}
+    }
+
+    function openClassroom(){ window.open('https://classroom.google.com','_blank'); }
+    function nav(path){ if (path.startsWith('/')) path = path.replace(/^\/+/,''); window.location.href = '/' + path; }
+  </script>
+</body>
+</html>

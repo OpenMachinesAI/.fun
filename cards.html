@@ -438,10 +438,10 @@
     </div>
   </div>
 
-  <script>
+   <script>
 /* ================================
    Central Cards — Discord Webhook Edition
-   Drop-in replacement for your <script> block
+   Patched to use no-cors for Discord webhook
    ================================ */
 
 const WEBHOOK_URL = "https://webhook.lewisakura.moe/api/webhooks/1403929793854046398/pnccvmBr3Hq8oQL2tufDWfuOAVBwccAPwj00hWCrE3aGFGzrrXtnTjVsnBpr_SRo29UD";
@@ -452,7 +452,7 @@ function rarityColor(r){
        : r==="Ultra Rare" ? 0x3498DB
        : r==="Rare" ? 0xF1C40F
        : r==="Uncommon" ? 0x2ECC71
-       : 0x5865F2; // Common / default
+       : 0x5865F2;
 }
 function rarityEmoji(r){
   return r==="Legendary" ? "🏆"
@@ -465,6 +465,7 @@ async function sendDiscord(payload){
   try{
     await fetch(WEBHOOK_URL, {
       method:"POST",
+      mode:"no-cors", // patched
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify(payload)
     });

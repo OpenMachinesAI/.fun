@@ -2,7 +2,7 @@
   "name": "Aqua Addons",
   "short_name": "Addon Store",
   "description": "Approved addons for Central School Aqua Player",
-  "start_url": "https://www.centralschool.fun/aqua/store.html;",
+  "start_url": "store.html;",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",

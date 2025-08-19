@@ -1,0 +1,19 @@
+{
+  "name": "Aqua Addons",
+  "short_name": "Addon Store",
+  "description": "Approved addons for Central School Aqua Player",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#05232a",
+  "theme_color": "#03242c",
+  "icons": [
+    {
+      "src": "https://media.baamboozle.com/uploads/images/43234/1614004456_42049.png' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233dd5ff'/></svg>",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+[
+{
+"id": "music",
+"name": "Music Player",
+"icon": "icons/music.png",
+"desc": "Play school's approved MP3 lessons",
+"url": "app://music-player/",
+"installable": true
+},
+{
+"id": "notes",
+"name": "Class Notes",
+"icon": "icons/notes.png",
+"desc": "View school notes and homework",
+"url": "https://intranet.school.local/notes",
+"installable": false
+}
+]

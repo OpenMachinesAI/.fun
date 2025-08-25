@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Device Stats Dashboard</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #3a7bd5, #00d2ff);
+      color: white;
+      text-align: center;
+      padding: 2em;
+      animation: fadeIn 1s ease-in;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 0.2em;
+      text-shadow: 2px 2px 4px #000;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2em;
+      margin-bottom: 2em;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      padding: 1em 2em;
+      min-width: 160px;
+      animation: slideUp 1s ease forwards;
+      opacity: 0;
+    }
+
+    .stat h2 {
+      font-size: 2.5em;
+      margin: 0;
+    }
+
+    .stat p {
+      font-size: 1.1em;
+      margin-top: 0.5em;
+    }
+
+    .section {
+      margin-top: 2em;
+      animation: fadeIn 2s ease;
+    }
+
+    .device-list {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .device-list li {
+      background: rgba(255, 255, 255, 0.1);
+      margin: 0.5em 0;
+      padding: 0.5em;
+      border-radius: 8px;
+      list-style: none;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(40px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      } to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 School Device Tracker</h1>
+
+  <div class="stats">
+    <div class="stat" style="animation-delay: 0.1s">
+      <h2>127</h2>
+      <p>Total Devices</p>
+    </div>
+    <div class="stat" style="animation-delay: 0.2s">
+      <h2>107</h2>
+      <p>In Chromebook Carts</p>
+    </div>
+    <div class="stat" style="animation-delay: 0.3s">
+      <h2>20</h2>
+      <p>In Tech Tubs</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>💻 Chromebook Carts</h2>
+    <ul class="device-list">
+      <li>Carson Cart — 11 Chromebooks</li>
+      <li>Catie Cart — 26 Chromebooks</li>
+      <li>Chantel Cart — 16 Chromebooks</li>
+      <li>Messi Cart — 17 Chromebooks</li>
+      <li>Renoldo Cart — 18 Chromebooks</li>
+      <li>Falcon Cart — 19 Chromebooks</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>📦 Tech Tubs</h2>
+    <ul class="device-list">
+      <li>Victory — 4 iPads</li>
+      <li>Harmony — 6 iPads</li>
+      <li>Unity — 6 Chromebooks</li>
+      <li>Inspire — 4 Chromebooks</li>
+      <li>Endevor — 5 iPads</li>
+      <li>Triumph — 0 Devices</li>
+      <li>Liberty — 0 Devices</li>
+      <li>Victory — 2 Chromebooks</li>
+      <li>Bravery — 0 Devices</li>
+    </ul>
+  </div>
+</body>
+</html>

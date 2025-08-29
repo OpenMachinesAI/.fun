@@ -1,0 +1,154 @@
+{
+  "games": [
+    {
+      "id": "sports",
+      "title": "Wii-ish Sports",
+      "images": [
+        "https://picsum.photos/seed/sport1/640/480",
+        "https://picsum.photos/seed/sport2/640/480",
+        "https://picsum.photos/seed/sport3/640/480"
+      ],
+      "splash": {
+        "art": "https://media.giphy.com/media/l0MYGb8PjKLQCBgSA/giphy.gif",
+        "music": "https://files.catbox.moe/6d4y5t.mp3",
+        "howto": "Swing the controller to serve. Move with the D-Pad. First to 11 wins.",
+        "href": "#sports-start"
+      }
+    },
+    {
+      "id": "racer",
+      "title": "Turbo Racer",
+      "images": [
+        "https://picsum.photos/seed/race1/640/480",
+        "https://picsum.photos/seed/race2/640/480",
+        "https://picsum.photos/seed/race3/640/480"
+      ],
+      "splash": {
+        "art": "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
+        "music": "https://files.catbox.moe/9o0m9j.mp3",
+        "howto": "Hold accelerate to start. Use left/right to steer. Brake on corners.",
+        "href": "#racer"
+      }
+    },
+    {
+      "id": "puzzle",
+      "title": "Puzzle Box",
+      "images": [
+        "https://picsum.photos/seed/puz1/640/480",
+        "https://picsum.photos/seed/puz2/640/480",
+        "https://picsum.photos/seed/puz3/640/480"
+      ],
+      "splash": {
+        "art": "https://media.giphy.com/media/l0HFjV6M3S9k1eKXu/giphy.gif",
+        "music": "https://files.catbox.moe/z7u8pc.mp3",
+        "howto": "Match shapes by color. Chain 4+ for bonus time.",
+        "href": "#puzzle"
+      }
+    },
+    {
+      "id": "music",
+      "title": "Rhythm Mix",
+      "images": [
+        "https://picsum.photos/seed/mix1/640/480",
+        "https://picsum.photos/seed/mix2/640/480",
+        "https://picsum.photos/seed/mix3/640/480"
+      ],
+      "splash": {
+        "art": "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif",
+        "music": "https://files.catbox.moe/1v9k7d.mp3",
+        "howto": "Tap on the beat. Long notes = hold.",
+        "href": "#rhythm"
+      }
+    },
+    {
+      "id": "builder",
+      "title": "Builder+",
+      "images": [
+        "https://picsum.photos/seed/build1/640/480",
+        "https://picsum.photos/seed/build2/640/480",
+        "https://picsum.photos/seed/build3/640/480"
+      ],
+      "splash": {
+        "art": "https://media.giphy.com/media/3o7aCRuE3f1T8GJZfO/giphy.gif",
+        "music": "https://files.catbox.moe/klx7tq.mp3",
+        "howto": "Place blocks to solve challenges. Save often!",
+        "href": "#builder"
+      }
+    },
+    {
+      "id": "indie",
+      "title": "Indie Picks",
+      "images": [
+        "https://picsum.photos/seed/ind1/640/480",
+        "https://picsum.photos/seed/ind2/640/480",
+        "https://picsum.photos/seed/ind3/640/480"
+      ],
+      "splash": {
+        "art": "https://media.giphy.com/media/l0ExncehJzexFpRHq/giphy.gif",
+        "music": "https://files.catbox.moe/3k2d0y.mp3",
+        "howto": "Curated indie fun. Explore and enjoy.",
+        "href": "#indie"
+      }
+    },
+    {
+      "id": "arcade",
+      "title": "Classic Arcade",
+      "images": [
+        "https://picsum.photos/seed/arcade1/640/480",
+        "https://picsum.photos/seed/arcade2/640/480",
+        "https://picsum.photos/seed/arcade3/640/480"
+      ],
+      "splash": {
+        "art": "https://media.giphy.com/media/xT39D7O9Xj1JqKq5i0/giphy.gif",
+        "music": "https://files.catbox.moe/arcade.mp3",
+        "howto": "Retro games collection. High scores matter!",
+        "href": "#arcade"
+      }
+    },
+    {
+      "id": "adventure",
+      "title": "Adventure Quest",
+      "images": [
+        "https://picsum.photos/seed/adv1/640/480",
+        "https://picsum.photos/seed/adv2/640/480",
+        "https://picsum.photos/seed/adv3/640/480"
+      ],
+      "splash": {
+        "art": "https://media.giphy.com/media/3oKIPf3C7HqqYBVcCk/giphy.gif",
+        "music": "https://files.catbox.moe/quest.mp3",
+        "howto": "Explore vast worlds. Collect items and solve mysteries.",
+        "href": "#adventure"
+      }
+    },
+    {
+      "id": "strategy",
+      "title": "Strategy Master",
+      "images": [
+        "https://picsum.photos/seed/strat1/640/480",
+        "https://picsum.photos/seed/strat2/640/480",
+        "https://picsum.photos/seed/strat3/640/480"
+      ],
+      "splash": {
+        "art": "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+        "music": "https://files.catbox.moe/strategy.mp3",
+        "howto": "Plan your moves carefully. Outsmart your opponents.",
+        "href": "#strategy"
+      }
+    },
+    {
+      "id": "horror",
+      "title": "Spooky Tales",
+      "images": [
+        "https://picsum.photos/seed/horror1/640/480",
+        "https://picsum.photos/seed/horror2/640/480",
+        "https://picsum.photos/seed/horror3/640/480"
+      ],
+      "splash": {
+        "art": "https://media.giphy.com/media/xT9IgvEOwRzUcZDRiU/giphy.gif",
+        "music": "https://files.catbox.moe/spooky.mp3",
+        "howto": "Survive the night. Find clues and escape.",
+        "href": "#horror"
+      }
+    }
+  ]
+}

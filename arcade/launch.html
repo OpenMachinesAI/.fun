@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CentralArcade</title>
+<style>
+  :root {
+    --bg: #eef2f7;
+    --tile: #ffffff;
+    --shadow: 0 6px 22px rgba(0, 0, 0, .12), 0 2px 4px rgba(0, 0, 0, .06);
+    --accent: #49b8ff;
+    --accent2: #bfe6ff;
+    --text: #24364b;
+    --muted: #6d829c;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box }
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color: var(--text);
+    background: radial-gradient(140% 120% at 50% -20%, #fff 0%, var(--bg) 60%, #dfe7f1 100%);
+    overflow: hidden;
+  }
+
+  /* Layout */
+  .shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+  }
+  .shell.active { opacity: 1; pointer-events: auto }
+  
+  .grid-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+  }
+  
+  .grid-container {
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    height: 100%;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-style: preserve-3d;
+  }
+
+  /* Page Navigation Arrows */
+  .nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 120px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+    border: 2px solid var(--accent2);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--accent);
+    z-index: 20;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+    user-select: none;
+  }
+  .nav-arrow:hover {
+    transform: translateY(-50%) scale(1.1);
+    background: linear-gradient(135deg, rgba(255,255,255,1), rgba(255,255,255,0.9));
+    box-shadow: 0 8px 30px rgba(73, 184, 255, 0.3);
+  }
+  .nav-arrow.left { left: -80px; }
+  .nav-arrow.right { right: -80px; }
+  .nav-arrow.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    transform: translateY(-50%) scale(0.9);
+  }
+
+  /* Page Indicator */
+  .page-indicator {
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 20;
+  }
+  .page-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    border: 2px solid var(--accent2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .page-dot.active {
+    background: var(--accent);
+    transform: scale(1.2);
+    box-shadow: 0 0 0 3px var(--accent2);
+  }
+
+  /* Tiles */
+  .tile {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--tile);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    outline: 0;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: tileFloat 3s ease-in-out infinite;
+  }
+  .tile:nth-child(odd) { animation-delay: -1.5s; }
+  .tile:nth-child(3n) { animation-delay: -0.75s; }
+  
+  @keyframes tileFloat {
+    0%, 100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+    33% { transform: translateY(-3px) rotateX(1deg) rotateY(0.5deg); }
+    66% { transform: translateY(-1px) rotateX(-0.5deg) rotateY(-0.3deg); }
+  }
+
+  .tile:hover { 
+    transform: translateY(-8px) rotateX(5deg) rotateY(5deg) scale(1.02); 
+    box-shadow: 0 15px 40px rgba(0, 0, 0, .25);
+    z-index: 5;
+  }
+  
+  .tile .img-stack { 
+    position: absolute; 
+    inset: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  
+  .tile img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+    filter: saturate(1.1) contrast(1.05) brightness(0.95);
+  }
+  .tile img.active { opacity: 1 }
+
+  /* Retro Static Lines Overlay */
+  .tile::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    background: 
+      /* Moving static noise */
+      radial-gradient(circle at 20% 80%, rgba(120,119,198,0.15), transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255,119,198,0.15), transparent 50%),
+      /* Horizontal scanlines */
+      repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        rgba(0, 0, 0, 0.03) 0.5px,
+        rgba(255, 255, 255, 0.03) 1px,
+        transparent 1.5px,
+        transparent 2px
+      ),
+      /* Vertical interference */
+      repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        rgba(255, 255, 255, 0.02) 1px,
+        transparent 2px
+      ),
+      /* Random static pattern */
+      url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxmaWx0ZXIgaWQ9Im5vaXNlIiB4PSIwJSIgeT0iMCUiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPgogICAgICA8ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9IjAuOSIgbnVtT2N0YXZlcz0iNCIgcmVzdWx0PSJub2lzZSIgc2VlZD0iMSIvPgogICAgICA8ZmVDb2xvck1hdHJpeCBpbj0ibm9pc2UiIHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiLz4KICAgIDwvZmlsdGVyPgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZmIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjAyIi8+Cjwvc3ZnPg==');
+    mix-blend-mode: overlay;
+    opacity: 0.8;
+    animation: retroStatic 3s linear infinite, scanlineMove 1.5s linear infinite;
+    border-radius: var(--radius);
+  }
+
+  @keyframes retroStatic {
+    0% { 
+      background-position: 0 0, 0 0, 0 0, 0 0, 0 0; 
+      opacity: 0.8;
+      filter: contrast(1.1);
+    }
+    25% { 
+      background-position: 3px -1px, -2px 1px, 0 1px, 1px 0, 2px 1px;
+      opacity: 0.6;
+      filter: contrast(1.3);
+    }
+    50% { 
+      background-position: -1px 2px, 1px -1px, 0 -1px, -1px 0, -1px -1px;
+      opacity: 0.9;
+      filter: contrast(0.9);
+    }
+    75% { 
+      background-position: 2px 0px, -1px 2px, 0 2px, 2px 0, 1px 2px;
+      opacity: 0.5;
+      filter: contrast(1.2);
+    }
+    100% { 
+      background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+      opacity: 0.8;
+      filter: contrast(1.1);
+    }
+  }
+
+  @keyframes scanlineMove {
+    0% { 
+      background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+    }
+    100% { 
+      background-position: 0 2px, 0 0, 0 2px, 0 0, 0 0;
+    }
+  }
+
+  /* Glass reflection effect */
+  .tile::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 40%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, .4), rgba(255, 255, 255, .1), transparent);
+    pointer-events: none;
+    z-index: 3;
+    border-radius: var(--radius) var(--radius) 0 0;
+    opacity: 0.8;
+    animation: glassShine 6s ease-in-out infinite;
+  }
+
+  @keyframes glassShine {
+    0%, 100% { transform: translateX(-100%); opacity: 0; }
+    50% { transform: translateX(0); opacity: 0.8; }
+  }
+
+  .tile-label {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: .3px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+    z-index: 4;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+  }
+
+  .tile:hover .tile-label {
+    transform: translateY(-5px) scale(1.05);
+    background: rgba(0, 0, 0, 0.9);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .4);
+  }
+
+  /* Blank tiles */
+  .blank { 
+    background: repeating-linear-gradient(135deg, 
+      rgba(246,249,255,0.6), rgba(246,249,255,0.6) 12px, 
+      rgba(237,243,251,0.6) 12px, rgba(237,243,251,0.6) 24px); 
+    border: 3px dashed rgba(207,227,251,0.8);
+    animation: breathe 3s ease-in-out infinite;
+  }
+  .blank::before { opacity: .1 }
+  .blank::after { display: none; }
+  
+  @keyframes breathe {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.01); }
+  }
+
+  .tile.dragover { 
+    outline: 4px solid var(--accent); 
+    transform: translateY(-5px) scale(1.05);
+    background: rgba(73, 184, 255, 0.1);
+    animation: pulse 0.6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(73, 184, 255, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(73, 184, 255, 0); }
+  }
+
+  .tile.opening { 
+    animation: channelOpen .8s ease forwards; 
+    z-index: 15;
+  }
+  
+  @keyframes channelOpen { 
+    0% { transform: scale(1) rotateY(0deg); }
+    30% { transform: scale(1.1) rotateY(5deg); }
+    60% { transform: scale(1.15) rotateY(-2deg); }
+    100% { transform: scale(1.2) rotateY(0deg); opacity: 0.8; }
+  }
+
+  /* Page transition effects */
+  .grid.transitioning {
+    animation: pageSlide 0.6s ease-in-out;
+  }
+
+  @keyframes pageSlide {
+    0% { opacity: 1; transform: translateX(0) scale(1); }
+    50% { opacity: 0.3; transform: translateX(-20px) scale(0.95); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+  }
+
+  /* Footer */
+  .footer {
+    flex-shrink: 0;
+    height: 70px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .7));
+    border-top: 2px solid rgba(214, 230, 247, 0.8);
+    padding: 8px 20px;
+    display: grid;
+    grid-template-columns: 140px 1fr 180px;
+    align-items: center;
+    backdrop-filter: blur(10px);
+  }
+  
+  .brand { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-weight: 900; 
+    font-size: 14px;
+  }
+  .brand-dot { 
+    width: 10px; 
+    height: 10px; 
+    border-radius: 50%; 
+    background: var(--accent); 
+    box-shadow: 0 0 0 3px var(--accent2);
+    animation: pulse 2s infinite ease-in-out;
+  }
+  
+  .clock { 
+    text-align: center; 
+    font-weight: 800; 
+    font-size: 20px;
+    animation: fadeInClock 1s ease-in;
+  }
+  .subdate { 
+    text-align: center; 
+    margin-top: 1px; 
+    font-size: 10px; 
+    color: var(--muted);
+  }
+  
+  @keyframes fadeInClock { 
+    from { opacity: 0; transform: translateY(-10px) } 
+    to { opacity: 1; transform: translateY(0) } 
+  }
+
+  .controls { 
+    justify-self: end; 
+    display: flex; 
+    gap: 8px; 
+    align-items: center;
+  }
+  .btn {
+    border: 2px solid #b7dfff;
+    background: linear-gradient(135deg, #fff, #f0f8ff);
+    font-weight: 800;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .btn:hover { 
+    transform: translateY(-2px) scale(1.05); 
+    box-shadow: 0 4px 16px rgba(73, 184, 255, 0.3);
+    background: linear-gradient(135deg, #fff, #e8f4ff);
+  }
+
+  /* Modals and overlays */
+  .backdrop { 
+    position: fixed; 
+    inset: 0; 
+    display: none; 
+    place-items: center; 
+    background: rgba(10, 20, 30, .6); 
+    backdrop-filter: blur(4px); 
+    z-index: 40;
+    animation: fadeIn 0.3s ease;
+  }
+  .backdrop.show { display: grid }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .card {
+    width: min(720px, 92vw);
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, .4);
+    overflow: hidden;
+    transform: translateY(20px) scale(0.9);
+    opacity: 0;
+    transition: all .4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .card.open { 
+    transform: translateY(0) scale(1); 
+    opacity: 1;
+  }
+
+  .card-h {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #f2f8ff, #e7f2ff);
+    border-bottom: 1px solid #d6e6f7;
+    font-weight: 900;
+    font-size: 16px;
+  }
+  .card-b { 
+    padding: 20px; 
+    max-height: 60vh; 
+    overflow: auto; 
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+
+  /* Startup splash */
+  .splash {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(120% 120% at 50% 40%, #0b1020, #02050b 60%);
+    z-index: 100;
+    animation: starfield 20s linear infinite;
+  }
+  .splash.hidden { 
+    opacity: 0; 
+    pointer-events: none; 
+    transition: opacity 1s ease;
+  }
+
+  @keyframes starfield {
+    0% { background-position: 0 0; }
+    100% { background-position: 1000px 1000px; }
+  }
+
+  .type { 
+    font-weight: 900; 
+    font-size: clamp(38px, 7vw, 88px); 
+    letter-spacing: .6px; 
+    color: #fff;
+    text-shadow: 0 0 20px rgba(124, 200, 255, 0.5);
+  }
+  .type .cursor {
+    display: inline-block;
+    width: .6ch;
+    background: #9cdcff;
+    margin-left: .1ch;
+    animation: blink 1.2s step-end infinite;
+    box-shadow: 0 0 10px #9cdcff;
+  }
+  @keyframes blink { 50% { opacity: 0 } }
+
+  .rainbow {
+    background: linear-gradient(90deg, #7cf 0%, #6f6 20%, #ff6 40%, #f86 60%, #f6f 80%, #7cf 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 4px 22px rgba(124, 200, 255, .4));
+    animation: rainbowShift 3s ease-in-out infinite;
+  }
+
+  @keyframes rainbowShift {
+    0%, 100% { filter: drop-shadow(0 4px 22px rgba(124, 200, 255, .4)) hue-rotate(0deg); }
+    50% { filter: drop-shadow(0 4px 22px rgba(124, 200, 255, .4)) hue-rotate(180deg); }
+  }
+
+  .pressA { 
+    margin-top: 25px; 
+    color: #bfe6ff; 
+    font-weight: 800; 
+    text-align: center;
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  .pressA kbd {
+    border: 3px solid #9cdcff;
+    border-radius: 10px;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #0b223a, #1a3a5c);
+    color: #eaf6ff;
+    box-shadow: 0 4px 15px rgba(156, 220, 255, 0.3);
+    font-weight: 900;
+  }
+
+  @keyframes glow {
+    from { text-shadow: 0 0 5px rgba(191, 230, 255, 0.5); }
+    to { text-shadow: 0 0 20px rgba(191, 230, 255, 0.8), 0 0 30px rgba(191, 230, 255, 0.4); }
+  }
+
+  /* TV Channel Display */
+  .tv {
+    position: fixed;
+    inset: 0;
+    display: none;
+    place-items: center;
+    background: rgba(0, 0, 0, .7);
+    backdrop-filter: blur(4px);
+    z-index: 60;
+  }
+  .tv.show { 
+    display: grid; 
+    animation: tvFadeIn 0.5s ease;
+  }
+
+  @keyframes tvFadeIn {
+    from { opacity: 0; backdrop-filter: blur(0px); }
+    to { opacity: 1; backdrop-filter: blur(4px); }
+  }
+
+  .tv-screen {
+    width: min(920px, 92vw);
+    aspect-ratio: 16/9;
+    background: #eef2f6;
+    border-radius: 40px;
+    box-shadow: 
+      0 30px 100px rgba(0, 0, 0, .6), 
+      inset 0 0 0 16px #cfe2f7, 
+      inset 0 0 80px rgba(255, 255, 255, .8);
+    overflow: hidden;
+    position: relative;
+    animation: tvPop 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  @keyframes tvPop { 
+    0% { transform: scale(0.8) rotateX(10deg); opacity: 0; } 
+    60% { transform: scale(1.05) rotateX(-2deg); opacity: 0.9; }
+    100% { transform: scale(1) rotateX(0deg); opacity: 1; } 
+  }
+
+  .tv-inner { 
+    position: absolute; 
+    inset: 0; 
+    background: #fff; 
+    display: grid; 
+    grid-template-rows: 1fr auto;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  .tv-head { 
+    display: grid; 
+    place-items: center; 
+    background: linear-gradient(180deg, #fff, #f1f6ff); 
+    border-bottom: 3px solid #e1ecfb;
+    position: relative;
+  }
+  .tv-head img { 
+    max-width: 70%; 
+    max-height: 65%; 
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+  .tv-title {
+    position: absolute;
+    top: 15px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 900;
+    color: #2b3a55;
+    text-shadow: 0 2px 0 #fff, 0 2px 10px rgba(43, 58, 85, 0.3);
+    animation: titleGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes titleGlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+  }
+
+  .tv-foot {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(180deg, #f7fbff, #e9f3ff);
+  }
+  .pill {
+    border-radius: 25px;
+    border: 3px solid #cde2fa;
+    background: linear-gradient(135deg, #fff, #f0f8ff);
+    font-weight: 900;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .pill:hover { 
+    transform: translateY(-3px) scale(1.05); 
+    box-shadow: 0 8px 25px rgba(73, 184, 255, 0.3);
+    background: linear-gradient(135deg, #fff, #e8f4ff);
+  }
+  .pill.secondary { 
+    background: linear-gradient(135deg, #f7fbff, #eef6ff);
+    color: var(--muted);
+  }
+
+  .howto { 
+    position: fixed; 
+    inset: 0; 
+    display: none; 
+    place-items: center; 
+    background: rgba(0, 0, 0, .6); 
+    z-index: 80;
+  }
+  .howto.show { display: grid }
+  .howto .card { width: min(720px, 92vw) }
+  .howto .card-b { font-size: 15px; line-height: 1.6 }
+
+  /* Responsive */
+  @media (max-width: 1000px) { 
+    .grid { gap: 15px; }
+    .nav-arrow { width: 50px; height: 100px; font-size: 20px; }
+    .nav-arrow.left { left: -65px; }
+    .nav-arrow.right { right: -65px; }
+  }
+  @media (max-width: 800px) { 
+    .grid { grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .clock { font-size: 18px; }
+    .nav-arrow { width: 45px; height: 80px; font-size: 18px; }
+    .nav-arrow.left { left: -55px; }
+    .nav-arrow.right { right: -55px; }
+  }
+  @media (max-width: 600px) { 
+    .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .grid-wrap { padding: 20px; }
+    .nav-arrow { width: 40px; height: 70px; font-size: 16px; }
+    .nav-arrow.left { left: -50px; }
+    .nav-arrow.right { right: -50px; }
+  }
+</style>
+</head>
+<body>
+  <!-- Startup Splash -->
+  <div class="splash" id="startup">
+    <div>
+      <div class="type"><span class="rainbow"></span><span class="cursor"></span></div>
+      <div class="pressA">Press <kbd>A</kbd> to confirm you have teacher permission to play</div>
+    </div>
+  </div>
+
+  <!-- Updates Modal -->
+  <div class="backdrop" id="updatesModal" role="dialog" aria-modal="true" aria-labelledby="updatesTitle">
+    <div class="card" id="updatesCard">
+      <div class="card-h"><span id="updatesTitle">Latest Update</span><button class="btn" id="updatesClose">Close</button></div>
+      <div class="card-b" id="updatesBody">Loading…</div>
+    </div>
+  </div>
+
+  <!-- Channel Splash (TV) -->
+  <div class="tv" id="tv">
+    <div class="tv-screen" role="dialog" aria-modal="true">
+      <div class="tv-inner">
+        <div class="tv-head">
+          <div class="tv-title" id="tvTitle">Game</div>
+          <img id="tvArt" alt="Game Art" />
+        </div>
+        <div class="tv-foot">
+          <button class="pill" id="tvStart">Start</button>
+          <button class="pill secondary" id="tvHow">How to Play</button>
+          <button class="pill secondary" id="tvBack">Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell" id="shell">
+    <div class="grid-wrap">
+      <div class="grid-container">
+        <!-- Navigation Arrows -->
+        <div class="nav-arrow left" id="prevPage">◀</div>
+        <div class="nav-arrow right" id="nextPage">▶</div>
+        
+        <!-- Page Indicator -->
+        <div class="page-indicator" id="pageIndicator"></div>
+        
+        <div class="grid" id="grid"></div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="brand"><span class="brand-dot"></span> CentralArcade</div>
+      <div>
+        <div class="clock" id="clock">10:30 PM</div>
+        <div class="subdate" id="date">Thu, Aug 28, 2025</div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="updatesBtn">Updates</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Audio -->
+  <audio id="bgm" src="https://kappa.vgmsite.com/soundtracks/wii-music-collection/yizahfoe/01.%20Main%20Menu.mp3" loop></audio>
+  <audio id="startupSfx" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" preload="auto"></audio>
+  <audio id="typeSfx" src="https://actions.google.com/sounds/v1/cartoon/cartoon_pop.ogg" preload="auto"></audio>
+  <audio id="clickSfx" src="https://www.myinstants.com/media/sounds/wii-start-click-page-shift-sound.mp3" preload="auto"></audio>
+  <audio id="hoverSfx" src="https://www.myinstants.com/media/sounds/wii-start-click-page-shift-sound.mp3" preload="auto"></audio>
+
+<script>
+/* ========= Channel Data ========= */
+const DEFAULT_GAMES = [
+  { id:'sports', title:'Wii-ish Sports', images:[
+    'https://picsum.photos/seed/sport1/640/480',
+    'https://picsum.photos/seed/sport2/640/480',
+    'https://picsum.photos/seed/sport3/640/480'
+  ], splash:{ art:'https://media.giphy.com/media/l0MYGb8PjKLQCBgSA/giphy.gif',
+    music:'https://files.catbox.moe/6d4y5t.mp3',
+    howto:'Swing the controller to serve. Move with the D-Pad. First to 11 wins.',
+    href:'#sports-start'
+  }},
+  { id:'racer', title:'Turbo Racer', images:[
+    'https://picsum.photos/seed/race1/640/480',
+    'https://picsum.photos/seed/race2/640/480',
+    'https://picsum.photos/seed/race3/640/480'
+  ], splash:{ art:'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif',
+    music:'https://files.catbox.moe/9o0m9j.mp3',
+    howto:'Hold accelerate to start. Use left/right to steer. Brake on corners.',
+    href:'#racer'
+  }},
+  { id:'puzzle', title:'Puzzle Box', images:[
+    'https://picsum.photos/seed/puz1/640/480',
+    'https://picsum.photos/seed/puz2/640/480',
+    'https://picsum.photos/seed/puz3/640/480'
+  ], splash:{ art:'https://media.giphy.com/media/l0HFjV6M3S9k1eKXu/giphy.gif',
+    music:'https://files.catbox.moe/z7u8pc.mp3',
+    howto:'Match shapes by color. Chain 4+ for bonus time.',
+    href:'#puzzle'
+  }},
+  { id:'music', title:'Rhythm Mix', images:[
+    'https://picsum.photos/seed/mix1/640/480',
+    'https://picsum.photos/seed/mix2/640/480',
+    'https://picsum.photos/seed/mix3/640/480'
+  ], splash:{ art:'https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif',
+    music:'https://files.catbox.moe/1v9k7d.mp3',
+    howto:'Tap on the beat. Long notes = hold.',
+    href:'#rhythm'
+  }},
+  { id:'builder', title:'Builder+', images:[
+    'https://picsum.photos/seed/build1/640/480',
+    'https://picsum.photos/seed/build2/640/480',
+    'https://picsum.photos/seed/build3/640/480'
+  ], splash:{ art:'https://media.giphy.com/media/3o7aCRuE3f1T8GJZfO/giphy.gif',
+    music:'https://files.catbox.moe/klx7tq.mp3',
+    howto:'Place blocks to solve challenges. Save often!',
+    href:'#builder'
+  }},
+  { id:'indie', title:'Indie Picks', images:[
+    'https://picsum.photos/seed/ind1/640/480',
+    'https://picsum.photos/seed/ind2/640/480',
+    'https://picsum.photos/seed/ind3/640/480'
+  ], splash:{ art:'https://media.giphy.com/media/l0ExncehJzexFpRHq/giphy.gif',
+    music:'https://files.catbox.moe/3k2d0y.mp3',
+    howto:'Curated indie fun. Explore and enjoy.',
+    href:'#indie'
+  }},
+  { id:'arcade', title:'Classic Arcade', images:[
+    'https://picsum.photos/seed/arcade1/640/480',
+    'https://picsum.photos/seed/arcade2/640/480',
+    'https://picsum.photos/seed/arcade3/640/480'
+  ], splash:{ art:'https://media.giphy.com/media/xT39D7O9Xj1JqKq5i0/giphy.gif',
+    music:'https://files.catbox.moe/arcade.mp3',
+    howto:'Retro games collection. High scores matter!',
+    href:'#arcade'
+  }},
+  { id:'adventure', title:'Adventure Quest', images:[
+    'https://picsum.photos/seed/adv1/640/480',
+    'https://picsum.photos/seed/adv2/640/480',
+    'https://picsum.photos/seed/adv3/640/480'
+  ], splash:{ art:'https://media.giphy.com/media/3oKIPf3C7HqqYBVcCk/giphy.gif',
+    music:'https://files.catbox.moe/quest.mp3',
+    howto:'Explore vast worlds. Collect items and solve mysteries.',
+    href:'#adventure'
+  }},
+  { id:'strategy', title:'Strategy Master', images:[
+    'https://picsum.photos/seed/strat1/640/480',
+    'https://picsum.photos/seed/strat2/640/480',
+    'https://picsum.photos/seed/strat3/640/480'
+  ], splash:{ art:'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
+    music:'https://files.catbox.moe/strategy.mp3',
+    howto:'Plan your moves carefully. Outsmart your opponents.',
+    href:'#strategy'
+  }},
+  { id:'horror', title:'Spooky Tales', images:[
+    'https://picsum.photos/seed/horror1/640/480',
+    'https://picsum.photos/seed/horror2/640/480',
+    'https://picsum.photos/seed/horror3/640/480'
+  ], splash:{ art:'https://media.giphy.com/media/xT9IgvEOwRzUcZDRiU/giphy.gif',
+    music:'https://files.catbox.moe/spooky.mp3',
+    howto:'Survive the night. Find clues and escape.',
+    href:'#horror'
+  }}
+];
+
+// Pagination settings
+const CHANNELS_PER_PAGE = 18; // 6 columns x 3 rows
+let currentPage = 0;
+let totalPages = 0;
+let allChannels = [];
+
+// Generate complete channel layout with placeholders
+function generateChannelLayout() {
+  const saved = localStorage.getItem('arcadeLayout');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed.length >= DEFAULT_GAMES.length) {
+        return parsed;
+      }
+    } catch(e) {}
+  }
+
+  const channels = [];
+  
+  // Add 10 pre-installed games
+  DEFAULT_GAMES.forEach(game => {
+    channels.push(game);
+  });
+  
+  // Add placeholder slots to fill multiple pages
+  const totalSlots = Math.ceil((DEFAULT_GAMES.length + 30) / CHANNELS_PER_PAGE) * CHANNELS_PER_PAGE;
+  for (let i = DEFAULT_GAMES.length; i < totalSlots; i++) {
+    channels.push({ blank: true, id: `blank-${i}` });
+  }
+  
+  return channels;
+}
+
+allChannels = generateChannelLayout();
+totalPages = Math.ceil(allChannels.length / CHANNELS_PER_PAGE);
+
+/* ====== Elements ====== */
+const grid = document.getElementById('grid');
+const shell = document.getElementById('shell');
+const startup = document.getElementById('startup');
+const bgm = document.getElementById('bgm');
+const startupSfx = document.getElementById('startupSfx');
+const typeSfx = document.getElementById('typeSfx');
+const clickSfx = document.getElementById('clickSfx');
+const hoverSfx = document.getElementById('hoverSfx');
+const tv = document.getElementById('tv');
+const tvArt = document.getElementById('tvArt');
+const tvTitle = document.getElementById('tvTitle');
+const tvStart = document.getElementById('tvStart');
+const tvHow = document.getElementById('tvHow');
+const tvBack = document.getElementById('tvBack');
+const prevPageBtn = document.getElementById('prevPage');
+const nextPageBtn = document.getElementById('nextPage');
+const pageIndicator = document.getElementById('pageIndicator');
+let tvMusic = null;
+
+/* ====== Startup typing + Press A gate ====== */
+const splashText = 'Central Arcade';
+const typeText = document.querySelector('.type .rainbow');
+let ti = 0;
+let typingActive = true;
+
+function typeNext() {
+  if (!typingActive) return;
+  
+  typeText.textContent = splashText.slice(0, ti + 1);
+  
+  try {
+    typeSfx.currentTime = 0; 
+    typeSfx.play().catch(() => {});
+  } catch(err) {
+    console.log('Type audio failed:', err);
+  }
+  ti++; 
+  if (ti < splashText.length && typingActive) {
+    setTimeout(typeNext, 150 + Math.random() * 100);
+  }
+}
+
+// Load games first, then start typing
+(async () => {
+  await loadGamesFromJSON();
+  allChannels = generateChannelLayout();
+  totalPages = Math.ceil(allChannels.length / CHANNELS_PER_PAGE);
+  setTimeout(typeNext, 500);
+})();
+
+async function enterMenu() {
+  typingActive = false;
+  typeText.textContent = splashText;
+  
+  // Play startup sound
+  try {
+    startupSfx.currentTime = 0;
+    startupSfx.play().catch(() => {});
+  } catch(err) {
+    console.log('Startup audio failed:', err);
+  }
+  
+  startup.classList.add('hidden');
+  shell.classList.add('active');
+  
+  // Wait for games to load if still loading
+  while (!gamesLoaded) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  
+  // Initialize layout after games are loaded
+  allChannels = generateChannelLayout();
+  totalPages = Math.ceil(allChannels.length / CHANNELS_PER_PAGE);
+  
+  bgm.volume = .25;
+  bgm.play().catch((e) => console.log('BGM failed:', e));
+  
+  renderCurrentPage();
+  updatePageIndicator();
+  updateNavigationButtons();
+}
+
+document.addEventListener('keydown', e => {
+  if (startup.classList.contains('hidden')) return;
+  if (e.key.toLowerCase() === 'a') {
+    enterMenu();
+  }
+});
+startup.addEventListener('click', () => {
+  enterMenu();
+});
+
+/* ====== Pagination System ====== */
+function renderCurrentPage() {
+  const startIndex = currentPage * CHANNELS_PER_PAGE;
+  const endIndex = Math.min(startIndex + CHANNELS_PER_PAGE, allChannels.length);
+  const pageChannels = allChannels.slice(startIndex, endIndex);
+  
+  grid.innerHTML = '';
+  grid.classList.add('transitioning');
+  
+  setTimeout(() => {
+    pageChannels.forEach((item, i) => {
+      const t = document.createElement('div');
+      t.className = 'tile';
+      t.style.animationDelay = (i * 50) + 'ms';
+
+      // Drag & drop
+      t.draggable = !item.blank;
+      t.addEventListener('dragstart', ev => {
+        if (item.blank) return;
+        const globalIndex = startIndex + i;
+        ev.dataTransfer.setData('application/json', JSON.stringify({ item, index: globalIndex }));
+      });
+      t.addEventListener('dragover', ev => { 
+        ev.preventDefault(); 
+        t.classList.add('dragover'); 
+      });
+      t.addEventListener('dragleave', () => t.classList.remove('dragover'));
+      t.addEventListener('drop', ev => {
+        ev.preventDefault(); 
+        t.classList.remove('dragover');
+        try {
+          const data = JSON.parse(ev.dataTransfer.getData('application/json'));
+          const globalIndex = startIndex + i;
+          // Swap positions in global array
+          const temp = allChannels[globalIndex];
+          allChannels[globalIndex] = data.item;
+          allChannels[data.index] = temp;
+          saveLayout();
+          renderCurrentPage();
+        } catch(_) {}
+      });
+
+      if (item.blank) {
+        t.classList.add('blank');
+        const lbl = document.createElement('div');
+        lbl.className = 'tile-label'; 
+        lbl.textContent = 'Drag here';
+        t.appendChild(lbl);
+      } else {
+        const stack = document.createElement('div'); 
+        stack.className = 'img-stack';
+        const imgs = item.images.slice(0, 3).map((src, j) => {
+          const im = document.createElement('img'); 
+          im.src = src; 
+          if (j === 0) im.classList.add('active'); 
+          stack.appendChild(im); 
+          return im;
+        });
+        const lbl = document.createElement('div'); 
+        lbl.className = 'tile-label'; 
+        lbl.textContent = item.title;
+        t.appendChild(stack); 
+        t.appendChild(lbl);
+
+        // Cycle images with staggered timing
+        let idx = 0;
+        const interval = 4000 + (i * 500); // Stagger each tile
+        setInterval(() => { 
+          const prev = imgs[idx % imgs.length]; 
+          idx = (idx + 1) % imgs.length; 
+          const next = imgs[idx]; 
+          prev.classList.remove('active'); 
+          next.classList.add('active'); 
+        }, interval);
+
+        // Click to open with enhanced animation and sound
+        t.addEventListener('click', () => {
+          try {
+            clickSfx.currentTime = 0; 
+            clickSfx.play().catch(() => {});
+          } catch(err) {
+            console.log('Click audio failed:', err);
+          }
+          t.classList.add('opening');
+          setTimeout(() => openChannel(item), 400);
+        });
+
+        // Hover sound effect
+        t.addEventListener('mouseenter', () => {
+          try {
+            hoverSfx.volume = 0.3;
+            hoverSfx.currentTime = 0; 
+            hoverSfx.play().catch(() => {});
+          } catch(err) {
+            console.log('Hover audio failed:', err);
+          }
+        });
+      }
+      grid.appendChild(t);
+    });
+    
+    setTimeout(() => {
+      grid.classList.remove('transitioning');
+    }, 100);
+  }, 200);
+}
+
+function updatePageIndicator() {
+  pageIndicator.innerHTML = '';
+  for (let i = 0; i < totalPages; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'page-dot' + (i === currentPage ? ' active' : '');
+    dot.addEventListener('click', () => {
+      if (i !== currentPage) {
+        currentPage = i;
+        renderCurrentPage();
+        updatePageIndicator();
+        updateNavigationButtons();
+      }
+    });
+    pageIndicator.appendChild(dot);
+  }
+}
+
+function updateNavigationButtons() {
+  prevPageBtn.classList.toggle('disabled', currentPage === 0);
+  nextPageBtn.classList.toggle('disabled', currentPage >= totalPages - 1);
+}
+
+// Navigation event listeners
+prevPageBtn.addEventListener('click', () => {
+  if (currentPage > 0) {
+    currentPage--;
+    renderCurrentPage();
+    updatePageIndicator();
+    updateNavigationButtons();
+  }
+});
+
+nextPageBtn.addEventListener('click', () => {
+  if (currentPage < totalPages - 1) {
+    currentPage++;
+    renderCurrentPage();
+    updatePageIndicator();
+    updateNavigationButtons();
+  }
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (startup.classList.contains('hidden') && !tv.classList.contains('show')) {
+    if (e.key === 'ArrowLeft' && currentPage > 0) {
+      currentPage--;
+      renderCurrentPage();
+      updatePageIndicator();
+      updateNavigationButtons();
+    } else if (e.key === 'ArrowRight' && currentPage < totalPages - 1) {
+      currentPage++;
+      renderCurrentPage();
+      updatePageIndicator();
+      updateNavigationButtons();
+    }
+  }
+});
+
+/* ====== Save/Load Layout ====== */
+function saveLayout() {
+  try {
+    localStorage.setItem('arcadeLayout', JSON.stringify(allChannels));
+  } catch(e) {}
+}
+
+/* ====== Channel TV Display ====== */
+function openChannel(ch) {
+  if (!tvMusic) tvMusic = new Audio();
+  tvMusic.pause(); 
+  tvMusic.src = ch.splash.music || ''; 
+  tvMusic.loop = true;
+  try { 
+    bgm.pause(); 
+    tvMusic.volume = .45; 
+    tvMusic.play().catch(() => {}); 
+  } catch(_) {}
+  tvTitle.textContent = ch.title;
+  tvArt.src = ch.splash.art || ch.images[0];
+  tv.classList.add('show');
+
+  tvStart.onclick = () => { window.location.hash = ch.splash.href || '#'; };
+  tvHow.onclick = () => openHowTo(ch);
+  tvBack.onclick = closeChannel;
+  document.addEventListener('keydown', tvKeyHandler);
+}
+
+function tvKeyHandler(e) {
+  if (e.key === 'Escape' || e.key === 'Backspace') closeChannel();
+}
+
+function closeChannel() {
+  tv.classList.remove('show');
+  if (tvMusic) { tvMusic.pause(); }
+  bgm.play().catch(() => {});
+  document.removeEventListener('keydown', tvKeyHandler);
+}
+
+/* ====== How to Play Modal ====== */
+const howtoBackdrop = document.createElement('div');
+howtoBackdrop.className = 'howto';
+howtoBackdrop.innerHTML = `
+  <div class="card">
+    <div class="card-h">How to Play <button class="btn" id="howClose">Close</button></div>
+    <div class="card-b" id="howBody"></div>
+  </div>`;
+document.body.appendChild(howtoBackdrop);
+
+function openHowTo(ch) {
+  document.getElementById('howBody').textContent = ch.splash.howto || 'Have fun!';
+  howtoBackdrop.classList.add('show');
+  setTimeout(() => {
+    howtoBackdrop.querySelector('.card').classList.add('open');
+  }, 10);
+  document.getElementById('howClose').onclick = () => {
+    howtoBackdrop.classList.remove('show');
+    howtoBackdrop.querySelector('.card').classList.remove('open');
+  };
+  howtoBackdrop.onclick = e => { 
+    if (e.target === howtoBackdrop) {
+      howtoBackdrop.classList.remove('show');
+      howtoBackdrop.querySelector('.card').classList.remove('open');
+    }
+  };
+}
+
+/* ====== Clock ====== */
+const clockEl = document.getElementById('clock'); 
+const dateEl = document.getElementById('date');
+function pad(n) { return n.toString().padStart(2, '0'); }
+function tickClock() {
+  const d = new Date(); 
+  let h = d.getHours(); 
+  const m = pad(d.getMinutes()); 
+  const am = h < 12; 
+  const h12 = ((h + 11) % 12) + 1;
+  clockEl.textContent = `${h12}:${m} ${am ? 'AM' : 'PM'}`;
+  dateEl.textContent = d.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+}
+tickClock(); 
+setInterval(tickClock, 15000);
+
+/* ====== Updates Modal ====== */
+const updatesBtn = document.getElementById('updatesBtn');
+const upModal = document.getElementById('updatesModal');
+const upCard = document.getElementById('updatesCard');
+const upBody = document.getElementById('updatesBody');
+
+document.getElementById('updatesClose').onclick = () => {
+  upModal.classList.remove('show');
+  upCard.classList.remove('open');
+};
+
+updatesBtn.onclick = async () => {
+  try {
+    hoverSfx.volume = 0.2;
+    hoverSfx.currentTime = 0;
+    hoverSfx.play().catch(() => {});
+  } catch(err) {}
+  
+  upModal.classList.add('show'); 
+  setTimeout(() => upCard.classList.add('open'), 10);
+  upBody.textContent = 'Loading…';
+  try {
+    const res = await fetch('currentgameupdate.txt', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const txt = await res.text(); 
+    upBody.textContent = txt.trim() || 'No updates found.';
+  } catch(err) { 
+    upBody.textContent = 'Could not load currentgameupdate.txt (' + err.message + ').'; 
+  }
+};
+
+// Add hover sound to updates button
+updatesBtn.addEventListener('mouseenter', () => {
+  try {
+    hoverSfx.volume = 0.2;
+    hoverSfx.currentTime = 0;
+    hoverSfx.play().catch(() => {});
+  } catch(err) {}
+});
+
+upModal.addEventListener('click', e => { 
+  if (e.target === upModal) {
+    upModal.classList.remove('show');
+    upCard.classList.remove('open');
+  }
+});
+
+// Reset layout for testing
+document.addEventListener('keydown', e => {
+  if (e.key === 'r' && e.ctrlKey) {
+    localStorage.removeItem('arcadeLayout');
+    allChannels = generateChannelLayout();
+    currentPage = 0;
+    renderCurrentPage();
+    updatePageIndicator();
+    updateNavigationButtons();
+  }
+});
+</script>
+</body>
+</html>

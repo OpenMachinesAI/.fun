@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CSP Launch Go/No‑Go • Neon Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#050807;            /* deep black-green */
+      --panel:#0b1411;         /* card bg */
+      --grid:#0f2a21;          /* grid / borders */
+      --neon:#24ff62;          /* bright green */
+      --neon-dim:#0aff3a;
+      --text:#d6ffe4;          /* pale mint */
+      --warn:#ffd166;
+      --bad:#ff5277;
+      --good:#21f09c;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:radial-gradient(1200px 700px at 20% -10%, rgba(36,255,98,.06), transparent 70%),
+                       radial-gradient(900px 600px at 120% 10%, rgba(36,255,98,.04), transparent 70%),
+                       var(--bg);
+      color:var(--text); font-family:"Share Tech Mono", ui-monospace, monospace; letter-spacing:.3px;
+    }
+    header{
+      padding:20px 16px 8px; border-bottom:1px solid var(--grid);
+      position:sticky; top:0; z-index:10; backdrop-filter:saturate(1.2) blur(6px); background:linear-gradient(180deg, rgba(5,8,7,.9), rgba(5,8,7,.6));
+    }
+    .title{
+      font-family:"Orbitron", system-ui; font-weight:700; letter-spacing:1px; font-size: clamp(20px, 2.5vw, 32px);
+      color:var(--neon); text-shadow:0 0 12px rgba(36,255,98,.35);
+    }
+    .sub{opacity:.8; font-size:12px}
+    .container{max-width:1100px; margin:0 auto; padding:16px}
+    .grid{
+      display:grid; gap:16px; grid-template-columns: 1.2fr 1fr; align-items:start;
+    }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+
+    .card{
+      background:linear-gradient(180deg, rgba(15,42,33,.35), rgba(11,20,17,.9));
+      border:1px solid var(--grid); border-radius:16px; padding:14px 14px 16px; box-shadow: 0 0 0 1px rgba(36,255,98,.05), 0 8px 30px rgba(0,0,0,.45);
+    }
+    .card h2{margin:6px 0 10px; font-size:16px; color:var(--neon); text-shadow:0 0 10px rgba(36,255,98,.25)}
+    .row{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+    .chip{padding:6px 10px; border:1px solid var(--grid); border-radius:999px; font-size:12px; opacity:.95}
+    .chip[data-state="go"]{border-color:var(--good); color:var(--good); box-shadow:0 0 12px rgba(33,240,156,.25) inset}
+    .chip[data-state="nogo"]{border-color:var(--bad); color:var(--bad); box-shadow:0 0 12px rgba(255,82,119,.18) inset}
+    .chip[data-state="warn"]{border-color:var(--warn); color:var(--warn)}
+
+    label{font-size:12px; opacity:.9}
+    input, select, button, textarea{
+      font: inherit; color:var(--text); background: #0e1916; border:1px solid var(--grid); border-radius:10px; padding:9px 10px; outline:none;
+    }
+    input:focus, select:focus, textarea:focus{ border-color: var(--neon); box-shadow:0 0 0 3px rgba(36,255,98,.15)}
+    button{ cursor:pointer; transition:.15s transform ease, .2s box-shadow ease; }
+    .btn{
+      background: linear-gradient(180deg, rgba(36,255,98,.15), rgba(36,255,98,.05));
+      border-color: rgba(36,255,98,.25);
+    }
+    .btn:hover{ box-shadow: 0 0 18px rgba(36,255,98,.25) inset, 0 0 18px rgba(36,255,98,.1); transform: translateY(-1px)}
+    .btn.secondary{ background: linear-gradient(180deg, rgba(255,82,119,.1), rgba(255,82,119,.05)); border-color: rgba(255,82,119,.25)}
+
+    .go-banner{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; border-radius:12px; margin:10px 0 2px;
+      border:1px dashed var(--grid); background:linear-gradient(180deg, rgba(10,38,28,.6), rgba(10,38,28,.25));
+    }
+    .go{
+      color:var(--good); font-weight:700; letter-spacing:1px
+    }
+    .nogo{ color:var(--bad); font-weight:700; letter-spacing:1px }
+
+    .list{ margin:6px 0 0; padding:0; list-style:none; }
+    .item{ display:grid; grid-template-columns: 22px 1fr auto; gap:10px; align-items:start; padding:10px; border-bottom:1px dashed rgba(36,255,98,.08)}
+    .item:last-child{ border-bottom:none }
+    .item input[type="checkbox"]{ width:18px; height:18px; margin-top:2px; accent-color:var(--neon)}
+    .item .when{ font-size:12px; opacity:.8}
+    .item .text{ line-height:1.25}
+    .group{ margin-top:12px }
+    .group h3{ margin:8px 0; font-size:13px; color:var(--neon-dim) }
+
+    .footer{ margin-top:10px; font-size:11px; opacity:.75 }
+    .kbd{ border:1px solid var(--grid); border-bottom-color:rgba(36,255,98,.25); padding:2px 6px; border-radius:6px; font-size:11px }
+    .muted{ opacity:.7 }
+
+    .mini{ font-size:11px; opacity:.85 }
+    .hint{ font-size:11px; opacity:.8; margin-top:6px }
+    .mono{ font-family:"Share Tech Mono", ui-monospace, monospace }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="title">Central Space Program • Launch Console</div>
+      <div class="sub">Neon checklist + live weather (Victoria, BC) • LocalStorage‑backed</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <!-- Left: Weather & Criteria -->
+      <section class="card" id="weatherCard">
+        <h2>Weather & Go/No‑Go</h2>
+        <div class="row" style="gap:10px; align-items:flex-end">
+          <div>
+            <label for="launchDate">Launch Date</label><br>
+            <input type="date" id="launchDate" />
+          </div>
+          <div>
+            <label for="launchTime">Launch Time</label><br>
+            <input type="time" id="launchTime" value="10:15" />
+          </div>
+          <div>
+            <label>&nbsp;</label><br>
+            <button class="btn" id="refreshBtn">Fetch Weather</button>
+          </div>
+          <div class="muted mini">Location fixed: Victoria, BC (48.4284, −123.3656) • TZ: America/Vancouver</div>
+        </div>
+
+        <div class="go-banner" id="decisionBanner">
+          <div>Decision:&nbsp; <span id="decisionText" class="nogo">NEED DATA</span></div>
+          <div class="row">
+            <span class="chip" id="chipWind">Wind</span>
+            <span class="chip" id="chipGust">Gusts</span>
+            <span class="chip" id="chipPrecip">Precip</span>
+            <span class="chip" id="chipCloud">Cloud</span>
+          </div>
+        </div>
+
+        <div id="weatherReadout" class="mini">
+          <div class="row">
+            <div class="chip" id="lastUpdated">Waiting…</div>
+            <div class="chip">Source: Open‑Meteo (free)</div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <div class="chip" id="readTemp">Temp: –</div>
+            <div class="chip" id="readWind">Wind: –</div>
+            <div class="chip" id="readGust">Gusts: –</div>
+            <div class="chip" id="readPrecip">Precip: –</div>
+            <div class="chip" id="readCloud">Cloud: –</div>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>Criteria Thresholds</h3>
+          <div class="row">
+            <label>Max Wind (km/h) <input id="maxWind" type="number" value="32" min="0" style="width:90px"></label>
+            <label>Max Gust (km/h) <input id="maxGust" type="number" value="45" min="0" style="width:90px"></label>
+            <label>Max Precip (mm/h) <input id="maxPrecip" type="number" value="0" min="0" step="0.1" style="width:110px"></label>
+            <label>Max Cloud (%) <input id="maxCloud" type="number" value="95" min="0" max="100" style="width:100px"></label>
+            <button class="btn" id="saveCriteria">Save Criteria</button>
+          </div>
+          <div class="hint">Default wind per CSP rule: <span class="kbd">&lt;= 32 km/h</span> (≈ 20 mph).</div>
+        </div>
+      </section>
+
+      <!-- Right: Checklist -->
+      <section class="card">
+        <h2>Launch Checklist (Local)</h2>
+        <div class="row">
+          <button class="btn" id="resetList">Reset to CSP Template</button>
+          <button class="btn" id="exportList">Export JSON</button>
+          <label class="btn" for="importFile" style="display:inline-block">Import JSON<input id="importFile" type="file" accept="application/json" style="display:none"></label>
+          <button class="btn secondary" id="clearChecks">Clear Checks</button>
+        </div>
+
+        <div id="listRoot" class="group"></div>
+
+        <div class="footer">Changes auto‑save to your browser (<span class="mono">localStorage</span>). Works offline after first load.</div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+  // ---------- Constants & Utilities ----------
+  const LS_KEY = 'cspChecklist.v1';
+  const LS_CRIT = 'cspCriteria.v1';
+  const DEFAULT_COORDS = { lat: 48.4284, lon: -123.3656 };
+  const DEFAULT_TZ = 'America/Vancouver';
+
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+  function kmh(ms){ return Math.round(ms * 3.6); }
+
+  function nearestHourIndex(timesISO, targetISO){
+    let best = 0, bestDiff = Infinity;
+    const t = new Date(targetISO).getTime();
+    for (let i=0; i<timesISO.length; i++){
+      const d = new Date(timesISO[i]).getTime();
+      const diff = Math.abs(d - t);
+      if(diff < bestDiff){ best = i; bestDiff = diff; }
+    }
+    return best;
+  }
+
+  function saveJSON(filename, data){
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  }
+
+  function applyChip(chip, state){
+    chip.removeAttribute('data-state');
+    chip.dataset.state = state; // 'go' | 'warn' | 'nogo'
+  }
+
+  // ---------- Criteria (persisted) ----------
+  function loadCriteria(){
+    const c = JSON.parse(localStorage.getItem(LS_CRIT) || 'null');
+    const out = {
+      maxWind: 32, // km/h
+      maxGust: 45, // km/h (tunable)
+      maxPrecip: 0.0, // mm/h
+      maxCloud: 95 // %
+    };
+    return Object.assign(out, c||{});
+  }
+  function saveCriteriaUI(){
+    const c = {
+      maxWind: Number($('#maxWind').value||32),
+      maxGust: Number($('#maxGust').value||45),
+      maxPrecip: Number($('#maxPrecip').value||0),
+      maxCloud: Number($('#maxCloud').value||95)
+    };
+    localStorage.setItem(LS_CRIT, JSON.stringify(c));
+    flash($('#saveCriteria'));
+  }
+
+  // ---------- Checklist Template (from our prior planning) ----------
+  function templateChecklist(){
+    return [
+      { group:"T‑48h", items:[
+        { id:"wx-check", text:"Check weather; proceed only if winds ≤ 32 km/h (20 mph). Target 10:15 launch.", when:"10:00 AM" }
+      ]},
+      { group:"T‑47h30m", items:[
+        { id:"paperwork", text:"Prepare rocket paperwork; confirm staff availability (Josh → Ne'ron). Only check off after Mr. Shortreed confirms.", when:"~10:30 AM" },
+      ]},
+      { group:"T‑47h10m", items:[
+        { id:"clearance-sign", text:"Prepare rocket clearance sign for 20‑minute field closure window.", when:"~10:40–10:45 AM" }
+      ]},
+      { group:"T‑22h (Day‑before)", items:[
+        { id:"pick-engines", text:"Pick up rocket engines (BC Hobbies). Do not bring to school before this time.", when:"12:00 PM" }
+      ]},
+      { group:"T‑20h (Day‑before)", items:[
+        { id:"publish-site", text:"Publish launch details on the CSP website.", when:"2:00 PM" }
+      ]},
+      { group:"T‑19h45m (Day‑before)", items:[
+        { id:"cole-batteries", text:"Cole: double‑check that all batteries are charging/charged.", when:"2:15 PM" }
+      ]},
+      { group:"Launch Day", items:[
+        { id:"meet-cole", text:"Meet Cole at the designated room.", when:"T‑55m (9:20 AM)" },
+        { id:"final-permission", text:"Final secondary permission check with Mr. Shortreed or EA.", when:"T‑45m (9:30 AM)" },
+        { id:"pad-setup", text:"Place rocket on pad, hook igniters, start all cameras, return to Mission Control.", when:"T‑10m" },
+        { id:"field-clear", text:"Final field check—ensure the field is clear.", when:"T‑8m" },
+        { id:"spectators-in", text:"All spectators/CSP members to Mission Control; one person stays to film at ground zero.", when:"T‑5m" },
+        { id:"livestream", text:"Everyone in position; Cole starts student livestream upstairs.", when:"T‑1m" },
+        { id:"abort-window", text:"Final Abort—automated countdown begins; last chance to abort before lock‑in.", when:"T‑30s" },
+        { id:"ignition", text:"Automated ignition at T‑0. If igniter fails, auto‑abort; else lift‑off at T+1s.", when:"T‑0s" },
+      ]},
+      { group:"Post‑Flight", items:[
+        { id:"chute", text:"Parachute deploys; rocket in coast phase.", when:"T+7–8s" },
+        { id:"touchdown", text:"Touchdown; de‑arm igniters and log data.", when:"T+25s" },
+        { id:"recovery", text:"Begin safe recovery.", when:"T+30s" },
+        { id:"field-open", text:"Field reopens; team and spectators return to class.", when:"~T+1:00" },
+        { id:"publish-report", text:"Publish report; convert video to recap; document issues.", when:"T+30m" }
+      ]}
+    ];
+  }
+
+  // ---------- Checklist Rendering ----------
+  function loadChecklist(){
+    let data = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+    if(!data){ data = templateChecklist(); localStorage.setItem(LS_KEY, JSON.stringify(data)); }
+    return data;
+  }
+
+  function saveChecklist(data){ localStorage.setItem(LS_KEY, JSON.stringify(data)); }
+
+  function renderList(){
+    const root = $('#listRoot');
+    root.innerHTML = '';
+    const data = loadChecklist();
+
+    for(const group of data){
+      const div = document.createElement('div');
+      div.className = 'group';
+      div.innerHTML = `<h3>${group.group}</h3>`;
+      const ul = document.createElement('ul'); ul.className = 'list';
+
+      for(const item of group.items){
+        const li = document.createElement('li'); li.className='item';
+        const checked = !!item.done;
+        li.innerHTML = `
+          <input type="checkbox" ${checked? 'checked': ''} data-id="${item.id}">
+          <div class="text">
+            <div>${item.text}</div>
+            <div class="when">${item.when || ''}</div>
+          </div>
+          <button class="btn mini" data-edit="${item.id}">Edit</button>
+        `;
+        ul.appendChild(li);
+      }
+
+      div.appendChild(ul);
+      root.appendChild(div);
+    }
+
+    // wire interactions
+    root.addEventListener('change', (e)=>{
+      if(e.target.matches('input[type="checkbox"]')){
+        const id = e.target.dataset.id; const checked = e.target.checked;
+        const data = loadChecklist();
+        for(const g of data){ for(const it of g.items){ if(it.id===id){ it.done = checked; } } }
+        saveChecklist(data);
+      }
+    });
+
+    root.addEventListener('click', (e)=>{
+      if(e.target.matches('button[data-edit]')){
+        const id = e.target.dataset.edit; const data = loadChecklist();
+        let target;
+        for(const g of data){ for(const it of g.items){ if(it.id===id){ target=it; } } }
+        if(!target) return;
+        const newText = prompt('Edit item text', target.text);
+        if(newText===null) return;
+        target.text = newText;
+        const newWhen = prompt('Edit timing (optional)', target.when || '');
+        if(newWhen!==null) target.when = newWhen;
+        saveChecklist(data); renderList();
+      }
+    });
+  }
+
+  // ---------- Weather fetch via Open‑Meteo ----------
+  async function fetchWeather(dt){
+    const {lat, lon} = DEFAULT_COORDS;
+    const url = new URL('https://api.open-meteo.com/v1/forecast');
+    url.searchParams.set('latitude', lat);
+    url.searchParams.set('longitude', lon);
+    url.searchParams.set('hourly', [
+      'temperature_2m','precipitation','cloudcover','wind_speed_10m','wind_gusts_10m'
+    ].join(','));
+    url.searchParams.set('timezone', DEFAULT_TZ);
+
+    const res = await fetch(url.toString());
+    if(!res.ok) throw new Error('Weather fetch failed');
+    return res.json();
+  }
+
+  function evaluateCriteria(val, crit){
+    // Returns {decision, chips}
+    const chips = { wind:'warn', gust:'warn', precip:'warn', cloud:'warn' };
+    let ok = true;
+
+    if(Number.isFinite(val.wind)){ chips.wind = (val.wind <= crit.maxWind) ? 'go' : 'nogo'; }
+    if(Number.isFinite(val.gust)){ chips.gust = (val.gust <= crit.maxGust) ? 'go' : 'nogo'; }
+    if(Number.isFinite(val.precip)){
+      chips.precip = (val.precip <= crit.maxPrecip) ? 'go' : (val.precip <= crit.maxPrecip + 0.2 ? 'warn' : 'nogo');
+    }
+    if(Number.isFinite(val.cloud)){
+      chips.cloud = (val.cloud <= crit.maxCloud) ? 'go' : 'warn';
+    }
+
+    ok = Object.values(chips).every(s=> s==='go' || s==='warn') && chips.wind!=='nogo' && chips.gust!=='nogo' && chips.precip!=='nogo';
+    return { decision: ok ? 'GO' : 'NO‑GO', chips };
+  }
+
+  function flash(el){ el.animate([{boxShadow:'0 0 0 0 rgba(36,255,98,.0)'},{boxShadow:'0 0 0 6px rgba(36,255,98,.25)'}], {duration:280, easing:'ease'}); }
+
+  async function updateWeather(){
+    const date = $('#launchDate').value; const time = $('#launchTime').value || '10:15';
+    if(!date){ alert('Pick a Launch Date first.'); return; }
+    const target = new Date(`${date}T${time}:00`);
+
+    $('#lastUpdated').textContent = 'Fetching…';
+
+    try{
+      const data = await fetchWeather(target);
+      const hourly = data.hourly;
+      const idx = nearestHourIndex(hourly.time, target.toISOString());
+
+      const temp = hourly.temperature_2m?.[idx];
+      const wind = kmh(hourly.wind_speed_10m?.[idx] ?? NaN);
+      const gust = kmh(hourly.wind_gusts_10m?.[idx] ?? NaN);
+      const precip = hourly.precipitation?.[idx];
+      const cloud = hourly.cloudcover?.[idx];
+
+      $('#readTemp').textContent = `Temp: ${Math.round(temp)}°C`;
+      $('#readWind').textContent = `Wind: ${wind} km/h`;
+      $('#readGust').textContent = `Gusts: ${gust} km/h`;
+      $('#readPrecip').textContent = `Precip: ${precip} mm/h`;
+      $('#readCloud').textContent = `Cloud: ${cloud}%`;
+
+      const crit = loadCriteria();
+      const { decision, chips } = evaluateCriteria({wind, gust, precip, cloud}, crit);
+      const banner = $('#decisionBanner');
+      const text = $('#decisionText');
+      text.textContent = decision;
+      text.className = (decision==='GO') ? 'go' : 'nogo';
+
+      applyChip($('#chipWind'), chips.wind);
+      applyChip($('#chipGust'), chips.gust);
+      applyChip($('#chipPrecip'), chips.precip);
+      applyChip($('#chipCloud'), chips.cloud);
+
+      const fetchedAt = new Date().toLocaleString('en-CA', { timeZone: DEFAULT_TZ });
+      $('#lastUpdated').textContent = `Updated ${fetchedAt}`;
+      flash(banner);
+    }catch(err){
+      console.error(err);
+      $('#lastUpdated').textContent = 'Error fetching weather';
+      alert('Could not fetch weather. Try again in a moment.');
+    }
+  }
+
+  // ---------- UI Wiring ----------
+  function init(){
+    // Fill criteria UI
+    const c = loadCriteria();
+    $('#maxWind').value = c.maxWind; $('#maxGust').value = c.maxGust; $('#maxPrecip').value = c.maxPrecip; $('#maxCloud').value = c.maxCloud;
+
+    // Default launch date to today (local TZ)
+    const today = new Date();
+    const tzOffset = new Date(today.getTime() - (today.getTimezoneOffset()*60000));
+    $('#launchDate').value = tzOffset.toISOString().slice(0,10);
+
+    // Buttons
+    $('#refreshBtn').addEventListener('click', updateWeather);
+    $('#saveCriteria').addEventListener('click', saveCriteriaUI);
+
+    $('#resetList').addEventListener('click', ()=>{
+      if(confirm('Reset checklist to CSP template? This overwrites your current list.')){
+        localStorage.setItem(LS_KEY, JSON.stringify(templateChecklist()));
+        renderList();
+      }
+    });
+
+    $('#clearChecks').addEventListener('click', ()=>{
+      const data = loadChecklist();
+      for(const g of data){ for(const it of g.items){ delete it.done; } }
+      saveChecklist(data); renderList();
+    });
+
+    $('#exportList').addEventListener('click', ()=>{
+      saveJSON('csp-checklist.json', loadChecklist());
+    });
+
+    $('#importFile').addEventListener('change', async (e)=>{
+      const file = e.target.files?.[0]; if(!file) return;
+      try{
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if(!Array.isArray(data)) throw new Error('Invalid format');
+        localStorage.setItem(LS_KEY, JSON.stringify(data));
+        renderList();
+        alert('Checklist imported.');
+      }catch(err){ alert('Import failed: ' + err.message); }
+      e.target.value = '';
+    });
+
+    renderList();
+  }
+
+  document.addEventListener('DOMContentLoaded', init, {passive:true});
+  </script>
+</body>
+</html>

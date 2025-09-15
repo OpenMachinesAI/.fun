@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Rocket Flight Dashboard — Full Build (Rocket + Plume + Gauges + CSV + Replay + Descent Warnings)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0e1020; --panel:#151936; --border:#2a2f65; --ink:#e6e9ff;
+      --accent:#2430a3; --accent2:#3a49e0; --muted:#9aa6ff;
+      --good:#05e676; --warn:#ffb020; --bad:#ff3b3b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    .wrap{max-width:1400px;margin:20px auto;padding:0 16px}
+    h1{margin:0 0 10px;font-size:22px}
+    .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 12px 30px #0006}
+    .top3d{width:100%;height:380px;display:block;background:#000;border-radius:12px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:16px}
+    canvas.render{width:100%;height:200px;display:block;background:#000;border-radius:12px}
+    .log{height:180px;background:#0b0f2a;border:1px solid var(--border);border-radius:10px;padding:8px;overflow:auto;font-family:ui-monospace,Consolas,Menlo,monospace;font-size:13px}
+    button{background:var(--accent);color:#fff;border:1px solid var(--accent2);border-radius:12px;padding:10px 14px;margin:4px 8px 4px 0;font-weight:600;cursor:pointer}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .status{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    .dot{width:14px;height:14px;border-radius:50%;display:inline-block;vertical-align:-2px;margin-right:6px}
+    .ok{background:var(--good)} .warn{background:var(--warn)} .bad{background:var(--bad)}
+    .pill{background:#0b0f2a;border:1px solid var(--border);border-radius:10px;padding:6px 10px}
+    #replayBanner{display:none;background:var(--bad);color:#fff;text-align:center;padding:6px;font-weight:800;font-size:16px;margin:6px 0 10px;border-radius:8px}
+    /* Warning annunciator strip */
+    .annunciators{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .ann{min-width:120px;text-align:center;padding:8px 10px;border-radius:10px;border:1px solid var(--border);font-weight:800;letter-spacing:.5px}
+    .ann.off{background:#101325;color:#556}
+    .ann.amber{background:#3b2a00;color:#ffcd66;border-color:#604500;box-shadow:0 0 16px #ffb02066 inset}
+    .ann.red{background:#3b0000;color:#ffc8c8;border-color:#600;box-shadow:0 0 16px #ff3b3b66 inset}
+    /* throttle slider width */
+    .throttle input[type=range]{width:320px}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/babylonjs@6.42.0/babylon.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div id="replayBanner">REPLAY MODE — Playing back CSV</div>
+    <h1>Rocket Flight Computer Dashboard</h1>
+
+    <div class="row">
+      <div>
+        <button id="connectBtn">Connect Ground Micro:bit</button>
+        <button id="disconnectBtn" disabled>Disconnect</button>
+      </div>
+      <div class="status">
+        <div><span id="hbDot" class="dot bad"></span>Heartbeat</div>
+        <div><span id="killDot" class="dot ok"></span>Kill Status</div>
+      </div>
+      <div class="row">
+        <div class="throttle row">
+          <strong>Throttle</strong>
+          <input id="thr" type="range" min="0" max="100" value="0" step="1">
+          <span class="pill"><span id="thrVal">0</span>%</span>
+          <button id="thrZero">Zero</button><button id="thr50">50%</button><button id="thrMax">Max</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <button id="dlCsv">Download CSV</button>
+      <input type="file" id="replayCsv" accept=".csv" />
+    </div>
+
+    <!-- BIG compact red rocket with blue fins & exhaust plume -->
+    <div class="card"><canvas id="main3d" class="top3d"></canvas></div>
+
+    <!-- Annunciators -->
+    <div class="annunciators">
+      <div id="annSink"  class="ann off">SINK RATE</div>
+      <div id="annPull"  class="ann off">PULL UP</div>
+      <div id="annLink"  class="ann off">LINK</div>
+      <div id="annKill"  class="ann off">KILL</div>
+    </div>
+
+    <!-- Small gauges: Pitch/Roll (3D white towers), Accel/Temp/RSSI (speedometers) -->
+    <div class="grid">
+      <div class="card"><h3>Tilt (Pitch)</h3><canvas id="c1" class="render"></canvas></div>
+      <div class="card"><h3>Side Tilt (Roll)</h3><canvas id="c2" class="render"></canvas></div>
+      <div class="card"><h3>Acceleration</h3><canvas id="c3" class="render"></canvas></div>
+      <div class="card"><h3>Temperature</h3><canvas id="c4" class="render"></canvas></div>
+      <div class="card"><h3>Signal Strength</h3><canvas id="c5" class="render"></canvas></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Raw Telemetry</h3>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+
+<script>
+/* ============ Utility & State ============ */
+const logEl = document.getElementById('log');
+function log(s){ const d=document.createElement('div'); d.textContent=s; logEl.appendChild(d); logEl.scrollTop=logEl.scrollHeight; }
+
+const hbDot = document.getElementById('hbDot');
+const killDot = document.getElementById('killDot');
+
+const annSink = document.getElementById('annSink');
+const annPull = document.getElementById('annPull');
+const annLink = document.getElementById('annLink');
+const annKill = document.getElementById('annKill');
+
+let firstTelemetry = false;
+let lastHeartbeat = 0;
+let lastPacketMs = 0;
+
+const S = { PITCH:0, ROLL:0, AZ:0, TEMP:0, SIG:0 };
+function ema(k, v, a=0.25){ if(isNaN(v)) return S[k]; S[k] += (v - S[k]) * a; return S[k]; }
+let thrLevel = 0; // 0..100
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function map(v,a,b,c,d){ return c + (d-c) * ((v-a)/(b-a)); }
+
+/* ============ CSV Logging + Replay ============ */
+let csvRows = ["time_ms,pitch,roll,az,temp,sig,thr"];
+const t0 = performance.now();
+function csvPush(p,r,az,t,s,thr){
+  const ms = Math.round(performance.now() - t0);
+  csvRows.push([ms, p?.toFixed?.(2)??"", r?.toFixed?.(2)??"", az?.toFixed?.(2)??"", t?.toFixed?.(2)??"", s?.toFixed?.(2)??"", Math.round(thr??0)].join(","));
+}
+document.getElementById('dlCsv').onclick = ()=>{
+  const blob = new Blob([csvRows.join("\n")], {type:"text/csv"});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "telemetry.csv"; a.click();
+};
+
+document.getElementById('replayCsv').onchange = async e=>{
+  const f = e.target.files[0]; if(!f) return;
+  replayBanner(true);
+  const text = await f.text();
+  const lines = text.trim().split(/\r?\n/).slice(1);
+  let i=0, lastMs=0;
+  function step(){
+    if(i>=lines.length){ replayBanner(false); return; }
+    const [ms,p,r,az,t,s,thr] = lines[i].split(",").map(x=>parseFloat(x));
+    const delay = Math.max(10, (ms - lastMs) || 20);
+    lastMs = ms;
+    applyTelemetry({PITCH:p, ROLL:r, AZ:az, TEMP:t, SIG:s, THR:thr});
+    i++; setTimeout(step, delay);
+  }
+  step();
+};
+
+function replayBanner(show){
+  document.getElementById('replayBanner').style.display = show ? 'block' : 'none';
+}
+
+/* ============ Babylon: Big Compact Red Rocket (Blue Fins) + Exhaust ============ */
+function makeBigRocket(canvasId){
+  const canvas = document.getElementById(canvasId);
+  const engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer:true, antialias:true});
+  const scene  = new BABYLON.Scene(engine);
+  scene.clearColor = new BABYLON.Color4(0,0,0,0);
+
+  const camera = new BABYLON.ArcRotateCamera("cam", Math.PI/10, Math.PI/3, 11, BABYLON.Vector3.Zero(), scene);
+  camera.inputs.clear();
+
+  const redMat  = new BABYLON.StandardMaterial("red", scene);  redMat.emissiveColor  = new BABYLON.Color3(1,0,0);   redMat.disableLighting = true;
+  const blueMat = new BABYLON.StandardMaterial("blue", scene); blueMat.emissiveColor = new BABYLON.Color3(0.2,0.6,1); blueMat.disableLighting = true;
+
+  const rocket = new BABYLON.TransformNode("rocket", scene);
+
+  // Compact sizes
+  const bodyH=4.5, bodyD=0.8, noseH=1.2, baseY=-bodyH/2;
+
+  const body = BABYLON.MeshBuilder.CreateCylinder("body", {height:bodyH, diameter:bodyD, tessellation:96}, scene);
+  body.material = redMat; body.parent = rocket;
+
+  const nose = BABYLON.MeshBuilder.CreateCylinder("nose", {height:noseH, diameterTop:0.02, diameterBottom:bodyD, tessellation:64}, scene);
+  nose.material = redMat; nose.parent = rocket; nose.position.y = bodyH/2 + noseH/2;
+
+  const fins=[];
+  const finH=0.9, finW=0.7, finT=0.22;
+  const radius = bodyD/2 + finT*0.45;
+  for(let i=0;i<4;i++){
+    const fin = BABYLON.MeshBuilder.CreateBox("fin"+i, {width:finW, height:finH, depth:finT}, scene);
+    fin.material = blueMat; fin.parent = rocket;
+    const ang = i*Math.PI/2;
+    fin.position.set(Math.cos(ang)*radius, baseY + finH/2 + 0.05, Math.sin(ang)*radius);
+    fin.rotation.y = ang;
+    fins.push(fin);
+  }
+
+  // Exhaust plume
+  const useGPU = BABYLON.GPUParticleSystem.IsSupported;
+  const plume = useGPU ? new BABYLON.GPUParticleSystem("plume", {capacity:4000}, scene)
+                       : new BABYLON.ParticleSystem("plume", 1000, scene);
+  plume.particleTexture = null;
+  plume.emitter = new BABYLON.Vector3(0, baseY - 0.05, 0);
+  plume.minEmitBox = new BABYLON.Vector3(-0.05,0,-0.05);
+  plume.maxEmitBox = new BABYLON.Vector3( 0.05,0, 0.05);
+  const cone = new BABYLON.ConeParticleEmitter(); cone.radius=0.18; cone.angle=Math.PI/10; cone.directionRandomizer=0.4;
+  plume.particleEmitterType = cone;
+  plume.color1 = new BABYLON.Color4(1,1,1,1);
+  plume.color2 = new BABYLON.Color4(1,0.85,0.2,0.9);
+  plume.colorDead = new BABYLON.Color4(1,0.2,0,0);
+  plume.minSize=0.05; plume.maxSize=0.18; plume.minLifeTime=0.15; plume.maxLifeTime=0.45; plume.emitRate=0;
+  plume.direction1 = new BABYLON.Vector3(0,-1,0); plume.direction2 = new BABYLON.Vector3(0,-1,0); plume.updateSpeed=0.01; plume.start();
+
+  engine.runRenderLoop(()=> scene.render());
+  new ResizeObserver(()=> engine.resize()).observe(canvas);
+
+  return { rocket, body, fins, plume, scene };
+}
+const big = makeBigRocket('main3d');
+
+/* ============ Small 3D White Towers (Pitch/Roll) ============ */
+function makeWhiteTower(canvasId){
+  const canvas = document.getElementById(canvasId);
+  const engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer:true, antialias:true});
+  const scene  = new BABYLON.Scene(engine); scene.clearColor = new BABYLON.Color4(0,0,0,0);
+  const camera = new BABYLON.ArcRotateCamera("cam", 0, Math.PI/3, 6, BABYLON.Vector3.Zero(), scene); camera.inputs.clear();
+  const mat = new BABYLON.StandardMaterial("mat", scene); mat.emissiveColor = new BABYLON.Color3(1,1,1); mat.disableLighting = true;
+  const tower = BABYLON.MeshBuilder.CreateCylinder("tower", {diameterTop:1, diameterBottom:1, height:3, tessellation:64}, scene);
+  tower.material = mat;
+  engine.runRenderLoop(()=> scene.render());
+  new ResizeObserver(()=> engine.resize()).observe(canvas);
+  return tower;
+}
+const g1 = makeWhiteTower('c1'); // pitch
+const g2 = makeWhiteTower('c2'); // roll
+
+/* ============ 2D Car-Style Speedometers (Accel/Temp/RSSI) ============ */
+function makeSpeedo(canvasId, label, min, max, units){
+  const cvs = document.getElementById(canvasId); const ctx = cvs.getContext('2d');
+  function resize(){ cvs.width = cvs.clientWidth; cvs.height = cvs.clientHeight; draw((min+max)/2); }
+  function arcMap(v){ const t = clamp((v-min)/(max-min),0,1); return (-5*Math.PI/6) + t*(4*Math.PI/3); } // -150° .. +90°
+  function draw(val){
+    const w=cvs.width, h=cvs.height, r=Math.min(w,h)*0.42, cx=w*0.5, cy=h*0.65;
+    ctx.clearRect(0,0,w,h);
+    // bezel
+    ctx.lineWidth = Math.max(6, r*0.08); ctx.strokeStyle = '#2a2f65'; ctx.beginPath(); ctx.arc(cx,cy,r, Math.PI*0.35, Math.PI*1.65); ctx.stroke();
+    // ticks
+    ctx.lineWidth = 2; ctx.strokeStyle = '#7f8cff';
+    for(let i=0;i<=10;i++){ const a=(-5*Math.PI/6)+i*(4*Math.PI/3)/10; const r1=r*0.82, r2=r*0.92; ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*r1, cy+Math.sin(a)*r1); ctx.lineTo(cx+Math.cos(a)*r2, cy+Math.sin(a)*r2); ctx.stroke(); }
+    // needle
+    const a = arcMap(val); ctx.strokeStyle='#ffffff'; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*r*0.9, cy+Math.sin(a)*r*0.9); ctx.stroke();
+    // hub
+    ctx.fillStyle='#ffffff'; ctx.beginPath(); ctx.arc(cx,cy,6,0,Math.PI*2); ctx.fill();
+    // text
+    ctx.fillStyle='#bfc7ff'; ctx.textAlign='center'; ctx.font=Math.floor(r*0.26)+'px ui-sans-serif';
+    ctx.fillText((isNaN(val)?'--':Math.round(val)) + (units?(' '+units):''), cx, cy-r*0.2);
+    ctx.font=Math.floor(r*0.18)+'px ui-sans-serif'; ctx.fillText(label, cx, cy+r*0.4);
+  }
+  new ResizeObserver(resize).observe(cvs); window.addEventListener('resize', resize); resize();
+  return { set(v){ draw(v); } };
+}
+const spdAZ  = makeSpeedo('c3', 'ACCEL',  0, 2000, 'mg');
+const spdTMP = makeSpeedo('c4', 'TEMP',   0,   60, '°C');
+const spdSIG = makeSpeedo('c5', 'RSSI', -110,  -30, 'dBm');
+
+/* ============ Descent / Warning Logic ============ */
+/* Very simple vertical speed estimator from (AZ - 1g). Units are *approx* m/s. */
+let vz = 0; // vertical speed estimate (positive up)
+function updateWarnings(azRaw, sig, killFlag){
+  // Estimate dt
+  const now = performance.now();
+  const dt = lastPacketMs? (now - lastPacketMs)/1000 : 0.04;
+  lastPacketMs = now;
+
+  // From raw AZ (LSB≈mg). Remove 1g, convert to m/s^2 and integrate
+  if (!isNaN(azRaw)) {
+    const aVert_mps2 = ((azRaw - 1024)/1024) * 9.81;
+    vz = vz*0.90 + aVert_mps2*dt; // leaky integration
+  }
+
+  // Annunciator logic
+  annSink.className = 'ann ' + ((vz < -1.0) ? 'amber' : 'off'); // SINK RATE (amber)
+  annPull.className = 'ann ' + ((vz < -5.0) ? 'red'   : 'off'); // PULL UP (red)
+  annLink.className = 'ann ' + ((isNaN(sig) || sig < -95) ? 'amber' : 'off'); // weak link
+  annKill.className = 'ann ' + (killFlag ? 'red' : 'off');
+}
+
+/* ============ Apply telemetry to UI & Rocket ============ */
+function applyTelemetry(data){
+  // Smooth core values
+  const p  = ema('PITCH', data.PITCH);
+  const r  = ema('ROLL',  data.ROLL);
+  const az = ema('AZ',    Math.abs(data.AZ));
+  const t  = ema('TEMP',  data.TEMP);
+  const sig= ema('SIG',   data.SIG);
+
+  // Update 3D towers + speedos
+  if(!isNaN(p))  g1.rotation.x = p*Math.PI/180;
+  if(!isNaN(r))  g2.rotation.z = r*Math.PI/180;
+  if(!isNaN(az)) spdAZ.set(Math.min(2000, az));
+  if(!isNaN(t))  spdTMP.set(clamp(t,0,60));
+  if(!isNaN(sig)) spdSIG.set(clamp(sig,-110,-30));
+
+  // Big rocket transforms & plume
+  if(!isNaN(p))  big.rocket.rotation.x = p*Math.PI/180;
+  if(!isNaN(r))  big.rocket.rotation.z = r*Math.PI/180;
+  if(!isNaN(az)) big.rocket.scaling.y  = Math.max(0.5, 1 + az/1024);
+
+  // Plume intensity (prefer throttle; else |AZ|)
+  const drive = !isNaN(data.THR) ? clamp(data.THR,0,100) : clamp(az/10, 0, 100);
+  big.plume.emitRate    = Math.round(map(drive,0,100, 0, 2500));
+  big.plume.minSize     = map(drive,0,100, 0.04, 0.10);
+  big.plume.maxSize     = map(drive,0,100, 0.12, 0.24);
+  big.plume.minLifeTime = map(drive,0,100, 0.10, 0.30);
+  big.plume.maxLifeTime = map(drive,0,100, 0.25, 0.55);
+
+  // Warnings (use raw AZ before abs if available)
+  updateWarnings(data.AZ, data.SIG, data.KILL?true:false);
+
+  // CSV row
+  csvPush(p,r,az,t,sig,drive);
+}
+
+/* ============ Parser (tolerant to messy lines) ============ */
+function handleLine(line){
+  log(line);
+  if(line.slice(0,3) === 'TEL'){
+    const data = {};
+    const re = /([A-Z]{1,4})\s*=?\s*(-?\d+(?:\.\d+)?)/g;
+    let m; while((m=re.exec(line))!==null){ data[m[1]] = parseFloat(m[2]); }
+
+    // Shorthand aliases sometimes seen
+    if(data.X  !== undefined && data.AX === undefined) data.AX = data.X;
+    if(data.Y  !== undefined && data.AY === undefined) data.AY = data.Y;
+    if(data.Z  !== undefined && data.AZ === undefined) data.AZ = data.Z;
+    if(data.SI !== undefined && data.SIG=== undefined) data.SIG = data.SI;
+    if(data.SG !== undefined && data.SIG=== undefined) data.SIG = data.SG;
+
+    // Derive pitch/roll if missing
+    const G = 1024;
+    if((data.PITCH===undefined||isNaN(data.PITCH)) && (!isNaN(data.AX)||!isNaN(data.AY)||!isNaN(data.AZ))){
+      const ax=isNaN(data.AX)?0:data.AX, ay=isNaN(data.AY)?0:data.AY, az=isNaN(data.AZ)?G:data.AZ;
+      data.PITCH = Math.atan2(ax, Math.sqrt(ay*ay + az*az)) * 180/Math.PI;
+    }
+    if((data.ROLL===undefined||isNaN(data.ROLL)) && (!isNaN(data.AY)||!isNaN(data.AZ))){
+      const ay=isNaN(data.AY)?0:data.AY, az=isNaN(data.AZ)?G:data.AZ;
+      data.ROLL = Math.atan2(ay, az) * 180/Math.PI;
+    }
+
+    if(!isNaN(data.THR)) thrLevel = clamp(Math.round(data.THR), 0, 100);
+
+    if(!firstTelemetry){ firstTelemetry = true; }   // prevent snap on connect
+    lastHeartbeat = Date.now(); hbDot.className = 'dot ok'; killDot.className = 'dot ok';
+    applyTelemetry(data);
+  }
+  if(line.indexOf('KILL') >= 0){ killDot.className = 'dot bad'; annKill.className = 'ann red'; }
+}
+// Heartbeat watchdog
+setInterval(()=>{ if(firstTelemetry && Date.now()-lastHeartbeat > 3000){ hbDot.className='dot bad'; annLink.className='ann amber'; } }, 1000);
+
+/* ============ Web Serial + Throttle ============ */
+let port, reader, writer;
+async function sendLine(s){ if(!writer) return; const enc=new TextEncoder(); await writer.write(enc.encode(s.endsWith("\n")?s:(s+"\n"))); log("TX: "+s.trim()); }
+const connectBtn = document.getElementById('connectBtn');
+const disconnectBtn = document.getElementById('disconnectBtn');
+
+connectBtn.onclick = async ()=>{
+  try{
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 115200 });
+    reader = port.readable.getReader();
+    writer = port.writable.getWriter();
+    connectBtn.disabled = true; disconnectBtn.disabled = false;
+    readLoop();
+  }catch(e){ log("Error: "+e.message); }
+};
+disconnectBtn.onclick = async ()=>{
+  try{
+    if(reader){ await reader.cancel(); reader.releaseLock(); }
+    if(writer){ writer.releaseLock(); }
+    if(port){ await port.close(); }
+  }catch{}
+  connectBtn.disabled = false; disconnectBtn.disabled = true; log("Disconnected");
+};
+
+async function readLoop(){
+  const decoder = new TextDecoder();
+  let buffer = '';
+  while(port && reader){
+    const { value, done } = await reader.read();
+    if(done) break;
+    if(value){
+      buffer += decoder.decode(value);
+      let idx;
+      while((idx = buffer.indexOf('\n')) >= 0){
+        const line = buffer.slice(0, idx).trim();
+        buffer = buffer.slice(idx + 1);
+        if(line) handleLine(line);
+      }
+    }
+  }
+}
+
+// Throttle controls
+const thr = document.getElementById('thr'), thrVal=document.getElementById('thrVal');
+document.getElementById('thrZero').onclick = ()=> sendThr(0);
+document.getElementById('thr50').onclick   = ()=> sendThr(50);
+document.getElementById('thrMax').onclick   = ()=> sendThr(100);
+thr.addEventListener('input', ()=> sendThr(thr.value));
+function sendThr(p){ const pct = clamp(Math.round(p),0,100); thr.value=pct; thrVal.textContent=pct; sendLine("THR="+pct); }
+
+</script>
+</body>
+</html>

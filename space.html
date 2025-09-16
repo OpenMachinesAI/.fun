@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Central Space Program</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; min-height: 100svh; display: grid; place-items: center; background: #f6f7fb; }
+    .card {
+      width: min(92vw, 520px);
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+      padding: 24px 22px;
+      text-align: center;
+    }
+    h1 { margin: 0 0 10px; font-size: 1.1rem; }
+    p { margin: 0 0 18px; color: #444; line-height: 1.4; }
+    button {
+      appearance: none; border: 0; border-radius: 999px; padding: 12px 18px;
+      font-weight: 600; cursor: pointer; background: #1a73e8; color: white;
+    }
+    button:focus { outline: 3px solid #a8c7fa; outline-offset: 2px; }
+    .hidden { display: none; }
+    small { display:block; margin-top:10px; color:#666; }
+  </style>
+</head>
+<body>
+  <div id="notice" class="card" role="dialog" aria-labelledby="msg" aria-modal="true">
+    <h1 id="msg">To view our Space Program site you must be signed in to your student account on the browser.</h1>
+    <button id="okBtn" type="button" aria-label="I understand">Go to CSP</button>
+    <small>If you still can’t access, try signing out and back in to your school account. 
+      
+      
+ If your a parent ask your child to sign in</small>
+  </div>
+
+  <script>
+    document.getElementById('okBtn').addEventListener('click', () => {
+      document.getElementById('notice').classList.add('hidden');
+      
+     window.location.href = "https://sites.google.com/sd61learn.ca/space";
+    });
+  </script>
+</body>
+</html>

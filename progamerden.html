@@ -25,7 +25,6 @@
       overflow-x:hidden;
     }
 
-    /* Neon horizon grid */
     .gridbg{position:fixed;inset:auto 0 0 0;height:60vh;z-index:-1;
       background:
         repeating-linear-gradient(0deg, #ffffff10 0 2px, transparent 2px 26px),
@@ -38,7 +37,6 @@
       background:linear-gradient(rgba(255,255,255,.05) 50%,rgba(0,0,0,0) 50%);
       background-size:100% 2px;mix-blend-mode:overlay;opacity:.35}
 
-    /* Header */
     header{position:sticky;top:0;z-index:10;border-bottom:3px solid #ffffff44;backdrop-filter:blur(6px)}
     .bar{display:flex;align-items:center;gap:12px;padding:10px 12px;
       background:linear-gradient(90deg,#ff4ac7,#9b5bff,#2f9dff,#33ffaa);}
@@ -47,7 +45,6 @@
     h1{margin:0;font-weight:900;text-shadow:2px 2px 0 #000}
     .sub{font-size:12px;opacity:.9;margin-top:2px}
 
-    /* Trading Cards ribbon */
     .ribbon{display:flex;justify-content:center;align-items:center;gap:10px;padding:8px;border-top:2px solid #fff;border-bottom:2px solid #fff;
       background:linear-gradient(90deg,var(--gold),#fff3 40%,var(--gold));color:#2b2100;font-weight:900}
     .ribbon a{background:#fff;border:2px solid #0007;border-radius:8px;padding:6px 10px;color:#111;text-decoration:none}
@@ -55,7 +52,6 @@
 
     main{padding:16px}
 
-    /* Arcade board */
     .board{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
     .ticket{position:relative;text-decoration:none;color:var(--ink);background:var(--panel);
       border:3px dashed var(--edge);padding:14px;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.5);
@@ -66,12 +62,10 @@
     .tt svg{width:28px;height:28px;filter:drop-shadow(0 0 6px #000)}
     .desc{opacity:.9;font-size:13px;margin-top:6px}
 
-    /* Banner ads (tastefully retro) */
     .ads{display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0}
     .ad{border:3px double #ff9; background:#220000; color:#fff; padding:8px; font-weight:900; text-shadow:1px 1px 0 #000; animation:flash 1.4s linear infinite}
     @keyframes flash{0%,100%{background:#3a0000}50%{background:#5a2000}}
 
-    /* Win95 Modal */
     .modal{display:none;position:fixed;inset:10% 10%;background:#c0c0c0;border:2px solid #000;box-shadow:5px 5px 15px rgba(0,0,0,.5);z-index:1000}
     .modal.show{display:block}
     .modal-toolbar{background:#000080;color:#fff;padding:5px;display:flex;align-items:center;justify-content:space-between;font-size:1.1em}
@@ -81,10 +75,7 @@
     .modal-content{height:calc(100% - 40px)}
     .modal-content iframe{width:100%;height:100%;border:none;background:#000}
 
-    /* Footer */
     footer{display:flex;justify-content:center;opacity:.8;font-size:12px;margin:18px 0}
-
-    /* Utility */
     .hidden{display:none!important}
   </style>
 </head>
@@ -94,7 +85,6 @@
   <header>
     <div class="bar">
       <div class="mark" aria-hidden="true">
-        <!-- CRT-styled SVG logo -->
         <svg viewBox="0 0 120 96" preserveAspectRatio="xMidYMid slice">
           <defs>
             <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
@@ -112,28 +102,20 @@
         <div class="sub">LAN vibes • CRT glow • snack meta</div>
       </div>
     </div>
-    <div class="ribbon">
-    </div>
+    <div class="ribbon"></div>
   </header>
 
   <main>
-    <!-- Fun promo ads -->
     <div class="ads">
       <div class="ad">🚀 NEW: CSP Rocket Labs — build & fly rockets (by Central Space Program). Click to launch below.</div>
     </div>
 
-    <!-- Arcade tickets list -->
     <div class="board" id="games">
 
-      <!-- ✅ ADDED TO TOP -->
+      <!-- Original + New Games -->
       <a class="ticket new" data-url="Rocket%20Labs.html">
         <div class="tt">
-          <!-- simple rocket icon -->
-          <svg viewBox="0 0 24 24" fill="#33ffaa" aria-hidden="true">
-            <path d="M12 2c3 2 5 6 5 9 0 3-2 7-5 9-3-2-5-6-5-9 0-3 2-7 5-9z"/>
-            <circle cx="12" cy="10" r="2" fill="#0b0530"/>
-            <path d="M8 15l-3 3 0-4zM16 15l3 3 0-4z" />
-          </svg>
+          <svg viewBox="0 0 24 24" fill="#33ffaa"><path d="M12 2c3 2 5 6 5 9 0 3-2 7-5 9-3-2-5-6-5-9 0-3 2-7 5-9z"/><circle cx="12" cy="10" r="2" fill="#0b0530"/><path d="M8 15l-3 3 0-4zM16 15l3 3 0-4z" /></svg>
           CSP Rocket Labs <small style="opacity:.7">— Central Space Program</small>
         </div>
         <div class="desc">Build, fly, and (maybe) land your own rockets. Student-grade chaos, pro-grade vibes.</div>
@@ -186,13 +168,40 @@
         </div>
         <div class="desc">Nailed it. Or didn’t. You decide.</div>
       </a>
+
+      <!-- ✅ New ones -->
+      <a class="ticket new" data-url="fun%20flight%20sim.html">
+        <div class="tt">
+          <svg viewBox="0 0 24 24" fill="#33ffaa"><path d="M2 16l20-8-20-8v6l15 2-15 2v6z"/></svg>
+          Central Flight Sim <small style="opacity:.7">(Skybound)</small>
+        </div>
+        <div class="desc">Pilot your dreams. Turbo-props, afterburners, and crash landings—school-approved flight chaos.</div>
+      </a>
+
+      <a class="ticket new" data-url="Geometry.FUN.html">
+        <div class="tt">
+          <svg viewBox="0 0 24 24" fill="#ff4ac7"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+          Totally Licensed Geometry Dash <small style="opacity:.7">(Yes, really)</small>
+        </div>
+        <div class="desc">Jump, flip, rage, repeat. 100% legit and certified not-a-lawsuit… probably.</div>
+      </a>
+
+      <a class="ticket new" data-url="centralschool.fun%20--%20games.html">
+        <div class="tt">
+          <svg viewBox="0 0 24 24" fill="#ffc94d">
+            <circle cx="12" cy="12" r="10"/>
+            <text x="12" y="16" text-anchor="middle" font-size="10" fill="#000" font-weight="bold">M</text>
+          </svg>
+          Super Mario (don’t sue me) <small style="opacity:.7">(Classic-ish)</small>
+        </div>
+        <div class="desc">Run, jump, bonk blocks. Totally original plumber adventure, wink wink.</div>
+      </a>
+
     </div>
 
-    <!-- Hidden shortcut help -->
     <p class="desc" style="margin-top:10px">Tips: Click a game • <b>Enter</b> opens the highlighted one • <b>Esc</b> closes • <b>F</b> toggles fullscreen.</p>
   </main>
 
-  <!-- Win95 modal -->
   <div id="gameModal" class="modal" role="dialog" aria-modal="true" aria-label="Game window">
     <div class="modal-toolbar">
       <div id="modalTitle">CentralSchool.fun - Game</div>
@@ -209,32 +218,23 @@
   <footer>Back to <a href="index.html" style="color:#8bd0ff">Home</a> • <a href="cards.html" style="color:#ffc94d">Trading Cards</a></footer>
 
   <script>
-    // Focus & keyboard navigation
     const list = document.getElementById('games');
     let idx = 0; const items = () => Array.from(list.querySelectorAll('.ticket'));
     function highlight(i){
-      items().forEach((el,n)=>{
-        el.style.outline = n===i ? '3px solid '+getComputedStyle(document.documentElement).getPropertyValue('--edge') : 'none';
-      });
+      items().forEach((el,n)=>{ el.style.outline = n===i ? '3px solid '+getComputedStyle(document.documentElement).getPropertyValue('--edge') : 'none'; });
     }
     highlight(idx);
 
-    // Open modal
     function openModal(url, title){
-      const m=document.getElementById('gameModal');
-      const f=document.getElementById('gameFrame');
+      const m=document.getElementById('gameModal'); const f=document.getElementById('gameFrame');
       document.getElementById('modalTitle').textContent = 'CentralSchool.fun - '+(title||'Game');
       f.src=url; m.classList.add('show');
     }
     function closeModal(){ const m=document.getElementById('gameModal'); const f=document.getElementById('gameFrame'); m.classList.remove('show'); f.src=''; }
     function goFullScreen(){ const m=document.getElementById('gameModal'); if(m.requestFullscreen) m.requestFullscreen(); else if(m.webkitRequestFullscreen) m.webkitRequestFullscreen(); else if(m.msRequestFullscreen) m.msRequestFullscreen(); }
 
-    // Bind clicks
-    items().forEach((el,n)=>{
-      el.addEventListener('click',()=>{ idx=n; highlight(idx); openModal(el.dataset.url, el.textContent.trim()); });
-    });
+    items().forEach((el,n)=>{ el.addEventListener('click',()=>{ idx=n; highlight(idx); openModal(el.dataset.url, el.textContent.trim()); }); });
 
-    // Keyboard
     document.addEventListener('keydown',e=>{
       const k=e.key.toLowerCase();
       if(['arrowright','arrowdown','j'].includes(k)){ idx=(idx+1)%items().length; highlight(idx); }
@@ -244,16 +244,13 @@
       else if(k==='f'){ goFullScreen(); }
     });
 
-    // Toolbar buttons
     document.getElementById('btnClose').onclick=closeModal;
     document.getElementById('btnFull').onclick=goFullScreen;
 
-    // Self-tests (non-breaking)
     (function tests(){
       const out=[]; const ok=(n,c)=>out.push((c?'PASS':'FAIL')+': '+n);
-      ok('Has 7 games', document.querySelectorAll('.ticket').length===7);
+      ok('Has 10 games', document.querySelectorAll('.ticket').length===10);
       ok('Modal elements exist', !!document.getElementById('gameModal') && !!document.getElementById('gameFrame'));
-      ok('Keyboard help visible', document.querySelector('main p.desc')!==null);
       console.log('[Gamer Den Tests]\n'+out.join('\n'));
     })();
   </script>

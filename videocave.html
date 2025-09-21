@@ -5,71 +5,190 @@
   <meta charset="UTF-8">
   <title>CCP - Central Content Pool</title>
   <style>
+/* Full screen welcome overlay */
+#welcome-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  animation: fadeIn 0.8s ease;
+}
+
+#welcome-box {
+  background: #111;
+  padding: 40px;
+  border: 3px solid white;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 600px;
+  color: white;
+  font-family: 'Comic Neue', cursive;
+  text-shadow: 0 0 5px #0ff, 0 0 10px #f0f, 0 0 20px #ff0;
+  box-shadow: 0 0 20px magenta, 0 0 20px cyan;
+  animation: popIn 0.6s ease;
+}
+
+#welcome-box h1 {
+  font-size: 2.2em;
+  margin-bottom: 15px;
+}
+
+#welcome-box p {
+  font-size: 18px;
+  line-height: 1.4em;
+  margin-bottom: 25px;
+}
+
+.welcome-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.welcome-buttons button {
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid white;
+  background: linear-gradient(45deg, #00f, #f0f);
+  color: white;
+  cursor: pointer;
+  text-shadow: 1px 1px 2px black;
+  transition: transform 0.2s, background 0.3s;
+}
+
+.welcome-buttons button:hover {
+  transform: scale(1.08);
+  background: linear-gradient(45deg, #ff0, #f00);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+
     body {
-      background-color: #ffcc00;
       font-family: 'Comic Neue', cursive;
       margin: 0;
       padding: 0;
       text-align: center;
+      transition: background 1s ease;
+      background: linear-gradient(135deg, #ff00ff, #00ffff);
+      background-size: 400% 400%;
+      animation: rainbowShift 12s infinite;
     }
     header {
-      background-color: #003399;
+      background: linear-gradient(90deg, #ff0080, #ff8c00, #40e0d0, #8a2be2);
+      background-size: 600% 600%;
+      animation: rainbowShift 8s infinite;
       color: white;
       padding: 15px;
       font-size: 2em;
       border-bottom: 4px double #fff;
+      text-shadow: 2px 2px 0 black;
+    }
+    @keyframes rainbowShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
     .logo {
       font-size: 50px;
       font-weight: bold;
-      color: #ff0000;
-      text-shadow: 3px 3px 0 #000;
+      color: #fff;
+      text-shadow: 3px 3px 0 #000, 0 0 10px cyan, 0 0 20px magenta;
       margin-top: 20px;
     }
-    .subtext {
-      font-size: 24px;
-      color: black;
-      margin-top: -10px;
+    .subtext, .fineprint {
+      color: white;
+      text-shadow: 1px 1px 2px black;
     }
-    .fineprint {
-      font-size: 12px;
-      color: gray;
-      margin-top: -5px;
-      font-style: italic;
-    }
+    .subtext { font-size: 24px; margin-top: -10px; }
+    .fineprint { font-size: 12px; font-style: italic; }
+
     .container {
       margin: 20px auto;
       width: 90%;
       max-width: 1200px;
     }
-    /* Search Bar */
+
+    /* Search Bar + Lucky Button */
     .search-container {
       margin: 20px auto;
       width: 100%;
       display: flex;
       justify-content: center;
+      gap: 10px;
     }
     #search-input {
-      width: 80%;
+      width: 70%;
       padding: 10px;
       font-size: 18px;
-      border: 3px solid #000;
+      border: 3px solid #fff;
+      background: rgba(255,255,255,0.9);
       outline: none;
-      background: #ffffff;
-      transition: 0.3s ease-in-out;
+      transition: 0.3s;
     }
-    #search-input:focus {
-      background: #ffff99;
+    #search-input:focus { background: #ffff99; }
+    #lucky-btn {
+      background: linear-gradient(90deg, #ff0000, #ff9900, #33cc33, #3399ff, #cc33ff);
+      background-size: 400% 400%;
+      animation: rainbowShift 5s infinite;
+      border: 3px solid white;
+      color: white;
+      font-weight: bold;
+      padding: 10px 20px;
+      cursor: pointer;
+      text-shadow: 1px 1px 2px black;
+      transition: transform 0.3s;
     }
+    #lucky-btn:hover { transform: scale(1.1) rotate(-2deg); }
+
+    /* Category Navigation */
+    .category-bar {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+    .category-btn {
+      background: linear-gradient(45deg, #00f, #f0f);
+      border: 3px solid white;
+      color: white;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      text-shadow: 1px 1px 2px black;
+      transition: 0.3s;
+    }
+    .category-btn.active, .category-btn:hover {
+      background: linear-gradient(45deg, #ff0, #f00);
+      transform: scale(1.15) rotate(2deg);
+    }
+
+    .total-count {
+      font-size: 18px;
+      margin: 10px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+    }
+
     /* Videos Grid */
     .videos {
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
       justify-content: center;
+      transition: opacity 0.5s ease;
     }
     .video-card {
-      background-color: #fff;
+      background: rgba(255,255,255,0.9);
       border: 3px solid black;
       padding: 10px;
       width: 320px;
@@ -78,8 +197,8 @@
       animation: fadeIn 0.5s ease-in;
     }
     .video-card:hover {
-      transform: scale(1.05);
-      box-shadow: 5px 5px 0 #000;
+      transform: scale(1.08) rotate(-1deg);
+      box-shadow: 0 0 20px cyan, 0 0 30px magenta;
     }
     .video-card img {
       width: 100%;
@@ -87,36 +206,33 @@
       aspect-ratio: 16/9;
       object-fit: cover;
       border: 4px solid black;
-      image-rendering: pixelated;
     }
     .video-card h2 {
       margin: 10px 0 0 0;
       font-size: 20px;
-      color: #003399;
+      color: #000;
     }
+
     /* Modal */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
       display: none;
       align-items: center;
       justify-content: center;
       animation: fadeIn 0.5s;
     }
     .modal-window {
-      background-color: #c0c0c0;
-      border: 2px solid #000;
+      background: #111;
+      border: 2px solid white;
       width: 80%;
       max-width: 800px;
-      box-shadow: 5px 5px 0 #000;
+      box-shadow: 0 0 30px magenta, 0 0 30px cyan;
       animation: slideDown 0.5s ease-out;
     }
     .modal-header {
-      background: #000080;
+      background: linear-gradient(90deg, #ff0080, #ff8c00, #40e0d0, #8a2be2);
       color: white;
       padding: 5px;
       display: flex;
@@ -124,22 +240,18 @@
       align-items: center;
     }
     .modal-header button {
-      background: #c0c0c0;
-      border: 2px outset #fff;
+      background: #000;
+      color: white;
+      border: 2px solid white;
       cursor: pointer;
       margin-left: 5px;
     }
-    .modal-content {
-      padding: 10px;
-      background: #fff;
-    }
+    .modal-content { padding: 10px; background: #000; }
     .modal-content video {
       width: 100%;
-      height: auto;
       max-height: 80vh;
-      object-fit: contain;
-      display: block;
     }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -148,23 +260,58 @@
       from { transform: translateY(-20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
+#toast {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+#toast.show {
+  opacity: 1;
+  animation: neonPulse 1.5s infinite alternate;
+}
+
+@keyframes neonPulse {
+  from { box-shadow: 0 0 5px #0ff, 0 0 10px #f0f, 0 0 20px #ff0; }
+  to   { box-shadow: 0 0 15px #ff0, 0 0 30px #0ff, 0 0 45px #f0f; }
+}
+
   </style>
 </head>
+<!-- Welcome Overlay -->
+<div id="welcome-overlay">
+  <div id="welcome-box">
+    <h1>Welcome to Content Pool V2</h1>
+    <p>This is still being worked on and may be a little slow,<br>
+    but we are gonna give you access now.</p>
+    <div class="welcome-buttons">
+      <button id="enter-btn">🚀 Enter Content Pool V2</button>
+      <button id="old-btn">📼 Open Old Content Pool</button>
+    </div>
+  </div>
+</div>
+
 <body>
+
   <header>Welcome to CCP</header>
   <div class="logo">CCP</div>
   <div class="subtext">(Central Content Pool)</div>
-  <div class="fineprint">(not the China guys, they copied us...)</div>
+  <div class="fineprint">(Not Communist!)</div>
 
   <div class="container">
-    <!-- Search Bar -->
+    <!-- Search + Lucky -->
     <div class="search-container">
       <input type="text" id="search-input" placeholder="Search for videos...">
+      <button id="lucky-btn">🎲 I'm Feeling Lucky</button>
     </div>
+
+    <!-- Category Bar -->
+    <div class="category-bar" id="category-bar"></div>
+    <div class="total-count" id="total-count">Total Videos: 0</div>
 
     <div class="videos" id="video-list"></div>
   </div>
 
+  <!-- Modal -->
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal-window">
       <div class="modal-header">
@@ -177,91 +324,382 @@
       <div class="modal-content">
         <video id="modal-video" controls>
           <source id="video-source" src="" type="video/mp4">
-          Your browser does not support the video tag.
         </video>
       </div>
     </div>
   </div>
 
-  <script>
-    let allVideos = [];
-    const videoList = document.getElementById('video-list');
-    const searchInput = document.getElementById('search-input');
+ <script>
+// Loading sound
+const loadingSound = new Audio("https://www.centralschool.fun/Voicy_Loading%20sound%20Of%20Wii.mp3");
+loadingSound.loop = true;
 
-    // Fetch video data and store in allVideos
-    async function fetchVideos() {
-      try {
-        const response = await fetch('https://salexai-funserver.hf.space/album/B0p532ODWH4KDMb');
-        const data = await response.json();
-        allVideos = data.videos;
-        renderVideos(allVideos);
-      } catch (error) {
-        console.error('Failed to fetch videos:', error);
+// Track when all requests finish
+async function fetchAllCategories() {
+  showLoadingToast();      // show "Loading videos…" toast
+  loadingSound.play();     // start sound loop
+
+  let fetchPromises = Object.entries(categories).map(async ([cat, {album}]) => {
+    try {
+      const res = await fetch(`https://salexai-funserver-2-0.hf.space//album/${album}`);
+      const data = await res.json();
+      allVideosByCategory[cat] = data.videos || [];
+    } catch {
+      allVideosByCategory[cat] = [];
+    }
+  });
+
+  // Wait for all to finish
+  await Promise.all(fetchPromises);
+
+  // General = all categories combined
+  const combined = Object.entries(allVideosByCategory)
+    .filter(([cat]) => cat !== "General")
+    .flatMap(([_, vids]) => vids);
+  allVideosByCategory["General"] = (allVideosByCategory["General"] || []).concat(combined);
+
+  // Stop loading sound
+  loadingSound.pause();
+  loadingSound.currentTime = 0;
+
+  hideLoadingToast();
+
+  // Refresh the current category so videos appear automatically
+  const activeBtn = document.querySelector(".category-btn.active");
+  if (activeBtn) {
+    switchCategory(currentCategory, activeBtn);
+  }
+}
+
+  const categories = {
+    "General": {
+      album: "B0p532ODWH4KDMb",
+      bg: "linear-gradient(135deg, #00c6ff, #0072ff)",
+      music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/yizahfoe/01.%20Main%20Menu.mp3"
+    },
+    "Fun": {
+      album: "albumID2",
+      bg: "linear-gradient(135deg, #ff00cc, #3333ff)",
+      music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/ygkvkljl/03.%20Mii%20Channel.mp3"
+    },
+    "Rockets": {
+      album: "albumID3",
+      bg: "linear-gradient(135deg, #ff512f, #dd2476)",
+      music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/liqmqlxx/09.%20Training%20Menu%20%28Wii%20Fit%29.mp3"
+    },
+    "Sam Content": {
+      album: "B2cGI9HKKtaAF3T",
+      bg: "linear-gradient(135deg, #43cea2, #185a9d)",
+      music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/xkiaqfir/14.%20Results%20%28Wii%20Sports%29.mp3"
+    },
+    "Serious": {
+      album: "albumID6",
+      bg: "linear-gradient(135deg, #232526, #414345)",
+      music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/hvkzhflq/15.%20Yoga%20%28Wii%20Fit%29.mp3"
+    }
+  };
+function showToast(msg) {
+  let toast = document.getElementById("toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+    toast.style.position = "fixed";
+    toast.style.bottom = "20px";
+    toast.style.right = "20px";
+    toast.style.padding = "12px 20px";
+    toast.style.background = "rgba(0,0,0,0.85)";
+    toast.style.color = "white";
+    toast.style.fontSize = "16px";
+    toast.style.border = "2px solid white";
+    toast.style.zIndex = "9999";
+    toast.style.borderRadius = "8px";
+    toast.style.fontWeight = "bold";
+    toast.style.textShadow = "0 0 3px #0ff, 0 0 6px #f0f";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add("show");
+}
+
+function hideToast() {
+  const toast = document.getElementById("toast");
+  if (toast) {
+    toast.style.opacity = "0";  // fade
+    setTimeout(() => {
+      toast.remove(); // fully gone only after fade
+    }, 600);
+  }
+}
+  let allVideosByCategory = {};
+  let currentCategory = "General";
+  let bgMusic = null;
+
+  // Cache for preloaded audio
+  const musicCache = {};
+  const musicPositions = {};
+
+  // Sound effects
+  const hoverSound = new Audio("https://www.centralschool.fun/minimalist-button-hover-sound-effect-399749.mp3");
+  const clickSound = new Audio("https://www.centralschool.fun/tv-shutdown-386167.mp3");
+  const categorySound = new Audio("https://www.centralschool.fun/quick-swipe-405450.mp3");
+
+  const videoList = document.getElementById('video-list');
+  const searchInput = document.getElementById('search-input');
+  const categoryBar = document.getElementById('category-bar');
+  const totalCount = document.getElementById('total-count');
+
+  // Build category buttons
+  Object.keys(categories).forEach((cat, idx) => {
+    const btn = document.createElement('button');
+    btn.className = "category-btn" + (idx === 0 ? " active" : "");
+    btn.textContent = cat;
+    btn.addEventListener('click', () => switchCategory(cat, btn));
+    categoryBar.appendChild(btn);
+  });
+
+  // Preload all category music
+  function preloadMusic() {
+    for (const [cat, {music}] of Object.entries(categories)) {
+      const audio = new Audio(music);
+      audio.loop = true;
+      audio.preload = "auto";
+      audio.volume = 0;
+      musicCache[cat] = audio;
+      musicPositions[cat] = 0;
+    }
+  }
+
+  // Retro styled welcome popup
+  function showWelcomePopup() {
+    const popup = document.createElement("div");
+    popup.textContent = "Welcome to Our new Content Pool";
+    popup.style.position = "fixed";
+    popup.style.top = "50%";
+    popup.style.left = "50%";
+    popup.style.transform = "translate(-50%, -50%)";
+    popup.style.padding = "20px 40px";
+    popup.style.fontSize = "24px";
+    popup.style.fontWeight = "bold";
+    popup.style.color = "white";
+    popup.style.textShadow = "0 0 5px #0ff, 0 0 10px #f0f, 0 0 20px #ff0";
+    popup.style.background = "rgba(0,0,0,0.8)";
+    popup.style.border = "3px solid white";
+    popup.style.boxShadow = "0 0 20px magenta, 0 0 20px cyan";
+    popup.style.zIndex = "9999";
+    popup.style.borderRadius = "10px";
+    popup.style.animation = "fadePopup 5s forwards";
+
+    document.body.appendChild(popup);
+    setTimeout(() => popup.remove(), 5000);
+  }
+
+  // Welcome popup keyframes
+  const style = document.createElement("style");
+  style.textContent = `
+    @keyframes fadePopup {
+      0% { opacity: 0; transform: translate(-50%, -60%) scale(0.9); }
+      10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      80% { opacity: 1; }
+      100% { opacity: 0; transform: translate(-50%, -40%) scale(0.9); }
+    }
+    /* Static TV effect on thumbnails */
+    @keyframes tvStatic {
+      0% { background-position: 0 0; }
+      100% { background-position: 100% 100%; }
+    }
+    .video-card img:hover {
+      filter: contrast(2) brightness(1.5) saturate(2);
+      background-image: url("https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif");
+      background-size: cover;
+      animation: tvStatic 0.5s steps(4) infinite;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Fetch all categories
+async function fetchAllCategories() {
+  showToast("Downloading Videos... (pls wait)");   // show immediately
+
+  const fetchAlbum = async (cat, album) => {
+    try {
+      const res = await fetch(`https://salexai-funserver-2-0.hf.space/album/${album}`);
+      const data = await res.json();
+      return { cat, videos: data.videos || [] };
+    } catch {
+      return { cat, videos: [] };
+    }
+  };
+
+  // fetch everything in parallel
+  const promises = Object.entries(categories).map(([cat, { album }]) => fetchAlbum(cat, album));
+  const results = await Promise.all(promises);
+
+  // rebuild category storage
+  allVideosByCategory = {};
+  let total = 0;
+
+  results.forEach(({ cat, videos }) => {
+    allVideosByCategory[cat] = videos;
+    total += videos.length;
+  });
+
+  // ✅ rebuild General as combo of all + unique
+  const generalVideos = new Map();
+  (results.find(r => r.cat === "General")?.videos || []).forEach(v => generalVideos.set(v.url, v));
+  results.filter(r => r.cat !== "General").forEach(r => {
+    r.videos.forEach(v => {
+      if (!generalVideos.has(v.url)) generalVideos.set(v.url, v);
+    });
+  });
+  allVideosByCategory["General"] = [...generalVideos.values()];
+
+  totalCount.textContent = `Total Videos: ${total}`;
+
+  preloadMusic();
+
+  // ✅ only hide toast once everything is done
+  hideToast();
+
+  // go to General
+  switchCategory("General", document.querySelector(".category-btn"));
+}
+
+  function switchCategory(cat, btn) {
+    if (currentCategory === cat) return;
+    const oldCat = currentCategory;
+    currentCategory = cat;
+    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.body.style.background = categories[cat].bg;
+
+    // play category switch sound
+    categorySound.currentTime = 0;
+    categorySound.play();
+
+    // when sound finishes, crossfade
+    categorySound.onended = () => {
+      const oldMusic = musicCache[oldCat];
+      const newMusic = musicCache[cat];
+
+      // save old position
+      if (oldMusic) {
+        musicPositions[oldCat] = oldMusic.currentTime;
       }
+
+      // resume new from stored position
+      if (newMusic) {
+        newMusic.currentTime = musicPositions[cat] || 0;
+        newMusic.play();
+      }
+
+      crossfade(oldMusic, newMusic, 1000);
+      bgMusic = newMusic;
+    };
+
+    // fade videos
+    videoList.style.opacity = 0;
+    setTimeout(() => {
+      renderVideos(allVideosByCategory[cat]);
+      videoList.style.opacity = 1;
+    }, 300);
+  }
+
+  function crossfade(oldAudio, newAudio, duration) {
+    if (!newAudio) return;
+    let step = 50;
+    let fadeAmount = step / duration;
+
+    if (oldAudio) {
+      let fadeOut = setInterval(() => {
+        if (oldAudio.volume > 0.05) {
+          oldAudio.volume -= fadeAmount;
+        } else {
+          clearInterval(fadeOut);
+          oldAudio.pause();
+          oldAudio.volume = 0;
+        }
+      }, step);
     }
 
-    // Render videos after search filtering
-    async function renderVideos(videoArray) {
-      // Clear current list
-      videoList.innerHTML = '';
-
-      for (const vid of videoArray) {
-        const title = vid.caption && vid.caption.trim() ? vid.caption.trim() : 'Unnamed Video';
-        // Use the new poster field
-        const thumb = vid.poster && vid.poster.trim() ? vid.poster : 'https://via.placeholder.com/320x180.png?text=No+Preview';
-
-        // Build card
-        const card = document.createElement('div');
-        card.className = 'video-card';
-        card.innerHTML = `
-          <img src="${thumb}" alt="Thumbnail">
-          <h2>${title}</h2>
-        `;
-        card.addEventListener('click', () => openModal(title, vid.url));
-        videoList.appendChild(card);
+    newAudio.volume = 0;
+    let fadeIn = setInterval(() => {
+      if (newAudio.volume < 0.95) {
+        newAudio.volume += fadeAmount;
+      } else {
+        clearInterval(fadeIn);
+        newAudio.volume = 1;
       }
-    }
+    }, step);
+  }
 
-    // Simple search by caption text
-    searchInput.addEventListener('input', (e) => {
-      const searchVal = e.target.value.toLowerCase();
-      const filtered = allVideos.filter(v => {
-        // If no caption, we used 'Unnamed Video' so let's unify that.
-        const cap = v.caption && v.caption.trim() ? v.caption.trim().toLowerCase() : 'unnamed video';
-        return cap.includes(searchVal);
+  function renderVideos(videoArray) {
+    videoList.innerHTML = '';
+    for (const vid of videoArray) {
+      const title = vid.caption && vid.caption.trim() ? vid.caption.trim() : 'Unnamed Video';
+      const thumb = vid.poster && vid.poster.trim() ? vid.poster : 'https://via.placeholder.com/320x180.png?text=No+Preview';
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML = `<img src="${thumb}" alt="Thumbnail"><h2>${title}</h2>`;
+      card.addEventListener('mouseover', () => { hoverSound.play(); });
+      card.addEventListener('click', () => {
+        clickSound.play();
+        openModal(title, vid.url);
       });
-      renderVideos(filtered);
-    });
-
-    // Open modal
-    function openModal(title, url) {
-      document.getElementById('modal-title').textContent = title;
-      document.getElementById('video-source').src = url;
-      const modalVideo = document.getElementById('modal-video');
-      modalVideo.load();
-      document.getElementById('modal-overlay').style.display = 'flex';
+      videoList.appendChild(card);
     }
+  }
 
-    // Close modal
-    document.getElementById('close-btn').addEventListener('click', () => {
-      const modalVideo = document.getElementById('modal-video');
-      modalVideo.pause();
-      document.getElementById('modal-overlay').style.display = 'none';
+  searchInput.addEventListener('input', (e) => {
+    const val = e.target.value.toLowerCase();
+    const filtered = allVideosByCategory[currentCategory].filter(v => {
+      const cap = v.caption ? v.caption.toLowerCase() : '';
+      return cap.includes(val);
     });
+    renderVideos(filtered);
+  });
 
-    // Fullscreen
-    document.getElementById('fullscreen-btn').addEventListener('click', () => {
-      const modalVideo = document.getElementById('modal-video');
-      if (modalVideo.requestFullscreen) {
-        modalVideo.requestFullscreen();
-      } else if (modalVideo.webkitRequestFullscreen) {
-        modalVideo.webkitRequestFullscreen();
-      } else if (modalVideo.msRequestFullscreen) {
-        modalVideo.msRequestFullscreen();
-      }
-    });
+  document.getElementById('lucky-btn').addEventListener('click', () => {
+    const all = Object.values(allVideosByCategory).flat();
+    if (!all.length) return;
+    const randomVid = all[Math.floor(Math.random() * all.length)];
+    const title = randomVid.caption || "Unnamed Video";
+    clickSound.play();
+    openModal(title, randomVid.url);
+  });
 
-    fetchVideos();
-  </script>
+  function openModal(title, url) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('video-source').src = url;
+    const modalVideo = document.getElementById('modal-video');
+    modalVideo.load();
+    document.getElementById('modal-overlay').style.display = 'flex';
+  }
+  document.getElementById('close-btn').addEventListener('click', () => {
+    const modalVideo = document.getElementById('modal-video');
+    modalVideo.pause();
+    document.getElementById('modal-overlay').style.display = 'none';
+  });
+  document.getElementById('fullscreen-btn').addEventListener('click', () => {
+    const modalVideo = document.getElementById('modal-video');
+    if (modalVideo.requestFullscreen) modalVideo.requestFullscreen();
+  });
+
+document.getElementById("enter-btn").addEventListener("click", () => {
+  document.getElementById("welcome-overlay").style.display = "none";
+});
+
+document.getElementById("old-btn").addEventListener("click", () => {
+  // change this URL to your old content pool
+  window.location.href = "https://www.icloud.com/sharedalbum/#B0p532ODWH4KDMb";
+});
+
+
+
+
+  fetchAllCategories();
+</script>
+
+
+
 </body>
 </html>

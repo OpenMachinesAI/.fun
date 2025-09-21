@@ -388,7 +388,7 @@ async function fetchAllCategories() {
   }
 }
 
-  const categories = {
+const categories = {
   "General": {
     album: "B0p532ODWH4KDMb", // Legacy (only one redirect photo remains)
     bg: "linear-gradient(135deg, #00c6ff, #0072ff)",
@@ -418,8 +418,13 @@ async function fetchAllCategories() {
     album: "B2cJ0DiRHusi12z", // Music content
     bg: "linear-gradient(135deg, #f7971e, #ffd200)",
     music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/ifoakijw/22.%20Credits%20%28Wii%20Play%20Motion%29.mp3"
-  }
-};
+  },
+  "Cole's Content Crate": {
+  album: "B2cXYZ123AbCdEf", // Replace with Cole’s real iCloud album ID
+  bg: "linear-gradient(135deg, #ff0000, #0000ff, #ffff00)", 
+  music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/qhgpummn/21.%20Result%20Display%20%28Wii%20Sports%29.mp3"
+}
+
 
 function showToast(msg) {
   let toast = document.getElementById("toast");

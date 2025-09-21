@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Content Pool Glow Up ✨</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #ff00ff, #00ffff, #ffff00);
+      background-size: 400% 400%;
+      animation: bgshift 12s infinite;
+      font-family: "Comic Sans MS", "Comic Neue", cursive;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    @keyframes bgshift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    header {
+      font-size: 3em;
+      font-weight: bold;
+      padding: 20px;
+      background: black;
+      color: lime;
+      text-shadow: 2px 2px 5px #0ff, 2px 2px 15px #f0f;
+      border-bottom: 5px double magenta;
+    }
+    marquee {
+      font-size: 20px;
+      background: #000;
+      color: #ff0;
+      padding: 5px;
+      border-top: 2px solid white;
+      border-bottom: 2px solid white;
+    }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: rgba(0,0,0,0.8);
+      border: 4px ridge #0ff;
+      padding: 20px;
+      box-shadow: 0 0 20px #ff0, 0 0 40px #f0f;
+    }
+    h2 {
+      color: cyan;
+      text-shadow: 0 0 5px #fff, 0 0 15px #0ff;
+      margin-top: 20px;
+    }
+    p {
+      font-size: 18px;
+      line-height: 1.6em;
+      margin: 15px 0;
+    }
+    .glow-btn {
+      background: linear-gradient(45deg, #444, #999);
+      border: 3px solid #fff;
+      padding: 12px 20px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      text-shadow: 0 0 5px #fff, 0 0 10px #aaa;
+      box-shadow: 0 0 15px #fff, 0 0 25px #999;
+      transition: 0.3s;
+      margin-top: 20px;
+    }
+    .glow-btn:hover {
+      transform: scale(1.1) rotate(-2deg);
+      background: linear-gradient(45deg, #666, #aaa);
+      box-shadow: 0 0 25px #fff, 0 0 45px #ccc;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #ccc;
+      text-shadow: 0 0 3px #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>🚀 Content Pool V2 Glow Up 🚀</header>
+
+  <marquee scrollamount="6">💾 Big Facts: Old Content Pool was kinda mid… but now it’s bussin fr fr 💾</marquee>
+
+  <div class="container">
+    <h2>👎 The Struggle Was Real</h2>
+    <p>
+      Yo fam, not gonna lie… the OG Content Pool was lowkey pain.  
+      You had to <strong>dig forever</strong> just to find one vid.  
+      No categories. No search. Slow af. And don’t even start on the  
+      buffering — vids refused to stream. Straight 1998 dial-up vibes.  
+    </p>
+
+    <h2>🔥 The Glow Up</h2>
+    <p>
+      But guess what? We hit the lab, no cap. Content Pool V2 is now  
+      <strong>built different</strong>.  
+      ✨ Categories? Pulled up.  
+      ✨ Search bar? Bet.  
+      ✨ Smooth streaming? Say less.  
+      ✨ Load speed? Zoomin like Mario Kart Rainbow Road.  
+    </p>
+
+    <h2>🎨 Retro Vibes Only</h2>
+    <p>
+      And cuz we’re all about that aesthetic, we styled it 90s mode.  
+      Bright colors, neon borders, glow text, even a marquee bar like  
+      your fav throwback sites. Looks vintage but hits modern.  
+    </p>
+
+    <h2>🌐 It’s Live rn!</h2>
+    <p>
+      No more waiting, no more mid. Content Pool V2 is live,  
+      ready for y’all to stream, vibe, and flex. Tap in and see the glow up.  
+    </p>
+
+    <button class="glow-btn" onclick="window.location.href='https://www.centralschool.fun/videocave.html'">Enter Content Pool V2</button>
+  </div>
+
+  <footer>© 2025 Central Content Pool — serving retro drip + future tech</footer>
+
+</body>
+</html>

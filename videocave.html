@@ -60,6 +60,8 @@
   transition: transform 0.2s, background 0.3s;
 }
 
+
+
 .welcome-buttons button:hover {
   transform: scale(1.08);
   background: linear-gradient(45deg, #ff0, #f00);
@@ -147,6 +149,21 @@
       transition: transform 0.3s;
     }
     #lucky-btn:hover { transform: scale(1.1) rotate(-2deg); }
+
+#old-btn {
+  background: #777;       /* gray background */
+  color: white;           /* white text */
+  border: 2px solid #555; /* darker gray border */
+  cursor: pointer;
+  padding: 12px 20px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+#old-btn:hover {
+  background: #999;       /* lighter gray on hover */
+}
+
 
     /* Category Navigation */
     .category-bar {
@@ -285,7 +302,7 @@
     but we are gonna give you access now.</p>
     <div class="welcome-buttons">
       <button id="enter-btn">🚀 Enter Content Pool V2</button>
-      <button id="old-btn">📼 Open Old Content Pool</button>
+      <button id="old-btn">Learn More</button>
     </div>
   </div>
 </div>
@@ -372,32 +389,38 @@ async function fetchAllCategories() {
 }
 
   const categories = {
-    "General": {
-      album: "B0p532ODWH4KDMb",
-      bg: "linear-gradient(135deg, #00c6ff, #0072ff)",
-      music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/yizahfoe/01.%20Main%20Menu.mp3"
-    },
-    "Fun": {
-      album: "albumID2",
-      bg: "linear-gradient(135deg, #ff00cc, #3333ff)",
-      music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/ygkvkljl/03.%20Mii%20Channel.mp3"
-    },
-    "Rockets": {
-      album: "albumID3",
-      bg: "linear-gradient(135deg, #ff512f, #dd2476)",
-      music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/liqmqlxx/09.%20Training%20Menu%20%28Wii%20Fit%29.mp3"
-    },
-    "Sam Content": {
-      album: "B2cGI9HKKtaAF3T",
-      bg: "linear-gradient(135deg, #43cea2, #185a9d)",
-      music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/xkiaqfir/14.%20Results%20%28Wii%20Sports%29.mp3"
-    },
-    "Serious": {
-      album: "albumID6",
-      bg: "linear-gradient(135deg, #232526, #414345)",
-      music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/hvkzhflq/15.%20Yoga%20%28Wii%20Fit%29.mp3"
-    }
-  };
+  "General": {
+    album: "B0p532ODWH4KDMb", // Legacy (only one redirect photo remains)
+    bg: "linear-gradient(135deg, #00c6ff, #0072ff)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/yizahfoe/01.%20Main%20Menu.mp3"
+  },
+  "Fun": {
+    album: "B2c5n8hH4uWRoAW", // Fun content
+    bg: "linear-gradient(135deg, #ff00cc, #3333ff)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/ygkvkljl/03.%20Mii%20Channel.mp3"
+  },
+  "Rockets": {
+    album: "albumID3",
+    bg: "linear-gradient(135deg, #ff512f, #dd2476)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/liqmqlxx/09.%20Training%20Menu%20%28Wii%20Fit%29.mp3"
+  },
+  "Sam Content": {
+    album: "B2cGI9HKKtaAF3T",
+    bg: "linear-gradient(135deg, #43cea2, #185a9d)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/xkiaqfir/14.%20Results%20%28Wii%20Sports%29.mp3"
+  },
+  "Serious": {
+    album: "B2c59UlCquMMGkJ", // Serious content
+    bg: "linear-gradient(135deg, #232526, #414345)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/hvkzhflq/15.%20Yoga%20%28Wii%20Fit%29.mp3"
+  },
+  "Music": {
+    album: "B2cJ0DiRHusi12z", // Music content
+    bg: "linear-gradient(135deg, #f7971e, #ffd200)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/jxjgnogt/05.%20Wii%20Music.mp3"
+  }
+};
+
 function showToast(msg) {
   let toast = document.getElementById("toast");
   if (!toast) {

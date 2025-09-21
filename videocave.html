@@ -564,6 +564,40 @@ async function fetchAllCategories() {
   switchCategory("General", document.querySelector(".category-btn"));
 }
 
+function fadeOutMusic(audio, duration = 800) {
+  if (!audio) return;
+  let step = 50;
+  let fadeAmount = audio.volume / (duration / step);
+
+  let fade = setInterval(() => {
+    if (audio.volume > 0.05) {
+      audio.volume = Math.max(0, audio.volume - fadeAmount);
+    } else {
+      clearInterval(fade);
+      audio.pause();
+      audio.volume = 0;
+    }
+  }, step);
+}
+
+function fadeInMusic(audio, duration = 800) {
+  if (!audio) return;
+  audio.play();
+  audio.volume = 0;
+  let step = 50;
+  let fadeAmount = 1 / (duration / step);
+
+  let fade = setInterval(() => {
+    if (audio.volume < 0.95) {
+      audio.volume = Math.min(1, audio.volume + fadeAmount);
+    } else {
+      clearInterval(fade);
+      audio.volume = 1;
+    }
+  }, step);
+}
+
+
   function switchCategory(cat, btn) {
     if (currentCategory === cat) return;
     const oldCat = currentCategory;
@@ -668,21 +702,25 @@ async function fetchAllCategories() {
   });
 
   function openModal(title, url) {
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('video-source').src = url;
-    const modalVideo = document.getElementById('modal-video');
-    modalVideo.load();
-    document.getElementById('modal-overlay').style.display = 'flex';
-  }
-  document.getElementById('close-btn').addEventListener('click', () => {
-    const modalVideo = document.getElementById('modal-video');
-    modalVideo.pause();
-    document.getElementById('modal-overlay').style.display = 'none';
-  });
-  document.getElementById('fullscreen-btn').addEventListener('click', () => {
-    const modalVideo = document.getElementById('modal-video');
-    if (modalVideo.requestFullscreen) modalVideo.requestFullscreen();
-  });
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('video-source').src = url;
+  const modalVideo = document.getElementById('modal-video');
+  modalVideo.load();
+  document.getElementById('modal-overlay').style.display = 'flex';
+
+  // Fade out bg music
+  fadeOutMusic(bgMusic, 800);
+}
+
+document.getElementById('close-btn').addEventListener('click', () => {
+  const modalVideo = document.getElementById('modal-video');
+  modalVideo.pause();
+  document.getElementById('modal-overlay').style.display = 'none';
+
+  // Fade music back in
+  fadeInMusic(bgMusic, 800);
+});
+
 
 document.getElementById("enter-btn").addEventListener("click", () => {
   document.getElementById("welcome-overlay").style.display = "none";

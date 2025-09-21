@@ -1,0 +1,23 @@
+[
+  {
+    "path": "article/01.md",
+    "title": "Welcome Back to Central!",
+    "description": "A look at the start of the new school year and what’s ahead at Central Middle School.",
+    "image": "article/images/welcome-back.jpg",
+    "date": "2025-09-05"
+  },
+  {
+    "path": "article/science-fair-2025.md",
+    "title": "Science Fair 2025 Highlights",
+    "description": "Students showcase their creativity and innovation at this year’s Science Fair.",
+    "image": "article/images/science-fair-2025.jpg",
+    "date": "2025-09-12"
+  },
+  {
+    "path": "article/sports-update.md",
+    "title": "Fall Sports Update",
+    "description": "Central’s teams are off to a strong start this fall season. Here’s a recap.",
+    "image": "article/images/sports-update.jpg",
+    "date": "2025-09-18"
+  }
+]

@@ -3,129 +3,233 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Video Chat — Fullscreen</title>
+  <title>Neon Chat — Fullscreen</title>
   <style>
     :root{
-      --chat-border:#3af;
-      --bg1:#1d0045;
-      --bg2:#32006a;
-      --panel: rgba(15,0,40,.95);
+      --neon-cyan: #00e5ff;
+      --neon-magenta: #ff00f7;
+      --neon-yellow: #ffee00;
+      --neon-green: #3aff7a;
+      --panel: rgba(12, 0, 35, 0.88);
+      --panel-2: rgba(25, 0, 70, 0.85);
+      --stroke: #7cfbff;
     }
 
-    /* Page background (won’t be visible under the full-screen chat) */
+    /* Background: animated gradient + subtle scanlines and grid */
     html, body {
       height: 100%;
       margin: 0;
-      font-family: 'Orbitron', sans-serif;
-      background: linear-gradient(135deg, var(--bg1), var(--bg2));
-      color:#ddd;
+      font-family: 'Orbitron', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: #e9e9ff;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,0,245,.22), transparent 40%),
+        radial-gradient(circle at 85% 10%, rgba(0,255,255,.18), transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(255,255,0,.12), transparent 40%),
+        linear-gradient(135deg, #160035, #2a0072 40%, #21004a 70%, #0a0020);
+      position: relative;
     }
+    /* animated shifting colors */
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      background: conic-gradient(from 0deg, #7c00ff, #00e5ff, #00ff85, #ffee00, #ff00f7, #7c00ff);
+      mix-blend-mode: overlay; opacity:.18;
+      animation: hueSpin 12s linear infinite;
+      pointer-events:none;
+    }
+    /* faint scanlines */
+    body::after{
+      content:"";
+      position:fixed; inset:0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.04) 0px,
+        rgba(255,255,255,.04) 1px,
+        transparent 2px,
+        transparent 4px
+      );
+      mix-blend-mode: soft-light; opacity:.3; pointer-events:none;
+    }
+    @keyframes hueSpin { to { transform: rotate(1turn); } }
 
     /* === FULLSCREEN CHAT === */
     #chatBox{
-      position: fixed;
-      inset: 0;                 /* top:0 right:0 bottom:0 left:0 */
-      width: 100vw;
-      height: 100dvh;           /* dynamic viewport height (mobile safe) */
-      display: flex;
-      flex-direction: column;
-      background: var(--panel);
-      border: none;             /* no right-dock border anymore */
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      width: 100vw; height: 100dvh;
+      background:
+        linear-gradient(180deg, var(--panel), var(--panel-2) 35%, rgba(10,0,28,0.9));
+      border: 2px solid rgba(124, 251, 255, .35);
+      box-shadow:
+        0 0 0 2px rgba(124,251,255,.15) inset,
+        0 0 30px rgba(124,251,255,.25),
+        0 0 120px rgba(255,0,247,.15);
+      backdrop-filter: blur(6px);
       z-index: 1000;
-      box-shadow: none;
     }
 
+    /* chrome neon header */
     #chatHeader{
       padding: 14px 16px;
-      background:#2d0060;
-      font-weight: 700;
       text-align: center;
-      border-bottom: 2px solid var(--chat-border);
+      font-weight: 900;
+      letter-spacing: .5px;
+      background:
+        linear-gradient(180deg, rgba(124,251,255,.15), rgba(255,0,247,.08));
+      border-bottom: 2px solid rgba(124,251,255,.35);
+      position: relative;
+    }
+    #chatTitle{
+      font-size: clamp(18px, 2.2vw, 28px);
+      color: transparent;
+      background: linear-gradient(90deg, #fff, var(--neon-cyan), #fff, var(--neon-magenta));
+      -webkit-background-clip: text; background-clip: text;
+      text-shadow:
+        0 0 12px rgba(0,229,255,.55),
+        0 0 28px rgba(255,0,247,.35);
+      -webkit-text-stroke: 1px rgba(255,255,255,.25);
+    }
+    /* room pill */
+    #roomPill{
+      position: absolute; right: 12px; top: 10px;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: linear-gradient(90deg, rgba(0,229,255,.15), rgba(255,0,247,.15));
+      color: #eaffff;
+      box-shadow: 0 0 12px rgba(0,229,255,.4) inset, 0 0 12px rgba(255,0,247,.25);
+      max-width: 45vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
 
+    /* messages list */
     #messages{
       flex: 1;
       overflow-y: auto;
-      padding: 14px;
+      padding: clamp(10px, 2vw, 18px);
       display: grid;
       grid-template-columns: 1fr;
       grid-auto-rows: min-content;
-      gap: 10px;
+      gap: clamp(8px, 1.2vw, 14px);
       -webkit-overflow-scrolling: touch;
     }
 
+    /* neon message bubbles with subtle gradient borders */
     .msg{
-      padding: 10px 12px;
-      border:1px solid var(--chat-border);
-      border-radius:10px;
-      background: rgba(30,0,60,.6);
-      word-break: break-word;
+      padding: clamp(8px, 1.3vw, 14px);
+      border-radius: 12px;
+      position: relative;
+      color: #f4eaff;
+      background: linear-gradient(180deg, rgba(40,0,72,.85), rgba(22,0,44,.85));
+      border: 1.5px solid rgba(122, 251, 255, .28);
+      box-shadow:
+        0 0 0 1px rgba(255,0,247,.12) inset,
+        0 6px 18px rgba(0,0,0,.45),
+        0 0 18px rgba(122,251,255,.15);
     }
-    .msg:hover{ background: rgba(60,0,90,.8); }
-
+    .msg:hover{ box-shadow:
+        0 0 0 1px rgba(255,255,255,.15) inset,
+        0 10px 26px rgba(0,0,0,.55),
+        0 0 26px rgba(255,0,247,.22); }
     .author{
-      font-size:.85em;
-      color:#f0f;
-      margin-bottom: 4px;
+      font-size: 0.85em; margin-bottom: 4px;
+      color: var(--neon-magenta);
+      text-shadow: 0 0 8px rgba(255,0,247,.45);
     }
 
+    /* input bar */
     #chatInput{
-      display:flex;
-      gap:10px;
-      border-top: 2px solid var(--chat-border);
-      background:#18003b;
+      display:flex; gap:10px;
+      border-top: 2px solid rgba(124,251,255,.35);
+      background:
+        linear-gradient(180deg, rgba(10,0,28,.9), rgba(20,0,50,.9));
       padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
     }
-    #chatInput input{
+    #msgText{
       flex:1;
-      padding: 14px;
-      border:none;
-      outline:none;
-      background:#1a0035;
-      color:#fff;
-      font-size:16px;
-      border-radius:8px;
+      padding: 14px 16px;
+      border: 1.5px solid rgba(124,251,255,.35);
+      outline: none;
+      background: rgba(15,0,35,.75);
+      color:#fff; font-size: 16px; border-radius: 10px;
+      box-shadow: 0 0 12px rgba(124,251,255,.15) inset;
     }
-    #chatInput button{
+    #msgText::placeholder{ color: #c7bcec; opacity: .8; }
+    #sendBtn{
       padding: 14px 18px;
-      border:none;
-      background: var(--chat-border);
-      color:#000;
-      font-weight: 800;
-      border-radius:8px;
-      cursor:pointer;
+      border: 0;
+      border-radius: 10px;
+      font-weight: 900;
+      cursor: pointer;
+      color: #120026;
+      background:
+        linear-gradient(90deg, var(--neon-yellow), var(--neon-cyan), var(--neon-magenta));
+      box-shadow:
+        0 0 18px rgba(255,255,0,.35),
+        0 0 24px rgba(0,229,255,.35),
+        0 0 28px rgba(255,0,247,.28);
+      transition: transform .06s ease;
     }
-    #chatInput button:hover{ background:#5df; }
+    #sendBtn:active{ transform: translateY(1px); }
 
-    /* optional smooth show/hide when using the C key */
+    /* small screens: slightly larger touch targets */
+    @media (max-width: 600px){
+      #msgText{ font-size: 17px; }
+      #sendBtn{ font-size: 15px; }
+    }
+
+    /* optional fade when using the C key */
     @media (prefers-reduced-motion:no-preference){
-      #chatBox{ transition: opacity .2s ease; }
+      #chatBox{ transition: opacity .18s ease; }
       #chatBox.hidden{ opacity: 0; pointer-events:none; }
     }
   </style>
 </head>
 <body>
+  <div id="chatBox" role="region" aria-label="Neon chat panel">
+    <div id="chatHeader">
+      <div id="chatTitle">☆ Comments ☆</div>
+      <div id="roomPill" title="Current room"></div>
+    </div>
 
-  <!-- FULLSCREEN CHAT -->
-  <div id="chatBox" role="region" aria-label="Video chat panel">
-    <div id="chatHeader">Comments</div>
     <div id="messages" aria-live="polite" aria-atomic="false"></div>
+
     <div id="chatInput">
-      <input id="msgText" type="text" placeholder="Type a message..." />
+      <input id="msgText" type="text" placeholder="Type a message..." autocomplete="off" />
       <button id="sendBtn" type="button" aria-label="Send message">Send</button>
     </div>
   </div>
 
   <script>
     const API_BASE = "https://salexai-funserver-2-0.hf.space";
-    const videoId  = "samremix1";
 
+    // --- Read videoId from URL (?videoId=ROOM or ?v=ROOM), fallback to default
+    function getVideoId() {
+      const p = new URLSearchParams(window.location.search);
+      // accept videoId, VideoID, v, room, id (loose aliases)
+      const keys = ["videoId","VideoID","v","room","id"];
+      for (const k of keys) {
+        const val = p.get(k);
+        if (val && val.trim()) return sanitizeId(val.trim());
+      }
+      return "samremix1"; // fallback
+    }
+    // basic sanitization: keep common safe chars
+    function sanitizeId(s) {
+      return s.replace(/[^a-zA-Z0-9_\-\.~]/g, "_").slice(0, 120);
+    }
+
+    const videoId  = getVideoId();
     const chatBox  = document.getElementById("chatBox");
     const messages = document.getElementById("messages");
     const input    = document.getElementById("msgText");
     const sendBtn  = document.getElementById("sendBtn");
+    const roomPill = document.getElementById("roomPill");
 
-    // Author (stored once)
+    roomPill.textContent = `Room: ${videoId}`;
+
+    // Author
     let author = localStorage.getItem("chat_author");
     if (!author) {
       author = prompt("Enter your name or SD61 email:") || "anon";
@@ -145,7 +249,7 @@
 
     async function fetchMessages(){
       try{
-        let url = `${API_BASE}/chat/${videoId}?limit=50`;
+        let url = `${API_BASE}/chat/${encodeURIComponent(videoId)}?limit=50`;
         if (lastSeen) url += `&since=${encodeURIComponent(lastSeen)}`;
         const res = await fetch(url);
         const data = await res.json();
@@ -161,7 +265,7 @@
       const text = input.value.trim();
       if (!text) return;
       try{
-        await fetch(`${API_BASE}/chat/${videoId}`,{
+        await fetch(`${API_BASE}/chat/${encodeURIComponent(videoId)}`,{
           method:"POST",
           headers:{ "Content-Type":"application/json" },
           body: JSON.stringify({ author, text })
@@ -175,29 +279,14 @@
     sendBtn.addEventListener("click", sendMessage);
     input.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
 
-    // start populated + poll
+    // Start populated + poll
     fetchMessages();
     setInterval(fetchMessages, 2000);
 
-    // optional: hide/show with "C"
-    document.addEventListener("keydown", e => {
-      if (e.key?.toLowerCase() === "c") {
-        const hidden = chatBox.classList.toggle("hidden");
-        // fully remove from layout for a11y when hidden
-        chatBox.style.display = hidden ? "none" : "flex";
-        if (!hidden) { /* if showing again, keep layout consistent */
-          // ensure it refills the full viewport
-          chatBox.style.width = "100vw";
-          chatBox.style.height = "100dvh";
-        }
-      }
-    });
-
-    // keep input visible when virtual keyboard opens (mobile)
+    
+    // Keep input visible with virtual keyboards
     window.addEventListener("resize", () => {
-      if (document.activeElement === input) {
-        input.scrollIntoView({ block: "end" });
-      }
+      if (document.activeElement === input) input.scrollIntoView({ block: "end" });
     });
   </script>
 </body>

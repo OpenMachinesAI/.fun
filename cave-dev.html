@@ -1078,22 +1078,27 @@ const tlkioDiv = document.getElementById("tlkio");
 
 function toggleComments(videoUrl) {
   if (!commentsOpen) {
-    const channelName = encodeURIComponent(videoUrl);
+    // Extract unique part from iCloud URL
+    const match = videoUrl.match(/\/S\/([^/]+)/);
+    let channelName = "defaultchat";
+    if (match && match[1]) {
+      channelName = match[1].substring(0, 10); // first 10 chars
+    }
 
     // Reset tlkio div
     const tlkioDiv = document.getElementById("tlkio");
     tlkioDiv.innerHTML = "";
     tlkioDiv.setAttribute("data-channel", channelName);
 
-    // Remove old script if present
+    // Remove old embed script
     const oldScript = document.querySelector("script[data-tlkio]");
     if (oldScript) oldScript.remove();
 
-    // Re-inject embed script into body
+    // Re-inject embed script
     const script = document.createElement("script");
-    script.src = "https://tlk.io/embed.js";
+    script.src = "https://tlk.io/embed.js"; // ✅ use HTTPS
     script.async = true;
-    script.setAttribute("data-tlkio", "true"); // marker for cleanup
+    script.setAttribute("data-tlkio", "true");
     document.body.appendChild(script);
 
     commentsWindow.style.display = "flex";
@@ -1103,6 +1108,7 @@ function toggleComments(videoUrl) {
     commentsOpen = false;
   }
 }
+
 
 
 

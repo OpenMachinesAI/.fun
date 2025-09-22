@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+<script async src="http://tlk.io/embed.js" type="text/javascript"></script>
+
+  <meta charset="UTF-8">
+  <title>CCP - Central Content Pool</title>
+  <style>
+
+    /* Smooth zoom animation for video cards */
+.video-card {
+  transition: transform 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
+  transform-origin: center center;
+}
+
+.modal-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: all 0.4s ease;
+}
+.comments-window {
+  /* …existing styles… */
+  z-index: 100002; /* higher than modal overlay (100000) */
+}
+
+
+.modal-body.with-comments #modal-video {
+  flex: 2;
+  transition: all 0.4s ease;
+}
+
+#tlkio-container {
+  flex: 1.2;
+  height: 400px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.modal-body.with-comments #tlkio-container {
+  opacity: 1;
+  pointer-events: all;
+  display: block;
+}
+
+
+.toast-spinner {
+  width: 16px;
+  height: 16px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* Expanded zoom state */
+.video-card.zoomed {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 80vw;
+  height: auto;
+  max-width: 1000px;
+  z-index: 9998;
+  transform: translate(-50%, -50%) scale(1.2);
+  box-shadow: 0 0 50px #0ff, 0 0 80px #f0f, 0 0 100px #ff0;
+  border-radius: 12px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(12px);   /* 🔥 blur effect */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 100000;
+}
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-content {
+  background: rgba(20,20,20,0.9); /* dark translucent */
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 720px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+
+.modal-content h2 {
+  margin-bottom: 15px;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+
+.comments-window {
+  position: fixed;
+  top: 100px;
+  left: 100px;
+  width: 400px;
+  height: 300px;
+  background: #fff;
+  border: 2px solid #000;
+  box-shadow: 6px 6px 0px rgba(0,0,0,0.5);
+  display: none;
+  flex-direction: column;
+  resize: both;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.comments-header {
+  background: linear-gradient(90deg, #0055aa, #0077cc);
+  color: #fff;
+  padding: 4px 8px;
+  cursor: move;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "MS Sans Serif", sans-serif;
+  font-size: 14px;
+  user-select: none;
+}
+
+.comments-header button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.modal-buttons button {
+  background: linear-gradient(90deg, #444, #222);
+  color: #fff;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.modal-buttons button:hover {
+  background: linear-gradient(90deg, #666, #333);
+}
+
+
+
+    .modal-header {
+      background: linear-gradient(90deg, #ff0080, #ff8c00, #40e0d0, #8a2be2);
+      color: white;
+      padding: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header button {
+      background: #000;
+      color: white;
+      border: 2px solid white;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    .modal-content { padding: 10px; background: #000; }
+    .modal-content video {
+      width: 100%;
+      max-height: 80vh;
+    }
+
+
+
+/* keep your existing .modal-window/.modal-content styles */
+
+@keyframes tvOn {
+  0% {
+    transform: scaleY(0.05) scaleX(0);
+    opacity: 0;
+  }
+  40% {
+    transform: scaleY(0.05) scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1) scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* Static overlay for CRT effect */
+#tv-static {
+  position: absolute;
+  inset: 0;
+  background: url("https://i.makeagif.com/media/6-05-2018/X0qeyH.gif") center/cover no-repeat;
+  z-index: 10;
+  opacity: 1;
+  pointer-events: none;
+  animation: fadeStatic 1.5s forwards;
+}
+
+@keyframes fadeStatic {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Smooth gradient background shifts */
+body, header {
+  background-size: 600% 600%;
+  animation: rainbowShift 15s ease infinite;
+}
+
+/* Video card retro TV hover effect */
+.video-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.video-card img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border: 4px solid black;
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+/* TV static overlay */
+.video-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("https://i.pinimg.com/originals/bb/cb/17/bbcb17db81a9720520f4bd4d3271022f.gif");
+  background-size: cover;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* Hover effects */
+.video-card:hover img {
+  transform: scale(1.12);
+  filter: brightness(1.4) contrast(1.3) saturate(1.6) blur(1px);
+}
+
+.video-card:hover::after {
+  opacity: 0.9;
+}
+
+/* Extra neon pulse effect for hover */
+.video-card:hover {
+  box-shadow: 0 0 20px #0ff, 0 0 40px magenta, 0 0 60px yellow;
+  animation: neonPulse 1.5s infinite alternate;
+}
+
+@keyframes neonPulse {
+  from { box-shadow: 0 0 10px #ff0, 0 0 20px #0ff, 0 0 30px #f0f; }
+  to   { box-shadow: 0 0 20px #0ff, 0 0 40px #f0f, 0 0 60px #ff0; }
+}
+
+/* Full screen welcome overlay */
+#welcome-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  animation: fadeIn 0.8s ease;
+}
+
+#welcome-box {
+  background: #111;
+  padding: 40px;
+  border: 3px solid white;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 600px;
+  color: white;
+  font-family: 'Comic Neue', cursive;
+  text-shadow: 0 0 5px #0ff, 0 0 10px #f0f, 0 0 20px #ff0;
+  box-shadow: 0 0 20px magenta, 0 0 20px cyan;
+  animation: popIn 0.6s ease;
+}
+
+#welcome-box h1 {
+  font-size: 2.2em;
+  margin-bottom: 15px;
+}
+
+#welcome-box p {
+  font-size: 18px;
+  line-height: 1.4em;
+  margin-bottom: 25px;
+}
+
+.welcome-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.welcome-buttons button {
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid white;
+  background: linear-gradient(45deg, #00f, #f0f);
+  color: white;
+  cursor: pointer;
+  text-shadow: 1px 1px 2px black;
+  transition: transform 0.2s, background 0.3s;
+}
+
+
+
+.welcome-buttons button:hover {
+  transform: scale(1.08);
+  background: linear-gradient(45deg, #ff0, #f00);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+
+    body {
+      font-family: 'Comic Neue', cursive;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      transition: background 1s ease;
+      background: linear-gradient(135deg, #ff00ff, #00ffff);
+      background-size: 400% 400%;
+      animation: rainbowShift 12s infinite;
+    }
+    header {
+      background: linear-gradient(90deg, #ff0080, #ff8c00, #40e0d0, #8a2be2);
+      background-size: 600% 600%;
+      animation: rainbowShift 8s infinite;
+      color: white;
+      padding: 15px;
+      font-size: 2em;
+      border-bottom: 4px double #fff;
+      text-shadow: 2px 2px 0 black;
+    }
+    @keyframes rainbowShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .logo {
+      font-size: 50px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 3px 3px 0 #000, 0 0 10px cyan, 0 0 20px magenta;
+      margin-top: 20px;
+    }
+    .subtext, .fineprint {
+      color: white;
+      text-shadow: 1px 1px 2px black;
+    }
+    .subtext { font-size: 24px; margin-top: -10px; }
+    .fineprint { font-size: 12px; font-style: italic; }
+
+    .container {
+      margin: 20px auto;
+      width: 90%;
+      max-width: 1200px;
+    }
+
+    /* Search Bar + Lucky Button */
+    .search-container {
+      margin: 20px auto;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    #search-input {
+      width: 70%;
+      padding: 10px;
+      font-size: 18px;
+      border: 3px solid #fff;
+      background: rgba(255,255,255,0.9);
+      outline: none;
+      transition: 0.3s;
+    }
+    #search-input:focus { background: #ffff99; }
+    #lucky-btn {
+      background: linear-gradient(90deg, #ff0000, #ff9900, #33cc33, #3399ff, #cc33ff);
+      background-size: 400% 400%;
+      animation: rainbowShift 5s infinite;
+      border: 3px solid white;
+      color: white;
+      font-weight: bold;
+      padding: 10px 20px;
+      cursor: pointer;
+      text-shadow: 1px 1px 2px black;
+      transition: transform 0.3s;
+    }
+    #lucky-btn:hover { transform: scale(1.1) rotate(-2deg); }
+
+#old-btn {
+  background: #777;       /* gray background */
+  color: white;           /* white text */
+  border: 2px solid #555; /* darker gray border */
+  cursor: pointer;
+  padding: 12px 20px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+#old-btn:hover {
+  background: #999;       /* lighter gray on hover */
+}
+
+
+    /* Category Navigation */
+    .category-bar {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+    .category-btn {
+      background: linear-gradient(45deg, #00f, #f0f);
+      border: 3px solid white;
+      color: white;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      text-shadow: 1px 1px 2px black;
+      transition: 0.3s;
+    }
+    .category-btn.active, .category-btn:hover {
+      background: linear-gradient(45deg, #ff0, #f00);
+      transform: scale(1.15) rotate(2deg);
+    }
+
+    .total-count {
+      font-size: 18px;
+      margin: 10px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+    }
+
+    /* Videos Grid */
+    .videos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+    }
+    .video-card {
+      background: rgba(255,255,255,0.9);
+      border: 3px solid black;
+      padding: 10px;
+      width: 320px;
+      cursor: pointer;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      animation: fadeIn 0.5s ease-in;
+    }
+    .video-card:hover {
+      transform: scale(1.08) rotate(-1deg);
+      box-shadow: 0 0 20px cyan, 0 0 30px magenta;
+    }
+    .video-card img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border: 4px solid black;
+    }
+    .video-card h2 {
+      margin: 10px 0 0 0;
+      font-size: 20px;
+      color: #000;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+#toast {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+#toast.show {
+  opacity: 1;
+  animation: neonPulse 1.5s infinite alternate;
+}
+
+@keyframes neonPulse {
+  from { box-shadow: 0 0 5px #0ff, 0 0 10px #f0f, 0 0 20px #ff0; }
+  to   { box-shadow: 0 0 15px #ff0, 0 0 30px #0ff, 0 0 45px #f0f; }
+}
+
+  </style>
+</head>
+<!-- Welcome Overlay -->
+<div id="welcome-overlay">
+  <div id="welcome-box">
+    <h1>Welcome to Content Pool V2</h1>
+    <p>This is still being worked on and may be a little slow,<br>
+    but we are gonna give you access now.</p>
+    <div class="welcome-buttons">
+      <button id="enter-btn">🚀 Enter Content Pool V2</button>
+      <button id="old-btn">Learn More</button>
+    </div>
+  </div>
+</div>
+
+<body>
+
+  <header>Welcome to CCP</header>
+  <div class="logo">CCP</div>
+  <div class="subtext">(Central Content Pool)</div>
+  <div class="fineprint">(Not Communist!)</div>
+
+  <div class="container">
+    <!-- Search + Lucky -->
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search for videos...">
+    </div>
+
+    <!-- Category Bar -->
+    <div class="category-bar" id="category-bar"></div>
+    <div class="total-count" id="total-count">Total Videos: 0</div>
+
+    <div class="videos" id="video-list"></div>
+  </div>
+
+<div id="modal-overlay" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modal-title"></h2>
+      <div class="modal-controls">
+        <button id="fullscreen-btn" class="ctl-btn">Fullscreen</button>
+        <button class="ctl-btn js-close-modal">Close</button>
+        <button class="close-icon js-close-modal" aria-label="Close">&times;</button>
+      </div>
+    </div>
+
+    <!-- 👇 Wrap video + comments together -->
+  <div class="modal-body">
+  <video id="modal-video" controls autoplay style="width:100%; max-height:400px; background:#000;">
+    <source id="video-source" src="" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+
+<div id="comments-window" class="comments-window">
+  <div class="comments-header">
+    <span>Comments</span>
+    <button id="comments-close">×</button>
+  </div>
+  <div id="tlkio"
+       data-channel="placeholder"
+       data-theme="theme--minimal"
+       style="width:100%; height:100%;">
+  </div>
+</div>
+
+
+
+<script>
+
+
+
+let activeLoadingToast = null;
+
+function showLoadingToast(message = "Loading videos…") {
+  hideLoadingToast(); // just in case one is still open
+  activeLoadingToast = Toastify({
+    text: `<span class="toast-spinner"></span> ${message}`,
+    duration: -1, // stay until we manually remove
+    gravity: "bottom",
+    position: "center",
+    escapeMarkup: false,
+    style: {
+      background: "linear-gradient(90deg, #2196f3, #21cbf3)",
+      fontWeight: "bold",
+      display: "flex",
+      alignItems: "center"
+    }
+  });
+  activeLoadingToast.showToast();
+}
+
+function hideLoadingToast() {
+  const toasts = document.querySelectorAll(".toastify");
+  if (toasts.length > 0) {
+    toasts[toasts.length - 1].remove();
+  }
+  activeLoadingToast = null;
+}
+
+// =======================
+// 🔊 Sounds
+// =======================
+const sounds = {
+  loading: new Audio("https://www.centralschool.fun/Voicy_Loading%20sound%20Of%20Wii.mp3"),
+  error: new Audio("https://vgmsite.com/soundtracks/gamecube-system-sounds-gc-gamerip-2001/znczmalshq/01.%20Error.mp3"),
+  success: new Audio("https://downloads.khinsider.com/game-soundtracks/album/gamecube-system-sounds-gc-gamerip-2001/08.%2520Menu%2520Turn%2520Center.mp3"),
+  hover: new Audio("https://www.centralschool.fun/minimalist-button-hover-sound-effect-399749.mp3"),
+  click: new Audio("https://www.centralschool.fun/tv-shutdown-386167.mp3"),
+  category: new Audio("https://www.centralschool.fun/quick-swipe-405450.mp3")
+};
+sounds.loading.loop = true;
+
+let soundsEnabled = false; // unlocked only after welcome overlay click
+
+// =======================
+// 📦 Globals
+// =======================
+let allVideosByCategory = {};
+let currentCategory = "General";
+let bgMusic = null;
+const musicCache = {};
+const musicPositions = {};
+const videoList = document.getElementById('video-list');
+const searchInput = document.getElementById('search-input');
+const categoryBar = document.getElementById('category-bar');
+const totalCount = document.getElementById('total-count');
+const commentsWindow = document.getElementById("comments-window");
+
+
+// =======================
+// 🔔 Toasts (Toastify.js)
+// =======================
+function toastify(text, type = "info", opts = {}) {
+  const palettes = {
+    info:    "linear-gradient(90deg, #40e0d0, #8a2be2)",
+    success: "linear-gradient(90deg, #00c853, #64dd17)",
+    error:   "linear-gradient(90deg, #ff1744, #ff9100)"
+  };
+
+  Toastify({
+    text,
+    duration: opts.duration ?? 4500,
+    close: true,
+    gravity: "bottom",
+    position: "center",
+    stopOnFocus: true,
+    escapeMarkup: true, // plain text
+    style: { background: palettes[type] },
+    onClick: opts.onClick
+  }).showToast();
+}
+
+// =======================
+// 🎛 Categories
+// =======================
+const categories = {
+  "General": {
+    album: "B0p532ODWH4KDMb",
+    bg: "linear-gradient(135deg, #00c6ff, #0072ff)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/yizahfoe/01.%20Main%20Menu.mp3"
+  },
+  "Fun": {
+    album: "B2c5n8hH4uWRoAW",
+    bg: "linear-gradient(135deg, #ff00cc, #3333ff)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/ygkvkljl/03.%20Mii%20Channel.mp3"
+  },
+  "Rockets": {
+    album: "B2c5yeZFhHXzdFg",
+    bg: "linear-gradient(135deg, #ff512f, #dd2476)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/liqmqlxx/09.%20Training%20Menu%20%28Wii%20Fit%29.mp3"
+  },
+  "Sam Content": {
+    album: "B2cGI9HKKtaAF3T",
+    bg: "linear-gradient(135deg, #43cea2, #185a9d)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/xkiaqfir/14.%20Results%20%28Wii%20Sports%29.mp3"
+  },
+  "Serious": {
+    album: "B2c59UlCquMMGkJ",
+    bg: "linear-gradient(135deg, #232526, #414345)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/hvkzhflq/15.%20Yoga%20%28Wii%20Fit%29.mp3"
+  },
+  "Music": {
+    album: "B2cJ0DiRHusi12z",
+    bg: "linear-gradient(135deg, #f7971e, #ffd200)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/ifoakijw/22.%20Credits%20%28Wii%20Play%20Motion%29.mp3"
+  },
+  "Cole Content Crate": {
+    album: "B2cCCCEXAMPLE", // Replace with Cole's real album ID
+    bg: "linear-gradient(135deg, #8e2de2, #4a00e0)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/xyz/10.%20Cole%20Theme.mp3"
+  }
+};
+
+// =======================
+// 🔔 Toasts
+// =======================
+function showErrorToast(cat, album) {
+  if (soundsEnabled) sounds.error.play();
+
+  Toastify({
+    text: `❌ Failed to load ${cat}. Tap to retry.`,
+    duration: 8000,
+    gravity: "bottom",
+    position: "center",
+    close: true,
+    style: {
+      background: "linear-gradient(90deg,#ff1744,#ff9100)",
+      fontWeight: "bold"
+    },
+    onClick: () => retryFetchCategory(cat, album)
+  }).showToast();
+}
+
+function rebuildGeneral() {
+  const generalVideos = new Map();
+  // Start with existing General
+  (allVideosByCategory["General"] || []).forEach(v => generalVideos.set(v.url, v));
+  // Merge all other categories (skip Cole Content Crate)
+  Object.entries(allVideosByCategory)
+    .filter(([cat]) => cat !== "General" && cat !== "Cole Content Crate")
+    .forEach(([_, videos]) => {
+      videos.forEach(v => { if (!generalVideos.has(v.url)) generalVideos.set(v.url, v); });
+    });
+  allVideosByCategory["General"] = [...generalVideos.values()];
+
+  // Refresh if we're currently in General
+  if (currentCategory === "General") {
+    renderVideos(allVideosByCategory["General"]);
+  }
+}
+
+
+// =======================
+// 📥 Fetching
+// =======================
+async function fetchAllCategories() {
+  if (soundsEnabled) {
+    sounds.loading.currentTime = 0;
+    sounds.loading.play();
+  }
+
+  // 🔥 Show loading toast
+  showLoadingToast("Loading videos…");
+
+  let total = 0; // running total as we load categories
+
+  // Reset General so it builds fresh
+  allVideosByCategory = {};
+
+  const fetchAlbum = async (cat, album) => {
+    try {
+      const res = await fetch(`https://salexai-funserver-2-0.hf.space/album/${album}`);
+      const data = await res.json();
+      allVideosByCategory[cat] = data.videos || [];
+
+      // Update General immediately
+      rebuildGeneral();
+
+      // Update running total (skip General & Cole Content Crate)
+      if (cat !== "General" && cat !== "Cole Content Crate") {
+        const prev = total;
+        total += (data.videos || []).length;
+        animateCounter(totalCount, prev, total, 600); // animate from old total → new
+      }
+    } catch {
+      showErrorToast(cat, album);
+    }
+  };
+
+  // Instead of Promise.all, loop sequentially (or you could do Promise.allSettled for parallel)
+  for (const [cat, { album }] of Object.entries(categories)) {
+    await fetchAlbum(cat, album);
+  }
+
+  preloadMusic();
+
+  if (soundsEnabled) {
+    sounds.loading.pause();
+    sounds.loading.currentTime = 0;
+    sounds.success.play();
+  }
+
+  hideLoadingToast();
+  Toastify({
+    text: "All videos loaded ✅",
+    duration: 3000,
+    gravity: "bottom",
+    position: "center",
+    style: { background: "linear-gradient(90deg,#00c853,#64dd17)" }
+  }).showToast();
+
+  switchCategory("General", document.querySelector(".category-btn"));
+}
+
+
+async function retryFetchCategory(cat, album, _toastElIgnored) {
+  try {
+    const res = await fetch(`https://salexai-funserver-2-0.hf.space/album/${album}`);
+    const data = await res.json();
+    allVideosByCategory[cat] = data.videos || [];
+    if (currentCategory === cat) renderVideos(allVideosByCategory[cat]);
+
+    if (soundsEnabled) sounds.success.play();
+    toastify(`${cat} loaded`, "success");
+  } catch {
+    showErrorToast(cat, album);
+  }
+}
+
+function animateCounter(element, start, end, duration = 1000) {
+  let startTime = null;
+  function tick(timestamp) {
+    if (!startTime) startTime = timestamp;
+    const progress = Math.min((timestamp - startTime) / duration, 1);
+    const value = Math.floor(start + (end - start) * progress);
+    element.textContent = `Total Videos: ${value}`;
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+
+// =======================
+// 🎶 Music
+// =======================
+function preloadMusic() {
+  for (const [cat, { music }] of Object.entries(categories)) {
+    const audio = new Audio(music);
+    audio.loop = true;
+    audio.preload = "auto";
+    audio.volume = 0;
+    musicCache[cat] = audio;
+    musicPositions[cat] = 0;
+  }
+}
+function fadeOutMusic(audio, duration = 800) {
+  if (!audio) return;
+  let step = 50, fadeAmount = audio.volume / (duration / step);
+  let fade = setInterval(() => {
+    if (audio.volume > 0.05) audio.volume = Math.max(0, audio.volume - fadeAmount);
+    else { clearInterval(fade); audio.pause(); audio.volume = 0; }
+  }, step);
+}
+function fadeInMusic(audio, duration = 800) {
+  if (!audio) return;
+  audio.play();
+  audio.volume = 0;
+  let step = 50, fadeAmount = 1 / (duration / step);
+  let fade = setInterval(() => {
+    if (audio.volume < 0.95) audio.volume = Math.min(1, audio.volume + fadeAmount);
+    else { clearInterval(fade); audio.volume = 1; }
+  }, step);
+}
+
+// =======================
+// 📂 Categories
+// =======================
+function switchCategory(cat, btn) {
+  if (currentCategory === cat) return;
+  const oldCat = currentCategory;
+  currentCategory = cat;
+  document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.body.style.background = categories[cat].bg;
+
+  if (soundsEnabled) {
+    sounds.category.currentTime = 0;
+    sounds.category.play();
+  }
+
+  sounds.category.onended = () => {
+    const oldMusic = musicCache[oldCat];
+    const newMusic = musicCache[cat];
+    if (oldMusic) musicPositions[oldCat] = oldMusic.currentTime;
+    if (newMusic) { newMusic.currentTime = musicPositions[cat] || 0; newMusic.play(); }
+    crossfade(oldMusic, newMusic, 1000);
+    bgMusic = newMusic;
+  };
+
+  videoList.style.opacity = 0;
+  setTimeout(() => {
+    renderVideos(allVideosByCategory[cat]);
+    videoList.style.opacity = 1;
+  }, 300);
+}
+function crossfade(oldAudio, newAudio, duration) {
+  if (!newAudio) return;
+  let step = 50, fadeAmount = step / duration;
+  if (oldAudio) {
+    let fadeOut = setInterval(() => {
+      if (oldAudio.volume > 0.05) oldAudio.volume -= fadeAmount;
+      else { clearInterval(fadeOut); oldAudio.pause(); oldAudio.volume = 0; }
+    }, step);
+  }
+  newAudio.volume = 0;
+  let fadeIn = setInterval(() => {
+    if (newAudio.volume < 0.95) newAudio.volume += fadeAmount;
+    else { clearInterval(fadeIn); newAudio.volume = 1; }
+  }, step);
+}
+
+
+
+// =======================
+// 🎬 Video Rendering
+// =======================
+function renderVideos(videoArray) {
+  videoList.innerHTML = '';
+  if (!videoArray || videoArray.length === 0) {
+    videoList.innerHTML = "<p>No videos available.</p>";
+    return;
+  }
+  for (const vid of videoArray) {
+    const title = vid.caption && vid.caption.trim() ? vid.caption.trim() : 'Unnamed Video';
+    const thumb = vid.poster && vid.poster.trim() ? vid.poster : 'https://via.placeholder.com/320x180.png?text=No+Preview';
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.innerHTML = `<img src="${thumb}" alt="Thumbnail"><h2>${title}</h2>`;
+    card.addEventListener('mouseover', () => { if (soundsEnabled) sounds.hover.play(); });
+    card.addEventListener('click', () => {
+      if (soundsEnabled) sounds.click.play();
+      openModal(title, vid.url);
+    });
+    videoList.appendChild(card);
+  }
+}
+
+// =======================
+// 🎬 Modal + URL Params
+// =======================
+function openModal(title, url) {
+  document.getElementById("modal-title").textContent = title;
+  document.getElementById("video-source").src = url;
+  const modalVideo = document.getElementById("modal-video");
+  modalVideo.load();
+  modalVideo.play();
+
+  document.getElementById("modal-overlay").classList.add("active");
+  fadeOutMusic(bgMusic, 800);
+
+  // reset comments
+  commentsOpen = false;
+  document.querySelector(".modal-body").classList.remove("with-comments");
+  document.getElementById("tlkio-container").style.display = "none";
+
+  // hint toast
+  showCommentHint();
+
+  // update URL
+  const newUrl = new URL(window.location.href);
+  newUrl.searchParams.set("vid", encodeURIComponent(url));
+  history.replaceState({}, "", newUrl);
+}
+
+// =======================
+// 🚀 Init
+// =======================
+Object.keys(categories).forEach((cat, idx) => {
+  const btn = document.createElement('button');
+  btn.className = "category-btn" + (idx === 0 ? " active" : "");
+  btn.textContent = cat;
+  btn.addEventListener('click', () => switchCategory(cat, btn));
+  categoryBar.appendChild(btn);
+});
+
+// Unlock sounds on user click
+document.getElementById("enter-btn").addEventListener("click", () => {
+  document.getElementById("welcome-overlay").style.display = "none";
+  soundsEnabled = true;
+  fetchAllCategories().then(checkUrlParam);
+});
+
+// "Old Site" button
+document.getElementById("old-btn").addEventListener("click", () => {
+  window.location.href = "https://www.centralschool.fun/products/content-pool-upgrades";
+});
+
+
+window.addEventListener("DOMContentLoaded", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const vid = urlParams.get("vid");
+
+  if (vid) {
+    // Optionally decode if you encoded earlier
+    const decodedVid = decodeURIComponent(vid);
+    openModal("Video", decodedVid);
+  }
+});
+
+// Close everywhere
+function closeModal() {
+  const v = document.getElementById("modal-video");
+  v.pause();
+  document.getElementById("modal-overlay").classList.remove("active");
+  fadeInMusic(bgMusic, 800);
+
+  const newUrl = new URL(window.location.href);
+  newUrl.searchParams.delete("vid");
+  newUrl.searchParams.delete("title");
+  history.replaceState({}, "", newUrl);
+}
+
+// Bind to both buttons (X + Close)
+document.querySelectorAll(".js-close-modal").forEach(el =>
+  el.addEventListener("click", closeModal)
+);
+
+// Click outside modal-content closes
+document.getElementById("modal-overlay").addEventListener("click", (e) => {
+  if (e.target.id === "modal-overlay") closeModal();
+});
+
+// Keyboard shortcuts
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeModal();
+  if (e.key.toLowerCase() === "f") {
+    const v = document.getElementById("modal-video");
+    if (v.requestFullscreen) v.requestFullscreen();
+    else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
+    else if (v.msRequestFullscreen) v.msRequestFullscreen();
+  }
+});
+
+// Fullscreen button
+document.getElementById("fullscreen-btn").addEventListener("click", () => {
+  const v = document.getElementById("modal-video");
+  if (v.requestFullscreen) v.requestFullscreen();
+  else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
+  else if (v.msRequestFullscreen) v.msRequestFullscreen();
+});
+
+const commentsClose = document.getElementById("comments-close");
+const tlkioDiv = document.getElementById("tlkio");
+
+function toggleComments(videoUrl) {
+  if (!commentsOpen) {
+    const channelName = encodeURIComponent(videoUrl);
+
+    // Reset tlkio div
+    const tlkioDiv = document.getElementById("tlkio");
+    tlkioDiv.innerHTML = "";
+    tlkioDiv.setAttribute("data-channel", channelName);
+
+    // Remove old script if present
+    const oldScript = document.querySelector("script[data-tlkio]");
+    if (oldScript) oldScript.remove();
+
+    // Re-inject embed script into body
+    const script = document.createElement("script");
+    script.src = "http://tlk.io/embed.js";
+    script.async = true;
+    script.setAttribute("data-tlkio", "true"); // marker for cleanup
+    document.body.appendChild(script);
+
+    commentsWindow.style.display = "flex";
+    commentsOpen = true;
+  } else {
+    commentsWindow.style.display = "none";
+    commentsOpen = false;
+  }
+}
+
+
+
+// make draggable
+(function() {
+  const header = commentsWindow.querySelector(".comments-header");
+  let offsetX = 0, offsetY = 0, isDown = false;
+
+  header.addEventListener("mousedown", (e) => {
+    isDown = true;
+    offsetX = e.clientX - commentsWindow.offsetLeft;
+    offsetY = e.clientY - commentsWindow.offsetTop;
+  });
+
+  document.addEventListener("mouseup", () => isDown = false);
+
+  document.addEventListener("mousemove", (e) => {
+    if (isDown) {
+      commentsWindow.style.left = (e.clientX - offsetX) + "px";
+      commentsWindow.style.top = (e.clientY - offsetY) + "px";
+    }
+  });
+})();
+
+
+
+let commentsOpen = false;
+
+
+
+document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "c" && document.getElementById("modal-overlay").classList.contains("active")) {
+    const src = document.getElementById("video-source").src;
+    toggleComments(src);
+  }
+});
+
+
+
+function showCommentHint() {
+  Toastify({
+    text: "💬 Press C to Comment",
+    duration: 1000,
+    gravity: "bottom",
+    position: "center",
+    style: { background: "linear-gradient(90deg, #2196f3, #21cbf3)", fontWeight: "bold" }
+  }).showToast();
+}
+
+
+
+</script>
+</body>
+</html>

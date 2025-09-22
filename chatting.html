@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Video Chat — Fullscreen</title>
+  <style>
+    :root{
+      --chat-border:#3af;
+      --bg1:#1d0045;
+      --bg2:#32006a;
+      --panel: rgba(15,0,40,.95);
+    }
+
+    /* Page background (won’t be visible under the full-screen chat) */
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      color:#ddd;
+    }
+
+    /* === FULLSCREEN CHAT === */
+    #chatBox{
+      position: fixed;
+      inset: 0;                 /* top:0 right:0 bottom:0 left:0 */
+      width: 100vw;
+      height: 100dvh;           /* dynamic viewport height (mobile safe) */
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border: none;             /* no right-dock border anymore */
+      z-index: 1000;
+      box-shadow: none;
+    }
+
+    #chatHeader{
+      padding: 14px 16px;
+      background:#2d0060;
+      font-weight: 700;
+      text-align: center;
+      border-bottom: 2px solid var(--chat-border);
+    }
+
+    #messages{
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-auto-rows: min-content;
+      gap: 10px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .msg{
+      padding: 10px 12px;
+      border:1px solid var(--chat-border);
+      border-radius:10px;
+      background: rgba(30,0,60,.6);
+      word-break: break-word;
+    }
+    .msg:hover{ background: rgba(60,0,90,.8); }
+
+    .author{
+      font-size:.85em;
+      color:#f0f;
+      margin-bottom: 4px;
+    }
+
+    #chatInput{
+      display:flex;
+      gap:10px;
+      border-top: 2px solid var(--chat-border);
+      background:#18003b;
+      padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+    }
+    #chatInput input{
+      flex:1;
+      padding: 14px;
+      border:none;
+      outline:none;
+      background:#1a0035;
+      color:#fff;
+      font-size:16px;
+      border-radius:8px;
+    }
+    #chatInput button{
+      padding: 14px 18px;
+      border:none;
+      background: var(--chat-border);
+      color:#000;
+      font-weight: 800;
+      border-radius:8px;
+      cursor:pointer;
+    }
+    #chatInput button:hover{ background:#5df; }
+
+    /* optional smooth show/hide when using the C key */
+    @media (prefers-reduced-motion:no-preference){
+      #chatBox{ transition: opacity .2s ease; }
+      #chatBox.hidden{ opacity: 0; pointer-events:none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FULLSCREEN CHAT -->
+  <div id="chatBox" role="region" aria-label="Video chat panel">
+    <div id="chatHeader">Comments</div>
+    <div id="messages" aria-live="polite" aria-atomic="false"></div>
+    <div id="chatInput">
+      <input id="msgText" type="text" placeholder="Type a message..." />
+      <button id="sendBtn" type="button" aria-label="Send message">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://salexai-funserver-2-0.hf.space";
+    const videoId  = "samremix1";
+
+    const chatBox  = document.getElementById("chatBox");
+    const messages = document.getElementById("messages");
+    const input    = document.getElementById("msgText");
+    const sendBtn  = document.getElementById("sendBtn");
+
+    // Author (stored once)
+    let author = localStorage.getItem("chat_author");
+    if (!author) {
+      author = prompt("Enter your name or SD61 email:") || "anon";
+      author = author.trim() || "anon";
+      localStorage.setItem("chat_author", author);
+    }
+
+    let lastSeen = null;
+
+    function addMessage(m){
+      const div = document.createElement("div");
+      div.className = "msg";
+      div.innerHTML = `<div class="author">${m.author || "anon"}</div>${m.text}`;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function fetchMessages(){
+      try{
+        let url = `${API_BASE}/chat/${videoId}?limit=50`;
+        if (lastSeen) url += `&since=${encodeURIComponent(lastSeen)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.messages && data.messages.length){
+          data.messages.forEach(m => { addMessage(m); lastSeen = m.created_at; });
+        }
+      }catch(e){
+        console.error("fetchMessages error", e);
+      }
+    }
+
+    async function sendMessage(){
+      const text = input.value.trim();
+      if (!text) return;
+      try{
+        await fetch(`${API_BASE}/chat/${videoId}`,{
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ author, text })
+        });
+        input.value = "";
+      }catch(e){
+        console.error("sendMessage error", e);
+      }
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
+
+    // start populated + poll
+    fetchMessages();
+    setInterval(fetchMessages, 2000);
+
+    // optional: hide/show with "C"
+    document.addEventListener("keydown", e => {
+      if (e.key?.toLowerCase() === "c") {
+        const hidden = chatBox.classList.toggle("hidden");
+        // fully remove from layout for a11y when hidden
+        chatBox.style.display = hidden ? "none" : "flex";
+        if (!hidden) { /* if showing again, keep layout consistent */
+          // ensure it refills the full viewport
+          chatBox.style.width = "100vw";
+          chatBox.style.height = "100dvh";
+        }
+      }
+    });
+
+    // keep input visible when virtual keyboard opens (mobile)
+    window.addEventListener("resize", () => {
+      if (document.activeElement === input) {
+        input.scrollIntoView({ block: "end" });
+      }
+    });
+  </script>
+</body>
+</html>

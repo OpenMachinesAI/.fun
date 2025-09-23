@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Central TLKS — Main</title>
+
+  <style>
+    :root{
+      --bg-1: #0b0310;
+      --bg-2: #17061a;
+      --panel: linear-gradient(180deg, rgba(18,6,26,0.95), rgba(28,8,46,0.95));
+      --accent-purple: #8b43ff;
+      --accent-purple-2: #5e26d6;
+      --muted: #bfb7d9;
+      --card: rgba(255,255,255,0.03);
+      --glass: rgba(255,255,255,0.02);
+    }
+
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background: radial-gradient(circle at 10% 10%, rgba(139,67,255,0.06), transparent 8%), var(--bg-1); color:#f4f1ff}
+    a{color:inherit}
+    /* Layout: 3 columns */
+    .app{
+      display:grid;
+      grid-template-columns: 260px 1fr 320px;
+      grid-template-rows: 60px 1fr;
+      grid-template-areas:
+        "sidebar header header-right"
+        "sidebar main right";
+      height:100vh;
+      gap:18px;
+      padding:18px;
+      box-sizing:border-box;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      grid-area: sidebar;
+      background:var(--panel);
+      border-radius:14px;
+      padding:16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;margin-bottom:12px}
+    .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent-purple);box-shadow:0 0 12px rgba(139,67,255,0.35)}
+    .nav{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+    .nav button{background:transparent;border:0;padding:10px 12px;border-radius:10px;color:var(--muted);text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px}
+    .nav button.active{background:linear-gradient(90deg,var(--accent-purple),var(--accent-purple-2));color:white;box-shadow:0 8px 30px rgba(92,30,206,0.18)}
+    .postBtn{margin-top:18px;width:100%;padding:12px;border-radius:28px;border:0;background:linear-gradient(90deg,var(--accent-purple),var(--accent-purple-2));color:white;font-weight:800;cursor:pointer}
+
+    /* Header */
+    .header{
+      grid-area: header;
+      display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:14px;background:var(--panel);
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .header .title{font-weight:800;font-size:18px}
+    .header .roomSelect{display:flex;gap:8px;align-items:center}
+
+    /* Right-header area for small status */
+    .header-right{
+      grid-area: header-right;
+      display:flex;align-items:center;justify-content:flex-end;padding:14px;border-radius:14px;background:var(--panel);border:1px solid rgba(255,255,255,0.02)
+    }
+
+    /* Main feed */
+    .main{
+      grid-area: main;
+      padding:14px;border-radius:14px;background:var(--panel);
+      display:flex;flex-direction:column;gap:12px;border:1px solid rgba(255,255,255,0.02);overflow:hidden;
+    }
+    .composer{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;background:var(--glass);border:1px solid rgba(255,255,255,0.02)}
+    .composer textarea{flex:1;min-height:72px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#fff;resize:vertical}
+    .composer .controls{display:flex;flex-direction:column;gap:8px}
+    .btn{padding:10px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent-purple),var(--accent-purple-2));color:#fff;cursor:pointer;font-weight:700}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+
+    /* posts list */
+    .posts{overflow:auto;padding:6px;display:flex;flex-direction:column;gap:12px}
+    .post{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);display:flex;gap:12px}
+    .avatar{width:56px;height:56px;border-radius:50%;flex-shrink:0;background:#25202b;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .p-body{flex:1}
+    .p-meta{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+    .p-text{margin-top:8px;font-size:16px;line-height:1.35}
+    .p-media img{max-width:100%;max-height:420px;border-radius:10px;display:block;margin-top:10px;object-fit:contain}
+
+    /* Right column */
+    .right{grid-area:right;padding:14px;border-radius:14px;background:var(--panel);border:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column;gap:12px}
+    .card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
+
+    /* small helpers */
+    .muted{color:var(--muted);font-size:13px}
+    .small{font-size:13px;color:var(--muted)}
+    .roomItem{padding:8px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+    .roomItem.locked{opacity:0.6;filter:grayscale(.05)}
+    .profilePopup{position:fixed;z-index:3000;left:50%;top:50%;transform:translate(-50%,-50%);min-width:320px;background:var(--panel);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(0,0,0,0.6);display:none}
+    .followBtn{padding:8px 10px;border-radius:8px;border:0;background:linear-gradient(90deg,#00b4ff,#8b43ff);color:#fff;cursor:pointer}
+    .verified-blue{color:#2ea1ff;margin-left:6px}
+    .verified-purple{color:#b17bff;margin-left:6px}
+    .imgThumb{max-width:140px;max-height:96px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);object-fit:cover}
+    .inputFile{display:flex;gap:8px;align-items:center}
+    input[type="file"]{display:none}
+    .fileLabel{display:inline-block;padding:8px 10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.06);cursor:pointer}
+
+    /* responsive */
+    @media(max-width:1080px){ .app{grid-template-columns:200px 1fr;grid-template-areas:"sidebar header" "sidebar main";grid-template-rows:60px 1fr; } .right{display:none}}
+    @media(max-width:720px){ .app{grid-template-columns:1fr;grid-template-areas:"header" "main";padding:8px} .sidebar{display:none} .header-right{display:none} }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- left sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="dot"></div>
+        <div>Central TLKS</div>
+      </div>
+
+      <div class="nav" id="navRooms">
+        <!-- Rooms inserted by JS -->
+      </div>
+
+      <button class="postBtn" id="openComposer">Post</button>
+
+      <div style="margin-top:18px">
+        <div class="small muted">Following</div>
+        <div id="followingList" style="margin-top:8px;display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </aside>
+
+    <!-- header -->
+    <header class="header">
+      <div class="title" id="headerTitle">Home — For you</div>
+      <div class="roomSelect" id="roomSelectArea">
+        <div class="small muted" id="currentRoomLabel">Room: main</div>
+      </div>
+    </header>
+
+    <div class="header-right">
+      <div class="small muted" id="loginSummary">Not logged in</div>
+    </div>
+
+    <!-- main column -->
+    <main class="main">
+      <!-- composer -->
+      <div class="composer" id="composer">
+        <div class="avatar" id="composerAvatar"></div>
+        <div style="flex:1">
+          <textarea id="composeText" placeholder="What's happening?"></textarea>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="fileLabel" title="Upload image(s)">
+                📷
+                <input type="file" id="fileInput" accept="image/*" multiple />
+              </label>
+              <div id="previews" style="display:flex;gap:8px;align-items:center"></div>
+            </div>
+            <div>
+              <button class="btn ghost" id="toggleImgPreview">Toggle Images</button>
+              <button class="btn" id="sendPost">Post</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- posts -->
+      <div class="posts" id="posts"></div>
+    </main>
+
+    <!-- right column -->
+    <aside class="right">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:800" id="meName">Guest</div>
+            <div class="small muted" id="meHandle">@guest</div>
+          </div>
+          <div>
+            <button class="btn ghost" id="openProfile">Profile</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:700">Room</div>
+        <div class="muted" id="roomInfo">Public rooms: main. Private rooms require invite.</div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:700">Followers</div>
+        <div id="followersList" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- profile popup -->
+  <div class="profilePopup" id="profilePopup">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar" id="ppAvatar"></div>
+          <div>
+            <div id="ppName" style="font-weight:800"></div>
+            <div id="ppHandle" class="small muted"></div>
+          </div>
+        </div>
+        <div id="ppDesc" class="small muted" style="margin-top:8px"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="followBtn" id="ppFollow">Follow</button>
+        <button class="btn ghost" id="ppClose">Close</button>
+      </div>
+    </div>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0">
+    <div style="font-weight:700;margin-bottom:8px">Last posts</div>
+    <div id="ppPosts" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+
+  <!-- first-login intro modal -->
+  <div id="introModal" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:4000">
+    <div style="background:var(--panel);padding:20px;border-radius:12px;max-width:680px;color:#fff;border:1px solid rgba(255,255,255,0.03)">
+      <h2 style="margin-top:0">Welcome to Central TLKS</h2>
+      <p class="muted">Access is rolling out class-by-class. If you can't log in, double-check your handle & PIN and ask your teacher. Invitations are required for private rooms — ask your teacher for invite codes.</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+        <button class="btn ghost" id="introClose">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /*****************************************************************
+     * Configuration & "server" values you can edit quickly
+     *****************************************************************/
+    const API_BASE = "https://salexai-funserver-2-0.hf.space"; // change to your HF URL
+    // Rooms list hard-coded into the client (you requested rooms only exist in a json list in chat.html)
+    const ROOMS = [
+      { code: "main", name: "General", private: false, invite: "" },
+      { code: "announcements", name: "Announcements", private: true, invite: "ANNOUNCE1" },
+      { code: "grade6", name: "Grade 6", private: true, invite: "G6CODE" },
+      { code: "grade7", name: "Grade 7", private: true, invite: "G7CODE" }
+    ];
+
+    // Optional local meta about users (verified badges demo). You can later fetch this from server.
+    const USERS_META = {
+      "alex": { verified: "dev", profile_image: "" },
+      "admin": { verified: "staff", profile_image: "" }
+    };
+
+    // UI state
+    let CURRENT_ROOM = localStorage.getItem("current_room") || "main";
+    let TLKS_TOKEN = localStorage.getItem("tlks_token") || "";
+    let ME = null;
+
+    /*****************************************************************
+     * Helpers: API wrappers
+     *****************************************************************/
+    function apiFetch(path, opts = {}) {
+      opts.headers = opts.headers || {};
+      if (TLKS_TOKEN) opts.headers["Authorization"] = `Bearer ${TLKS_TOKEN}`;
+      return fetch(API_BASE.replace(/\/$/, "") + path, opts);
+    }
+
+    async function apiJson(path, opts = {}) {
+      const r = await apiFetch(path, opts);
+      try { return await r.json(); } catch { return { ok: false }; }
+    }
+
+    /*****************************************************************
+     * Rooms sidebar rendering & join flow
+     *****************************************************************/
+    const navRooms = document.getElementById("navRooms");
+    function renderRooms() {
+      navRooms.innerHTML = "";
+      ROOMS.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "roomItem" + (r.private ? " locked" : "");
+        if (r.code === CURRENT_ROOM) div.classList.add("active");
+        div.innerHTML = `<div style="display:flex;gap:8px;align-items:center">
+                          <div style="width:10px;height:10px;border-radius:50%;background:${r.private ? '#b77cff' : '#6ee7b7'}"></div>
+                          <div><strong>${r.name}</strong><div class="small muted">${r.code}</div></div>
+                         </div>
+                         <div style="display:flex;gap:8px;align-items:center">
+                           ${r.private ? "<span class='small muted'>🔒</span>" : ""}
+                           <button class="btn ghost">${r.code === CURRENT_ROOM ? "Open" : "Open"}</button>
+                         </div>`;
+        div.querySelector("button").addEventListener("click", () => selectRoom(r));
+        navRooms.appendChild(div);
+      });
+    }
+
+    function joinedRooms() {
+      return new Set(JSON.parse(localStorage.getItem("joined_rooms") || '["main"]'));
+    }
+    function saveJoined(set) {
+      localStorage.setItem("joined_rooms", JSON.stringify([...set]));
+    }
+
+    async function selectRoom(r) {
+      const joined = joinedRooms();
+      if (r.private && !joined.has(r.code)) {
+        const code = prompt(`Room "${r.name}" is private. Enter invite code:`);
+        if (!code) return;
+        if (code.trim() !== r.invite) {
+          alert("Incorrect invite. Ask your teacher.");
+          return;
+        }
+        joined.add(r.code);
+        saveJoined(joined);
+      }
+      CURRENT_ROOM = r.code;
+      localStorage.setItem("current_room", CURRENT_ROOM);
+      document.getElementById("currentRoomLabel").textContent = `Room: ${CURRENT_ROOM}`;
+      renderRooms();
+      await loadPosts();
+    }
+
+    /*****************************************************************
+     * Login, /me, intro modal, and notifications
+     *****************************************************************/
+    const loginSummary = document.getElementById("loginSummary");
+    async function tryResumeLogin() {
+      if (!TLKS_TOKEN) {
+        showLoginOverlay();
+        return;
+      }
+      const res = await apiJson("/me");
+      if (!res || !res.ok) { // invalid token
+        TLKS_TOKEN = "";
+        localStorage.removeItem("tlks_token");
+        showLoginOverlay();
+        return;
+      }
+      ME = res.user;
+      populateMe();
+      // show one-time intro from server or client
+      const seenKey = `seen_intro_${ME.handle}`;
+      const showIntro = (res.user && res.user.show_intro) || !localStorage.getItem(seenKey);
+      if (showIntro) {
+        document.getElementById("introModal").style.display = "flex";
+        localStorage.setItem(seenKey, "1");
+      }
+      // show access popup
+      if (res.user && res.user.access_notice) {
+        setTimeout(()=> alert(res.user.access_notice), 600);
+      }
+      // request Notification permission for DMs
+      if (("Notification" in window) && Notification.permission !== "granted") {
+        Notification.requestPermission();
+      }
+    }
+
+    function populateMe() {
+      if (!ME) return;
+      document.getElementById("meName").textContent = `${ME.first_name || ""} ${ME.last_name || ""}`;
+      document.getElementById("meHandle").textContent = `@${ME.handle || ""}`;
+      loginSummary.textContent = `@${ME.handle} • ${ME.klass || ""}`;
+      // composer avatar
+      const avatarEl = document.getElementById("composerAvatar");
+      avatarEl.innerHTML = ME.profile_image ? `<img src="${ME.profile_image}" style="width:56px;height:56px;object-fit:cover">` : (ME.first_name ? ME.first_name[0].toUpperCase() : "U");
+      // following/followers lists
+      renderFollowers();
+      renderFollowing();
+    }
+
+    // Simple login overlay (inlined small UI)
+    function showLoginOverlay() {
+      const overlay = document.createElement("div");
+      overlay.style = "position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.65);z-index:5000";
+      overlay.innerHTML = `
+        <div style="background:var(--panel);padding:18px;border-radius:12px;min-width:320px;border:1px solid rgba(255,255,255,0.03)">
+          <h3 style="margin:0 0 8px;color:var(--accent-purple)">Central TLKS Login</h3>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <input id="tmpHandle" placeholder="handle (no @)" style="padding:10px;border-radius:8px;background:#120026;color:#fff;border:1px solid rgba(255,255,255,0.03)">
+            <input id="tmpPin" placeholder="PIN" type="password" style="padding:10px;border-radius:8px;background:#120026;color:#fff;border:1px solid rgba(255,255,255,0.03)">
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button id="tmpCancel" class="btn ghost">Cancel</button>
+              <button id="tmpSubmit" class="btn">Login</button>
+            </div>
+            <div id="tmpErr" style="color:#ff7ca2"></div>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+      overlay.querySelector("#tmpCancel").onclick = () => overlay.remove();
+      overlay.querySelector("#tmpSubmit").onclick = async () => {
+        const handle = overlay.querySelector("#tmpHandle").value.trim().replace(/^@/,"");
+        const pin = overlay.querySelector("#tmpPin").value.trim();
+        if (!handle || !pin) { overlay.querySelector("#tmpErr").textContent = "Enter handle and PIN"; return; }
+        overlay.querySelector("#tmpErr").textContent = "";
+        try {
+          const r = await fetch(API_BASE + "/auth/login", {
+            method: "POST",
+            headers: { "Content-Type":"application/json" },
+            body: JSON.stringify({ handle, pin })
+          });
+          const j = await r.json();
+          if (!j.ok) { overlay.querySelector("#tmpErr").textContent = (j.error || "Login failed"); return; }
+          TLKS_TOKEN = j.token;
+          localStorage.setItem("tlks_token", TLKS_TOKEN);
+          overlay.remove();
+          await tryResumeLogin();
+          await loadPosts();
+        } catch (e) { overlay.querySelector("#tmpErr").textContent = "Network error"; }
+      };
+    }
+
+    document.getElementById("introClose").addEventListener("click", ()=> document.getElementById("introModal").style.display = "none");
+
+    /*****************************************************************
+     * Posts fetch + render
+     *****************************************************************/
+    const postsEl = document.getElementById("posts");
+    let lastSeen = null;
+
+    function renderPost(m) {
+      const div = document.createElement("div");
+      div.className = "post";
+      const avatarHtml = m.profile_image ? `<img src="${m.profile_image}" style="width:56px;height:56px;object-fit:cover;border-radius:50%">` : `<div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff">${(m.author||"U")[0]}</div>`;
+      const verified = (USERS_META[m.handle] && USERS_META[m.handle].verified) || (m.verified || "");
+      const badge = verified === "staff" ? `<span class="verified-blue" title="Verified Staff — Can moderate">✔︎</span>` : (verified === "dev" ? `<span class="verified-purple" title="Verified Developer of TLKS">✔︎</span>` : "");
+      const time = new Date(m.created_at || Date.now()).toLocaleString();
+      let imgsHtml = "";
+      if (m.images && m.images.length) {
+        imgsHtml = `<div class="p-media">${m.images.map(i => `<img src="${i}" alt="img">`).join("")}</div>`;
+      }
+      div.innerHTML = `<div class="avatar">${avatarHtml}</div>
+                       <div class="p-body">
+                         <div class="p-meta"><strong style="cursor:pointer" data-handle="${m.handle}" data-author="${m.author}">${m.author || m.handle}</strong> ${badge} <span class="small muted">@${m.handle}</span> <span class="small muted">• ${time}</span></div>
+                         <div class="p-text">${escapeHtml(m.text || "")}</div>
+                         ${imgsHtml}
+                       </div>`;
+      // profile click
+      div.querySelector("strong[data-handle]")?.addEventListener("click", (ev)=>{
+        const h = ev.currentTarget.dataset.handle;
+        const author = ev.currentTarget.dataset.author;
+        openProfilePopup(h, author);
+      });
+      return div;
+    }
+
+    async function loadPosts() {
+      postsEl.innerHTML = "Loading…";
+      try {
+        const res = await apiJson(`/chat/${encodeURIComponent(CURRENT_ROOM)}?limit=100`);
+        if (!res || !res.messages) { postsEl.innerHTML = "<div class='muted'>No posts</div>"; return; }
+        postsEl.innerHTML = "";
+        res.messages.forEach(m => postsEl.appendChild(renderPost(m)));
+        // update lastSeen
+        if (res.messages.length) lastSeen = res.messages[res.messages.length-1].created_at;
+      } catch (e) {
+        postsEl.innerHTML = `<div class="muted">Error loading posts</div>`;
+        console.error(e);
+      }
+    }
+
+    // Polling new messages and DM notifications
+    async function pollLoop() {
+      try {
+        const url = `/chat/${encodeURIComponent(CURRENT_ROOM)}?limit=50${lastSeen ? "&since="+encodeURIComponent(lastSeen) : ""}`;
+        const res = await apiJson(url);
+        if (res && res.messages && res.messages.length) {
+          res.messages.forEach(m => {
+            postsEl.appendChild(renderPost(m));
+            lastSeen = m.created_at;
+            // notify if DM for me
+            if (m.room && m.room.startsWith("dm_")) {
+              const members = m.room.split("dm_")[1].split("_");
+              if (ME && members.includes(ME.handle) && m.handle !== ME.handle) {
+                showNotification(`DM from @${m.handle}`, m.text || "New message");
+              }
+            }
+          });
+        }
+      } catch (e) { /* ignore */ }
+      setTimeout(pollLoop, 2000);
+    }
+
+    function showNotification(title, body) {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      new Notification(title, { body, icon: "" });
+    }
+
+    /*****************************************************************
+     * Composer: file -> base64, previews and post
+     *****************************************************************/
+    const fileInput = document.getElementById("fileInput");
+    const previews = document.getElementById("previews");
+    let imagesData = []; // data URLs
+    fileInput.addEventListener("change", async (ev) => {
+      const files = Array.from(ev.target.files || []);
+      for (const f of files) {
+        if (!f.type.startsWith("image/")) continue;
+        // convert to data url
+        const dataUrl = await fileToDataUrl(f);
+        // small optional client resizing can be added here
+        imagesData.push(dataUrl);
+        const img = document.createElement("img");
+        img.src = dataUrl;
+        img.className = "imgThumb";
+        const wrapper = document.createElement("div");
+        wrapper.style.display = "flex"; wrapper.style.flexDirection="column"; wrapper.style.alignItems="center";
+        const rem = document.createElement("button");
+        rem.textContent = "Remove";
+        rem.className = "btn ghost";
+        rem.style.marginTop = "6px";
+        rem.addEventListener("click", ()=> {
+          const i = imagesData.indexOf(dataUrl);
+          if (i >= 0) imagesData.splice(i,1);
+          wrapper.remove();
+        });
+        wrapper.appendChild(img);
+        wrapper.appendChild(rem);
+        previews.appendChild(wrapper);
+      }
+      // reset input
+      fileInput.value = "";
+    });
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = reject;
+        fr.readAsDataURL(file);
+      });
+    }
+
+    document.getElementById("sendPost").addEventListener("click", async () => {
+      if (!ME) { showLoginOverlay(); return; }
+      const text = document.getElementById("composeText").value.trim();
+      if (!text && imagesData.length === 0) return alert("Write something or add an image");
+      // build payload with base64 images (user requested base64 usage)
+      const payload = { text, images: imagesData.slice(0,6) };
+      try {
+        const r = await apiFetch(`/chat/${encodeURIComponent(CURRENT_ROOM)}`, {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!r.ok) { const txt = await r.text(); console.error(txt); alert("Post failed"); return; }
+        // clear composer
+        document.getElementById("composeText").value = "";
+        imagesData = [];
+        previews.innerHTML = "";
+        // reload posts (quick)
+        await loadPosts();
+      } catch (e) { console.error(e); alert("Network error"); }
+    });
+
+    /*****************************************************************
+     * Profile popup: show last 5 posts for that user + Follow
+     *****************************************************************/
+    const profilePopup = document.getElementById("profilePopup");
+    const ppAvatar = document.getElementById("ppAvatar");
+    const ppName = document.getElementById("ppName");
+    const ppHandle = document.getElementById("ppHandle");
+    const ppDesc = document.getElementById("ppDesc");
+    const ppPosts = document.getElementById("ppPosts");
+    const ppFollow = document.getElementById("ppFollow");
+    const ppClose = document.getElementById("ppClose");
+    let currentProfile = null;
+
+    function openProfilePopup(handle, authorName) {
+      currentProfile = handle;
+      // get local info
+      ppAvatar.innerHTML = USERS_META[handle] && USERS_META[handle].profile_image ? `<img src="${USERS_META[handle].profile_image}" style="width:56px;height:56px;border-radius:50%;object-fit:cover">` : (authorName ? authorName[0].toUpperCase() : handle[0].toUpperCase());
+      ppName.textContent = authorName || handle;
+      ppHandle.textContent = "@" + handle;
+      ppDesc.textContent = USERS_META[handle] && USERS_META[handle].desc ? USERS_META[handle].desc : "No bio";
+      renderProfileFollowButton();
+      // fetch last 5 posts from current room & global attempt
+      ppPosts.innerHTML = "Loading…";
+      fetchProfilePosts(handle).then(postEls => {
+        ppPosts.innerHTML = "";
+        if (!postEls.length) ppPosts.innerHTML = `<div class='muted'>No recent posts</div>`;
+        postEls.forEach(pe => ppPosts.appendChild(pe));
+      });
+      profilePopup.style.display = "block";
+    }
+
+    ppClose.addEventListener("click", ()=> profilePopup.style.display = "none");
+
+    function renderProfileFollowButton() {
+      const following = new Set(JSON.parse(localStorage.getItem("following") || "[]"));
+      if (following.has(currentProfile)) {
+        ppFollow.textContent = "Unfollow";
+      } else {
+        ppFollow.textContent = "Follow";
+      }
+    }
+
+    ppFollow.addEventListener("click", ()=> {
+      const following = new Set(JSON.parse(localStorage.getItem("following") || "[]"));
+      if (following.has(currentProfile)) {
+        following.delete(currentProfile);
+      } else {
+        following.add(currentProfile);
+      }
+      localStorage.setItem("following", JSON.stringify([...following]));
+      renderProfileFollowButton();
+      renderFollowing();
+    });
+
+    async function fetchProfilePosts(handle) {
+      // attempt to gather last 5 posts by scanning current room and maybe main
+      const roomsToTry = [CURRENT_ROOM, "main"];
+      let posts = [];
+      for (const r of roomsToTry) {
+        try {
+          const res = await apiJson(`/chat/${encodeURIComponent(r)}?limit=200`);
+          if (res && res.messages) {
+            posts = posts.concat(res.messages.filter(m => m.handle === handle));
+          }
+        } catch {}
+      }
+      posts = posts.sort((a,b)=> (b.created_at || 0) > (a.created_at || 0) ? 1 : -1).slice(0,5);
+      return posts.map(p => {
+        const el = document.createElement("div");
+        el.style.padding = "8px"; el.style.borderRadius = "8px"; el.style.border = "1px solid rgba(255,255,255,0.02)";
+        el.innerHTML = `<div class="small muted">${(new Date(p.created_at||Date.now())).toLocaleString()}</div><div style="margin-top:6px">${escapeHtml(p.text||"")}</div>`;
+        return el;
+      });
+    }
+
+    function renderFollowers() {
+      const followers = new Set(JSON.parse(localStorage.getItem("followers") || "[]"));
+      const el = document.getElementById("followersList");
+      el.innerHTML = "";
+      followers.forEach(f => {
+        const div = document.createElement("div");
+        div.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="width:34px;height:34px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center">${f[0] || "U"}</div><div><strong>${f}</strong><div class="small muted">@${f}</div></div></div>`;
+        el.appendChild(div);
+      });
+      if (!followers.size) el.innerHTML = `<div class="muted">No followers yet</div>`;
+    }
+    function renderFollowing() {
+      const following = new Set(JSON.parse(localStorage.getItem("following") || "[]"));
+      const el = document.getElementById("followingList");
+      el.innerHTML = "";
+      following.forEach(f => {
+        const div = document.createElement("div");
+        div.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center">${f[0] || "U"}</div><div style="line-height:1">${f}<div class="small muted">@${f}</div></div></div>`;
+        el.appendChild(div);
+      });
+      if (!following.size) el.innerHTML = `<div class="muted">You are not following anyone</div>`;
+    }
+
+    /*****************************************************************
+     * Utility helpers
+     *****************************************************************/
+    function escapeHtml(txt) {
+      if (!txt) return "";
+      return txt.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+    }
+
+    /*****************************************************************
+     * DM flow: clicking a profile shows DM button if following
+     *****************************************************************/
+    // add a small DM button to profile popup
+    const dmBtn = document.createElement("button");
+    dmBtn.className = "btn";
+    dmBtn.textContent = "Message (DM)";
+    dmBtn.style.marginLeft = "8px";
+    dmBtn.addEventListener("click", async () => {
+      if (!ME) { showLoginOverlay(); return; }
+      const following = new Set(JSON.parse(localStorage.getItem("following") || "[]"));
+      if (!following.has(currentProfile)) {
+        alert("You must follow this profile before you can DM them.");
+        return;
+      }
+      // Build DM room code deterministic (alphabetical)
+      const handles = [ME.handle, currentProfile].sort();
+      const room = `dm_${handles[0]}_${handles[1]}`;
+      CURRENT_ROOM = room;
+      localStorage.setItem("current_room", CURRENT_ROOM);
+      document.getElementById("currentRoomLabel").textContent = `Room: ${CURRENT_ROOM} (DM)`;
+      profilePopup.style.display = "none";
+      // Pre-fill composer with mention
+      document.getElementById("composeText").value = "";
+      await loadPosts();
+    });
+    // place DM button into popup
+    document.getElementById("profilePopup").querySelector("div").appendChild(dmBtn);
+
+    /*****************************************************************
+     * Boot: render rooms, attempt login resume, and load posts
+     *****************************************************************/
+    renderRooms();
+    document.getElementById("currentRoomLabel").textContent = `Room: ${CURRENT_ROOM}`;
+    tryResumeLogin().then(loadPosts).then(()=> setTimeout(pollLoop, 2000));
+
+    // header and composer wiring
+    document.getElementById("openComposer").addEventListener("click", ()=> window.scrollTo({top:0,behavior:"smooth"}));
+    document.getElementById("openProfile").addEventListener("click", ()=> {
+      if (!ME) { showLoginOverlay(); return; }
+      openProfilePopup(ME.handle, `${ME.first_name || ""} ${ME.last_name || ""}`);
+    });
+
+    // small keyboard shortcut: press 'c' to open composer
+    window.addEventListener("keydown", (e) => { if (e.key === "c" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+      document.getElementById("composeText").focus();
+    }});
+
+    // simple toggle images preview button
+    document.getElementById("toggleImgPreview").addEventListener("click", ()=> {
+      previews.style.display = previews.style.display === "none" ? "flex" : "none";
+    });
+
+    // basic escape handler to close profile popup
+    window.addEventListener("keydown", (e) => { if (e.key === "Escape") profilePopup.style.display = "none"; });
+
+    // initial placeholder for composer avatar when logged out
+    document.getElementById("composerAvatar").textContent = "U";
+
+  </script>
+</body>
+</html>

@@ -1,718 +1,854 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Central TLKS — Main</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Central TLKS</title>
+<style>
+  :root{
+    --bg: #0c0615;
+    --bg-2:#140a26;
+    --card:#1a0f2f;
+    --card-2:#21123f;
+    --text:#eef;
+    --muted:#b8a9d9;
+    --accent:#8a5cff;      /* purple */
+    --accent-2:#b589ff;    /* lighter purple */
+    --accent-3:#5e39d7;    /* deep purple */
+    --good:#4cd2a2;
+    --bad:#ff7aa8;
+    --cyan:#6be6ff;
 
-  <style>
-    :root{
-      --bg-1: #0b0310;
-      --bg-2: #17061a;
-      --panel: linear-gradient(180deg, rgba(18,6,26,0.95), rgba(28,8,46,0.95));
-      --accent-purple: #8b43ff;
-      --accent-purple-2: #5e26d6;
-      --muted: #bfb7d9;
-      --card: rgba(255,255,255,0.03);
-      --glass: rgba(255,255,255,0.02);
-    }
+    --ring: rgba(152,96,255,.35);
+    --ring-2: rgba(152,96,255,.18);
 
-    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background: radial-gradient(circle at 10% 10%, rgba(139,67,255,0.06), transparent 8%), var(--bg-1); color:#f4f1ff}
-    a{color:inherit}
-    /* Layout: 3 columns */
-    .app{
-      display:grid;
-      grid-template-columns: 260px 1fr 320px;
-      grid-template-rows: 60px 1fr;
-      grid-template-areas:
-        "sidebar header header-right"
-        "sidebar main right";
-      height:100vh;
-      gap:18px;
-      padding:18px;
-      box-sizing:border-box;
-    }
+    --max-col: 680px;
+  }
 
-    /* Sidebar */
-    .sidebar{
-      grid-area: sidebar;
-      background:var(--panel);
-      border-radius:14px;
-      padding:16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-      border:1px solid rgba(255,255,255,0.03);
-    }
-    .brand{display:flex;align-items:center;gap:10px;font-weight:800;margin-bottom:12px}
-    .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent-purple);box-shadow:0 0 12px rgba(139,67,255,0.35)}
-    .nav{display:flex;flex-direction:column;gap:8px;margin-top:6px}
-    .nav button{background:transparent;border:0;padding:10px 12px;border-radius:10px;color:var(--muted);text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px}
-    .nav button.active{background:linear-gradient(90deg,var(--accent-purple),var(--accent-purple-2));color:white;box-shadow:0 8px 30px rgba(92,30,206,0.18)}
-    .postBtn{margin-top:18px;width:100%;padding:12px;border-radius:28px;border:0;background:linear-gradient(90deg,var(--accent-purple),var(--accent-purple-2));color:white;font-weight:800;cursor:pointer}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:
+    radial-gradient(1100px 700px at -10% -10%, #251346 10%, transparent 60%),
+    radial-gradient(900px 600px at 110% -10%, #2b1456 10%, transparent 60%),
+    radial-gradient(1200px 900px at 50% 120%, #1d0f39 15%, transparent 65%),
+    linear-gradient(180deg, var(--bg), var(--bg-2));
+    color:var(--text); font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    overflow:hidden;
+  }
 
-    /* Header */
-    .header{
-      grid-area: header;
-      display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:14px;background:var(--panel);
-      border:1px solid rgba(255,255,255,0.02);
-    }
-    .header .title{font-weight:800;font-size:18px}
-    .header .roomSelect{display:flex;gap:8px;align-items:center}
+  /* layout */
+  .app{display:grid; grid-template-columns: 280px minmax(0,1fr) 320px; gap:18px;
+       height:100%; max-width:1600px; margin:0 auto; padding:18px;}
+  @media (max-width: 1100px){
+    .app{grid-template-columns: 250px minmax(0,1fr);}
+    aside.right{display:none}
+  }
+  @media (max-width: 760px){
+    .app{grid-template-columns: 1fr}
+    aside.left{display:none}
+  }
 
-    /* Right-header area for small status */
-    .header-right{
-      grid-area: header-right;
-      display:flex;align-items:center;justify-content:flex-end;padding:14px;border-radius:14px;background:var(--panel);border:1px solid rgba(255,255,255,0.02)
-    }
+  aside{background:linear-gradient(180deg,var(--card),var(--card-2));
+        border:1px solid var(--ring); border-radius:18px; padding:14px; overflow:auto}
+  main{display:flex; flex-direction:column; gap:14px; overflow:auto}
 
-    /* Main feed */
-    .main{
-      grid-area: main;
-      padding:14px;border-radius:14px;background:var(--panel);
-      display:flex;flex-direction:column;gap:12px;border:1px solid rgba(255,255,255,0.02);overflow:hidden;
-    }
-    .composer{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;background:var(--glass);border:1px solid rgba(255,255,255,0.02)}
-    .composer textarea{flex:1;min-height:72px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#fff;resize:vertical}
-    .composer .controls{display:flex;flex-direction:column;gap:8px}
-    .btn{padding:10px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent-purple),var(--accent-purple-2));color:#fff;cursor:pointer;font-weight:700}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+  /* header */
+  .room-header{position:sticky; top:0; z-index:10; background:linear-gradient(180deg,rgba(20,10,38,.9),rgba(20,10,38,.7));
+    backdrop-filter: blur(6px); border:1px solid var(--ring); border-radius:16px; padding:14px}
+  .room-title{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
+  .room-actions{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap}
+  .dot{width:10px; height:10px; border-radius:999px; background:var(--good); box-shadow:0 0 0 3px var(--ring-2)}
+  .subtle{color:var(--muted); font-size:13px}
 
-    /* posts list */
-    .posts{overflow:auto;padding:6px;display:flex;flex-direction:column;gap:12px}
-    .post{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);display:flex;gap:12px}
-    .avatar{width:56px;height:56px;border-radius:50%;flex-shrink:0;background:#25202b;display:flex;align-items:center;justify-content:center;overflow:hidden}
-    .p-body{flex:1}
-    .p-meta{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
-    .p-text{margin-top:8px;font-size:16px;line-height:1.35}
-    .p-media img{max-width:100%;max-height:420px;border-radius:10px;display:block;margin-top:10px;object-fit:contain}
+  /* composer */
+  .composer{max-width:var(--max-col); width:100%; margin:0 auto; background:linear-gradient(180deg, #1a0f2f, #190d2b);
+    border:1px solid var(--ring); border-radius:16px; padding:12px}
+  .composer-top{display:flex; gap:10px; align-items:flex-start}
+  .avatar{width:42px;height:42px;border-radius:50%;background:#2b1a4a;border:1px solid var(--ring)}
+  textarea.input{flex:1; min-height:60px; resize:vertical; padding:12px 12px 40px 12px;
+    border-radius:12px; outline:none; border:1px solid var(--ring); background:#150a27; color:var(--text)}
+  .actions{display:flex; align-items:center; justify-content:space-between; margin-top:8px}
+  .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; border:1px solid var(--ring);
+       background:linear-gradient(180deg,#231443,#1e0f39); color:var(--text); cursor:pointer; font-weight:700}
+  .btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent-3)); border-color:#a281ff}
+  .btn[disabled]{opacity:.55; cursor:not-allowed}
+  .file-hide{display:none}
+  .img-chip{font-size:12px; color:var(--cyan)}
 
-    /* Right column */
-    .right{grid-area:right;padding:14px;border-radius:14px;background:var(--panel);border:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column;gap:12px}
-    .card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
+  /* feed */
+  .feed{display:flex; flex-direction:column; gap:12px; padding-bottom:80px}
+  .post{max-width:var(--max-col); width:100%; margin:0 auto; background:linear-gradient(180deg,#180e2b,#160c28);
+        border:1px solid var(--ring); border-radius:16px; padding:12px}
+  .post-header{display:flex; align-items:center; gap:10px}
+  .post-author{font-weight:800}
+  .handle{color:var(--muted); font-weight:600}
+  .check{display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:999px; margin-left:6px;
+         font-size:12px; color:#fff}
+  .check.blue{background:#1d9bf0}
+  .check.purple{background:#9e6bff}
+  .meta{margin-left:auto; color:var(--muted); font-size:12px}
 
-    /* small helpers */
-    .muted{color:var(--muted);font-size:13px}
-    .small{font-size:13px;color:var(--muted)}
-    .roomItem{padding:8px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-    .roomItem.locked{opacity:0.6;filter:grayscale(.05)}
-    .profilePopup{position:fixed;z-index:3000;left:50%;top:50%;transform:translate(-50%,-50%);min-width:320px;background:var(--panel);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(0,0,0,0.6);display:none}
-    .followBtn{padding:8px 10px;border-radius:8px;border:0;background:linear-gradient(90deg,#00b4ff,#8b43ff);color:#fff;cursor:pointer}
-    .verified-blue{color:#2ea1ff;margin-left:6px}
-    .verified-purple{color:#b17bff;margin-left:6px}
-    .imgThumb{max-width:140px;max-height:96px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);object-fit:cover}
-    .inputFile{display:flex;gap:8px;align-items:center}
-    input[type="file"]{display:none}
-    .fileLabel{display:inline-block;padding:8px 10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.06);cursor:pointer}
+  .post-body{margin-top:8px; line-height:1.45}
+  .post-body img{max-width:100%; height:auto; max-height:420px; border-radius:12px; display:block; margin-top:8px; border:1px solid var(--ring)}
+  .post-actions{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap}
+  .linkish{padding:6px 10px; border-radius:8px; background:#1b0f2f; border:1px solid var(--ring); color:var(--text); cursor:pointer; font-weight:700}
+  .linkish:hover{background:#201242}
 
-    /* responsive */
-    @media(max-width:1080px){ .app{grid-template-columns:200px 1fr;grid-template-areas:"sidebar header" "sidebar main";grid-template-rows:60px 1fr; } .right{display:none}}
-    @media(max-width:720px){ .app{grid-template-columns:1fr;grid-template-areas:"header" "main";padding:8px} .sidebar{display:none} .header-right{display:none} }
-  </style>
+  /* link preview card */
+  .link-card{display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--ring);
+             border-radius:12px; background:#120923; text-decoration:none; color:var(--text); margin-top:8px}
+  .link-favicon{width:28px; height:28px; border-radius:6px; background:#1d0f39; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid var(--ring)}
+  .link-favicon img{width:20px; height:20px}
+  .link-meta{display:flex; flex-direction:column; min-width:0}
+  .link-host{font-weight:800; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .link-url{font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
+  /* replies block */
+  .replies{margin-top:8px; border-top:1px dashed var(--ring); padding-top:8px; display:none}
+  .reply{background:#130a23; border:1px solid var(--ring); border-radius:12px; padding:8px 10px; margin-top:8px}
+  .view-toggle{margin-top:6px}
+
+  /* modals */
+  .overlay{position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+           background:rgba(0,0,0,.5); z-index:50}
+  .modal{width:min(720px,92vw); background:linear-gradient(180deg,#1b0f31,#190d2c); border:1px solid var(--ring); border-radius:16px; padding:16px}
+  .modal h3{margin:0 0 10px}
+  .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .w100{width:100%}
+
+  /* room list */
+  .room-list{display:flex; flex-direction:column; gap:6px}
+  .room-item{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; border:1px solid var(--ring);
+             background:linear-gradient(180deg,#1a0f2f,#160c28); cursor:pointer}
+  .room-item.active{outline:2px solid #a281ff}
+  .room-item small{color:var(--muted)}
+
+  /* right panel simple list */
+  .panel-card{border:1px solid var(--ring); border-radius:16px; padding:12px; background:linear-gradient(180deg,#1a0f2f,#160c28); margin-bottom:12px}
+
+  /* DMs list */
+  .dm-list{display:flex; flex-direction:column; gap:6px}
+  .dm-item{display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; border:1px solid var(--ring);
+           background:linear-gradient(180deg,#1a0f2f,#160c28); cursor:pointer}
+
+  /* settings toggles */
+  .toggle{display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--ring); border-radius:10px; background:#140a26}
+  .toggle label{flex:1}
+
+  /* Settings effects */
+  body.compact .feed{gap:8px}
+  body.compact .post{padding:10px}
+  body.text-only .post-body img{display:none}
+</style>
 </head>
 <body>
-  <div class="app">
-    <!-- left sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="brand">
+
+<div class="app">
+  <!-- LEFT: Rooms & DMs -->
+  <aside class="left">
+    <div style="font-weight:900; letter-spacing:.2px; margin-bottom:12px">Central TLKS</div>
+
+    <div class="panel-card" style="margin-bottom:12px">
+      <div style="font-weight:800;margin-bottom:8px">Rooms</div>
+      <div id="roomList" class="room-list"></div>
+    </div>
+
+    <div class="panel-card" style="margin-bottom:12px">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px">
+        <div style="font-weight:800">Direct Messages</div>
+        <button id="newDmBtn" class="btn" style="padding:6px 10px">New DM</button>
+      </div>
+      <div id="dmList" class="dm-list"></div>
+    </div>
+
+    <div class="panel-card">
+      <div style="font-weight:800;margin-bottom:6px">Tips</div>
+      <div class="subtle">General is public. Other rooms require an invite code.</div>
+    </div>
+  </aside>
+
+  <!-- CENTER -->
+  <main>
+    <div class="room-header">
+      <div class="room-title">
         <div class="dot"></div>
-        <div>Central TLKS</div>
+        <div id="roomTitle">General</div>
+        <div id="roomId" class="subtle">· main</div>
       </div>
-
-      <div class="nav" id="navRooms">
-        <!-- Rooms inserted by JS -->
-      </div>
-
-      <button class="postBtn" id="openComposer">Post</button>
-
-      <div style="margin-top:18px">
-        <div class="small muted">Following</div>
-        <div id="followingList" style="margin-top:8px;display:flex;flex-direction:column;gap:8px"></div>
-      </div>
-    </aside>
-
-    <!-- header -->
-    <header class="header">
-      <div class="title" id="headerTitle">Home — For you</div>
-      <div class="roomSelect" id="roomSelectArea">
-        <div class="small muted" id="currentRoomLabel">Room: main</div>
-      </div>
-    </header>
-
-    <div class="header-right">
-      <div class="small muted" id="loginSummary">Not logged in</div>
-    </div>
-
-    <!-- main column -->
-    <main class="main">
-      <!-- composer -->
-      <div class="composer" id="composer">
-        <div class="avatar" id="composerAvatar"></div>
-        <div style="flex:1">
-          <textarea id="composeText" placeholder="What's happening?"></textarea>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <label class="fileLabel" title="Upload image(s)">
-                📷
-                <input type="file" id="fileInput" accept="image/*" multiple />
-              </label>
-              <div id="previews" style="display:flex;gap:8px;align-items:center"></div>
-            </div>
-            <div>
-              <button class="btn ghost" id="toggleImgPreview">Toggle Images</button>
-              <button class="btn" id="sendPost">Post</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- posts -->
-      <div class="posts" id="posts"></div>
-    </main>
-
-    <!-- right column -->
-    <aside class="right">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div style="font-weight:800" id="meName">Guest</div>
-            <div class="small muted" id="meHandle">@guest</div>
-          </div>
-          <div>
-            <button class="btn ghost" id="openProfile">Profile</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div style="font-weight:700">Room</div>
-        <div class="muted" id="roomInfo">Public rooms: main. Private rooms require invite.</div>
-      </div>
-
-      <div class="card">
-        <div style="font-weight:700">Followers</div>
-        <div id="followersList" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
-      </div>
-    </aside>
-  </div>
-
-  <!-- profile popup -->
-  <div class="profilePopup" id="profilePopup">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="avatar" id="ppAvatar"></div>
-          <div>
-            <div id="ppName" style="font-weight:800"></div>
-            <div id="ppHandle" class="small muted"></div>
-          </div>
-        </div>
-        <div id="ppDesc" class="small muted" style="margin-top:8px"></div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <button class="followBtn" id="ppFollow">Follow</button>
-        <button class="btn ghost" id="ppClose">Close</button>
+      <div class="subtle" id="roomNote">Welcome to Central TLKS</div>
+      <div class="room-actions">
+        <button id="openSettingsBtn" class="btn">Settings</button>
+        <button id="openDmPickerBtn" class="btn">DMs</button>
       </div>
     </div>
-    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0">
-    <div style="font-weight:700;margin-bottom:8px">Last posts</div>
-    <div id="ppPosts" style="display:flex;flex-direction:column;gap:8px"></div>
-  </div>
 
-  <!-- first-login intro modal -->
-  <div id="introModal" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:4000">
-    <div style="background:var(--panel);padding:20px;border-radius:12px;max-width:680px;color:#fff;border:1px solid rgba(255,255,255,0.03)">
-      <h2 style="margin-top:0">Welcome to Central TLKS</h2>
-      <p class="muted">Access is rolling out class-by-class. If you can't log in, double-check your handle & PIN and ask your teacher. Invitations are required for private rooms — ask your teacher for invite codes.</p>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
-        <button class="btn ghost" id="introClose">Got it</button>
+    <!-- composer -->
+    <div class="composer" id="composer">
+      <div class="composer-top">
+        <img id="meAvatar" class="avatar" alt="">
+        <textarea id="composerText" class="input" placeholder="What's happening?" maxlength="2000"></textarea>
+      </div>
+      <div class="actions">
+        <div class="row">
+          <label class="btn" for="filePick">Upload image</label>
+          <input id="filePick" type="file" accept="image/*" class="file-hide">
+          <span id="imgChip" class="img-chip"></span>
+        </div>
+        <button id="postBtn" class="btn primary">Post</button>
+      </div>
+    </div>
+
+    <!-- feed -->
+    <div id="feed" class="feed" aria-live="polite"></div>
+  </main>
+
+  <!-- RIGHT -->
+  <aside class="right">
+    <div class="panel-card">
+      <div style="font-weight:800;margin-bottom:6px" id="meName">You</div>
+      <div id="meHandle" class="subtle"></div>
+    </div>
+    <div class="panel-card">
+      <div style="font-weight:800;margin-bottom:6px">Recent (this room)</div>
+      <div id="recentList" style="display:flex; flex-direction:column; gap:8px"></div>
+    </div>
+    <div class="panel-card">
+      <div style="font-weight:800;margin-bottom:6px">Quick actions</div>
+      <div class="row">
+        <button id="quickNewDm" class="btn">New DM</button>
+        <button id="quickSettings" class="btn">Settings</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Login -->
+<div id="loginOv" class="overlay">
+  <div class="modal">
+    <h3>Sign in to Central TLKS</h3>
+    <div class="row w100">
+      <input id="loginHandle" class="w100" placeholder="Handle (no @)" style="padding:12px;border-radius:10px;border:1px solid var(--ring);background:#140a26;color:var(--text)">
+      <input id="loginPIN" type="password" class="w100" placeholder="PIN" style="padding:12px;border-radius:10px;border:1px solid var(--ring);background:#140a26;color:var(--text)">
+    </div>
+    <div class="row" style="margin-top:10px; justify-content:flex-end">
+      <button id="loginBtn" class="btn primary">Login</button>
+    </div>
+    <div id="loginErr" class="subtle" style="color:var(--bad); min-height:18px"></div>
+    <div class="subtle">Access is rolling out class-by-class. You must be invited—ask your teacher if your name or PIN doesn’t work.</div>
+  </div>
+</div>
+
+<!-- Intro (first login) -->
+<div id="introOv" class="overlay">
+  <div class="modal">
+    <h3>Welcome to Central TLKS 🎉</h3>
+    <p class="subtle">This is your school’s chat. <b>General</b> is public; other rooms require invite codes. Keep it respectful.</p>
+    <div class="row" style="justify-content:flex-end">
+      <button id="introClose" class="btn primary">Got it</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reply modal -->
+<div id="replyOv" class="overlay">
+  <div class="modal">
+    <h3>Reply</h3>
+    <div id="replyingTo" class="subtle" style="margin-bottom:6px"></div>
+    <textarea id="replyText" class="input w100" style="min-height:120px" placeholder="Write a reply…"></textarea>
+    <div class="row" style="margin-top:10px; justify-content:space-between">
+      <div class="row">
+        <label class="btn" for="replyPick">Upload image</label>
+        <input id="replyPick" type="file" accept="image/*" class="file-hide">
+        <span id="replyImgChip" class="img-chip"></span>
+      </div>
+      <div class="row">
+        <button id="replyCancel" class="btn">Cancel</button>
+        <button id="replySend" class="btn primary">Send reply</button>
       </div>
     </div>
   </div>
+</div>
 
-  <script>
-    /*****************************************************************
-     * Configuration & "server" values you can edit quickly
-     *****************************************************************/
-    const API_BASE = "https://salexai-funserver-2-0.hf.space"; // change to your HF URL
-    // Rooms list hard-coded into the client (you requested rooms only exist in a json list in chat.html)
-    const ROOMS = [
-      { code: "main", name: "General", private: false, invite: "" },
-      { code: "announcements", name: "Announcements", private: true, invite: "ANNOUNCE1" },
-      { code: "grade6", name: "Grade 6", private: true, invite: "G6CODE" },
-      { code: "grade7", name: "Grade 7", private: true, invite: "G7CODE" }
-    ];
+<!-- Settings modal -->
+<div id="settingsOv" class="overlay">
+  <div class="modal">
+    <h3>Settings</h3>
+    <div class="toggle"><label for="compactToggle">Compact mode</label><input id="compactToggle" type="checkbox"></div>
+    <div class="toggle"><label for="textOnlyToggle">Text-only (hide images)</label><input id="textOnlyToggle" type="checkbox"></div>
+    <div class="toggle"><label for="time24Toggle">24-hour time</label><input id="time24Toggle" type="checkbox"></div>
+    <div class="row" style="justify-content:flex-end; margin-top:10px">
+      <button id="settingsClose" class="btn primary">Close</button>
+    </div>
+  </div>
+</div>
 
-    // Optional local meta about users (verified badges demo). You can later fetch this from server.
-    const USERS_META = {
-      "alex": { verified: "dev", profile_image: "" },
-      "admin": { verified: "staff", profile_image: "" }
-    };
+<!-- DM picker (quick jump) -->
+<div id="dmPickerOv" class="overlay">
+  <div class="modal">
+    <h3>Direct Messages</h3>
+    <div class="row w100">
+      <input id="dmHandleInput" class="w100" placeholder="Start DM with handle…" style="padding:12px;border-radius:10px;border:1px solid var(--ring);background:#140a26;color:var(--text)">
+    </div>
+    <div class="row" style="margin-top:10px; justify-content:space-between">
+      <div></div>
+      <div class="row">
+        <button id="dmPickerCancel" class="btn">Cancel</button>
+        <button id="dmPickerGo" class="btn primary">Open DM</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-    // UI state
-    let CURRENT_ROOM = localStorage.getItem("current_room") || "main";
-    let TLKS_TOKEN = localStorage.getItem("tlks_token") || "";
-    let ME = null;
+<script>
+/* ================== Config ================== */
+const API_BASE = "https://salexai-funserver-2-0.hf.space";
 
-    /*****************************************************************
-     * Helpers: API wrappers
-     *****************************************************************/
-    function apiFetch(path, opts = {}) {
-      opts.headers = opts.headers || {};
-      if (TLKS_TOKEN) opts.headers["Authorization"] = `Bearer ${TLKS_TOKEN}`;
-      return fetch(API_BASE.replace(/\/$/, "") + path, opts);
-    }
+/* Rooms list + invite codes (edit here) */
+const ROOMS = [
+  { id:"main", name:"General", private:false },
+  { id:"math101", name:"Math 101", private:true, invite:"MATH-101-2024" },
+  { id:"eng101", name:"English 101", private:true, invite:"ENG-101-2024" },
+  { id:"grade6", name:"Grade 6", private:true, invite:"GRADE6-OK" },
+  { id:"grade7", name:"Grade 7", private:true, invite:"GRADE7-OK" }
+];
 
-    async function apiJson(path, opts = {}) {
-      const r = await apiFetch(path, opts);
-      try { return await r.json(); } catch { return { ok: false }; }
-    }
+/* Verified accounts (handles without @) */
+const VERIFIED_STAFF = new Set(["teacher1","staff","alex"]);
+const VERIFIED_DEV   = new Set(["dev","maintainer","tlksdev"]);
 
-    /*****************************************************************
-     * Rooms sidebar rendering & join flow
-     *****************************************************************/
-    const navRooms = document.getElementById("navRooms");
-    function renderRooms() {
-      navRooms.innerHTML = "";
-      ROOMS.forEach(r => {
-        const div = document.createElement("div");
-        div.className = "roomItem" + (r.private ? " locked" : "");
-        if (r.code === CURRENT_ROOM) div.classList.add("active");
-        div.innerHTML = `<div style="display:flex;gap:8px;align-items:center">
-                          <div style="width:10px;height:10px;border-radius:50%;background:${r.private ? '#b77cff' : '#6ee7b7'}"></div>
-                          <div><strong>${r.name}</strong><div class="small muted">${r.code}</div></div>
-                         </div>
-                         <div style="display:flex;gap:8px;align-items:center">
-                           ${r.private ? "<span class='small muted'>🔒</span>" : ""}
-                           <button class="btn ghost">${r.code === CURRENT_ROOM ? "Open" : "Open"}</button>
-                         </div>`;
-        div.querySelector("button").addEventListener("click", () => selectRoom(r));
-        navRooms.appendChild(div);
-      });
-    }
+/* ============== State ============== */
+let TLKS_TOKEN = localStorage.getItem("tlks_token") || "";
+let CURRENT_ROOM = getRoomFromURL();
+let ME = null;
 
-    function joinedRooms() {
-      return new Set(JSON.parse(localStorage.getItem("joined_rooms") || '["main"]'));
-    }
-    function saveJoined(set) {
-      localStorage.setItem("joined_rooms", JSON.stringify([...set]));
-    }
+let allMessages = [];            // raw
+let byId = new Map();            // id -> message
+let repliesByParent = new Map(); // parentId -> [reply,...]
+let lastSeen = null;
 
-    async function selectRoom(r) {
-      const joined = joinedRooms();
-      if (r.private && !joined.has(r.code)) {
-        const code = prompt(`Room "${r.name}" is private. Enter invite code:`);
-        if (!code) return;
-        if (code.trim() !== r.invite) {
-          alert("Incorrect invite. Ask your teacher.");
-          return;
-        }
-        joined.add(r.code);
-        saveJoined(joined);
-      }
-      CURRENT_ROOM = r.code;
-      localStorage.setItem("current_room", CURRENT_ROOM);
-      document.getElementById("currentRoomLabel").textContent = `Room: ${CURRENT_ROOM}`;
+/* ============== Helpers ============== */
+function $(id){ return document.getElementById(id); }
+
+function getRoomFromURL(){
+  const p = new URLSearchParams(location.search);
+  const keys = ["room","videoId","v","id"];
+  for (const k of keys){ const v = p.get(k); if (v) return sanitize(v); }
+  return "main";
+}
+function sanitize(s){ return String(s).replace(/[^a-zA-Z0-9_.~-]/g,"_").slice(0,64); }
+
+function use24h(){ return localStorage.getItem("tlks_24h")==="1"; }
+function fmtTime(iso){
+  try{
+    const d = new Date(iso);
+    const opts = use24h() ? {hour12:false,hour:'2-digit',minute:'2-digit'} : {hour:'2-digit',minute:'2-digit'};
+    return d.toLocaleTimeString([], opts);
+  }catch{ return "" }
+}
+
+/* Link utils */
+function truncate(s, n){ return s.length>n ? s.slice(0,n-1)+"…" : s; }
+function hostnameFrom(url){
+  try{ return new URL(url).hostname; }catch{ return url; }
+}
+function linkCardHTML(url){
+  const host = hostnameFrom(url);
+  const safeUrl = url.replace(/"/g,'&quot;');
+  const fav = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`;
+  return `<a class="link-card" href="${safeUrl}" target="_blank" rel="noopener">
+    <div class="link-favicon"><img src="${fav}" alt=""></div>
+    <div class="link-meta">
+      <div class="link-host">${host}</div>
+      <div class="link-url">${truncate(url, 68)}</div>
+    </div>
+  </a>`;
+}
+
+/* Markdown & media */
+function mdWithImages(text){
+  // linkify http(s) – keep it minimal; cards will replace anchors later
+  text = text.replace(/(https?:\/\/[^\s)]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  // newline -> <br>
+  return text.replace(/\n/g,"<br>");
+}
+
+/* reply tag parsing */
+function extractReply(text){
+  const m = text.match(/^::reply:([a-f0-9]{8,32})::\s*/i);
+  if (!m) return {parent:null, body:text};
+  return {parent:m[1], body:text.slice(m[0].length)};
+}
+function buildImageTag(b64){
+  return `<img src="${b64}" alt="">`;
+}
+
+/* DM helpers (DMs are just special rooms that map to /chat/:id) */
+function isDmRoom(id){ return id && id.startsWith("dm-"); }
+function dmIdFor(a,b){ return "dm-" + [a.toLowerCase(), b.toLowerCase()].sort().join("-"); }
+function dmPeersStoreKey(){ return "tlks_dm_peers"; }
+function getDmPeers(){
+  try{ return JSON.parse(localStorage.getItem(dmPeersStoreKey())||"[]"); }catch{ return []; }
+}
+function addDmPeer(handle){
+  const peers = new Set(getDmPeers());
+  peers.add(handle.toLowerCase());
+  localStorage.setItem(dmPeersStoreKey(), JSON.stringify([...peers]));
+  renderDmList();
+}
+
+/* ============== Auth ============== */
+const loginOv = $("loginOv"), loginHandle = $("loginHandle"), loginPIN = $("loginPIN"),
+      loginBtn = $("loginBtn"), loginErr = $("loginErr");
+
+async function ensureLogin(){
+  if (!TLKS_TOKEN) { loginOv.style.display="flex"; return false; }
+  try{
+    const r = await fetch(`${API_BASE}/me`, {headers:{Authorization:`Bearer ${TLKS_TOKEN}`}});
+    if (!r.ok) throw new Error("bad");
+    const data = await r.json();
+    if (!data.ok) throw new Error("bad");
+    ME = data.user;
+    updateMeUI();
+    maybeShowIntro();
+    return true;
+  }catch{
+    TLKS_TOKEN=""; localStorage.removeItem("tlks_token"); loginOv.style.display="flex"; return false;
+  }
+}
+loginBtn.onclick = async () => {
+  loginErr.textContent = "";
+  const handle = (loginHandle.value||"").trim().replace(/^@/,"");
+  const pin    = (loginPIN.value||"").trim();
+  if (!handle || !pin){ loginErr.textContent="Enter handle and PIN."; return; }
+  try{
+    const r = await fetch(`${API_BASE}/auth/login`,{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({handle, pin})
+    });
+    const data = await r.json();
+    if (!data.ok){ loginErr.textContent = data.error || "Login failed"; return; }
+    TLKS_TOKEN = data.token;
+    localStorage.setItem("tlks_token", TLKS_TOKEN);
+    loginOv.style.display="none";
+    await ensureLogin();
+    loadRoom(CURRENT_ROOM, true);
+  }catch{ loginErr.textContent = "Network error."; }
+};
+function updateMeUI(){
+  $("meName").textContent = `${ME.first_name} ${ME.last_name}`;
+  $("meHandle").textContent = `@${ME.handle} • ${ME.klass||""}`;
+  $("meAvatar").src = ME.profile_image || "";
+}
+
+/* First-time intro */
+const introOv = $("introOv");
+$("introClose").onclick = () => { introOv.style.display="none"; localStorage.setItem("tlks_intro_shown","1"); };
+function maybeShowIntro(){
+  if (!localStorage.getItem("tlks_intro_shown")) introOv.style.display="flex";
+}
+
+/* ============== Rooms + DMs UI ============== */
+const roomList = $("roomList");
+function renderRooms(){
+  roomList.innerHTML = "";
+  for (const r of ROOMS){
+    const el = document.createElement("div");
+    el.className = "room-item" + (r.id===CURRENT_ROOM ? " active":"");
+    el.innerHTML = `<div style="font-weight:800">${r.name}</div><small> ${r.id}${r.private?" • private":""}</small>`;
+    el.onclick = () => switchRoom(r);
+    roomList.appendChild(el);
+  }
+}
+function renderDmList(){
+  const dmList = $("dmList");
+  const peers = getDmPeers();
+  dmList.innerHTML = "";
+  if (!peers.length){
+    dmList.innerHTML = `<div class="subtle">No DMs yet. Start one!</div>`;
+    return;
+  }
+  for (const h of peers){
+    const el = document.createElement("div");
+    const dmRoom = dmIdFor(ME?.handle||"me", h);
+    el.className = "dm-item";
+    el.innerHTML = `<div style="font-weight:800">@${h}</div><div class="subtle" style="margin-left:auto">${dmRoom===CURRENT_ROOM?"· open":""}</div>`;
+    el.onclick = () => {
+      CURRENT_ROOM = dmRoom;
+      const q = new URLSearchParams(location.search);
+      q.set("room", dmRoom);
+      history.replaceState(null,"","?"+q.toString());
+      loadRoom(CURRENT_ROOM, true);
       renderRooms();
-      await loadPosts();
-    }
+    };
+    dmList.appendChild(el);
+  }
+}
+async function switchRoom(r){
+  if (r.id===CURRENT_ROOM) return;
+  if (r.private && !hasAccess(r.id)){
+    const code = prompt(`Invite required for ${r.name}. Enter invite code:`);
+    if (!code || code.trim()!==r.invite){ alert("Invalid code."); return; }
+    grantAccess(r.id);
+  }
+  CURRENT_ROOM = r.id;
+  const q = new URLSearchParams(location.search);
+  q.set("room", r.id);
+  history.replaceState(null,"","?"+q.toString());
+  loadRoom(CURRENT_ROOM, true);
+  renderRooms();
+}
+function hasAccess(roomId){ const k="room_access"; const set = new Set(JSON.parse(localStorage.getItem(k)||"[]")); return set.has(roomId) || roomId==="main"; }
+function grantAccess(roomId){ const k="room_access"; const set = new Set(JSON.parse(localStorage.getItem(k)||"[]")); set.add(roomId); localStorage.setItem(k, JSON.stringify([...set])); }
 
-    /*****************************************************************
-     * Login, /me, intro modal, and notifications
-     *****************************************************************/
-    const loginSummary = document.getElementById("loginSummary");
-    async function tryResumeLogin() {
-      if (!TLKS_TOKEN) {
-        showLoginOverlay();
-        return;
+function setRoomHeader(){
+  const isDm = isDmRoom(CURRENT_ROOM);
+  if (isDm){
+    const parts = CURRENT_ROOM.slice(3).split("-");
+    const peer = (ME?.handle) ? parts.find(p=>p!==ME.handle.toLowerCase()) : parts[0];
+    $("roomTitle").textContent = peer ? `DM with @${peer}` : "Direct Message";
+    $("roomId").textContent = "· " + CURRENT_ROOM;
+    $("roomNote").textContent = "Private 1:1 room";
+  }else{
+    const r = ROOMS.find(x=>x.id===CURRENT_ROOM) || ROOMS[0];
+    $("roomTitle").textContent = r.name;
+    $("roomId").textContent = "· " + r.id + (r.private?" • private":"");
+    $("roomNote").textContent = r.private ? "Invite-only room" : "Public room";
+  }
+}
+
+/* ============== Composer & Reply ============== */
+const composerText = $("composerText"), postBtn = $("postBtn");
+const filePick = $("filePick"), imgChip = $("imgChip");
+
+let pendingImageB64 = "";
+filePick.onchange = async (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const b64 = await readFileB64(f);
+  pendingImageB64 = b64;
+  imgChip.textContent = "image ready";
+};
+$("replyPick").onchange = async (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const b64 = await readFileB64(f);
+  replyImageB64 = b64;
+  $("replyImgChip").textContent = "image ready";
+};
+
+function readFileB64(file){
+  return new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+postBtn.onclick = async () => {
+  if (!(await ensureLogin())) return;
+  const body = composerText.value.trim();
+  if (!body && !pendingImageB64) return;
+
+  let textToSend = body;
+  if (pendingImageB64) textToSend += (textToSend? "\n":"") + buildImageTag(pendingImageB64);
+
+  // optimistic add
+  const optimistic = makeLocalMessage(textToSend);
+  addToStore(optimistic);
+  renderFeed();
+
+  // send
+  composerText.value = ""; imgChip.textContent=""; pendingImageB64="";
+  try{
+    await postToServer(textToSend);
+  }catch(e){ console.warn("post failed", e); } // optimistic stays; next poll will reconcile
+};
+
+function makeLocalMessage(text){
+  const id = Math.random().toString(16).slice(2,10);
+  return {
+    id, video_id: CURRENT_ROOM, author: `${ME.first_name} ${ME.last_name}`,
+    handle: ME.handle, klass: ME.klass||"", profile_image: ME.profile_image||"",
+    text, created_at: new Date().toISOString(), _local:true
+  };
+}
+
+async function postToServer(text){
+  await fetch(`${API_BASE}/chat/${encodeURIComponent(CURRENT_ROOM)}`,{
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${TLKS_TOKEN}` },
+    body: JSON.stringify({ text })
+  });
+}
+
+/* Reply modal */
+const replyOv = $("replyOv"), replyText = $("replyText");
+const replySend = $("replySend"), replyCancel = $("replyCancel");
+let replyingToId = null, replyImageB64 = "";
+
+replyCancel.onclick = () => { replyOv.style.display="none"; replyText.value=""; replyImageB64=""; $("replyImgChip").textContent=""; };
+
+replySend.onclick = async () => {
+  if (!replyingToId) return;
+  if (!(await ensureLogin())) return;
+  let body = replyText.value.trim();
+  if (!body && !replyImageB64) return;
+  if (replyImageB64) body += (body? "\n":"") + buildImageTag(replyImageB64);
+  const text = `::reply:${replyingToId}:: ` + body;
+
+  // optimistic local
+  const optimistic = makeLocalMessage(text);
+  addToStore(optimistic);
+  renderFeed();
+
+  replyCancel.onclick(); // close & reset
+
+  // send
+  try{ await postToServer(text); }catch(e){ console.warn("reply failed", e); }
+};
+
+/* ============== Fetch & Render ============== */
+async function fetchNew(){
+  try{
+    let url = `${API_BASE}/chat/${encodeURIComponent(CURRENT_ROOM)}?limit=200`;
+    if (lastSeen) url += `&since=${encodeURIComponent(lastSeen)}`;
+    const r = await fetch(url);
+    const data = await r.json();
+    const msgs = data.messages || [];
+    if (msgs.length){
+      for (const m of msgs){
+        addToStore(m);
+        if (!lastSeen || (m.created_at && m.created_at > lastSeen)) lastSeen = m.created_at;
       }
-      const res = await apiJson("/me");
-      if (!res || !res.ok) { // invalid token
-        TLKS_TOKEN = "";
-        localStorage.removeItem("tlks_token");
-        showLoginOverlay();
-        return;
-      }
-      ME = res.user;
-      populateMe();
-      // show one-time intro from server or client
-      const seenKey = `seen_intro_${ME.handle}`;
-      const showIntro = (res.user && res.user.show_intro) || !localStorage.getItem(seenKey);
-      if (showIntro) {
-        document.getElementById("introModal").style.display = "flex";
-        localStorage.setItem(seenKey, "1");
-      }
-      // show access popup
-      if (res.user && res.user.access_notice) {
-        setTimeout(()=> alert(res.user.access_notice), 600);
-      }
-      // request Notification permission for DMs
-      if (("Notification" in window) && Notification.permission !== "granted") {
-        Notification.requestPermission();
-      }
+      renderFeed();
+      renderRecent();
     }
+  }catch(e){ console.warn("fetch error", e); }
+}
 
-    function populateMe() {
-      if (!ME) return;
-      document.getElementById("meName").textContent = `${ME.first_name || ""} ${ME.last_name || ""}`;
-      document.getElementById("meHandle").textContent = `@${ME.handle || ""}`;
-      loginSummary.textContent = `@${ME.handle} • ${ME.klass || ""}`;
-      // composer avatar
-      const avatarEl = document.getElementById("composerAvatar");
-      avatarEl.innerHTML = ME.profile_image ? `<img src="${ME.profile_image}" style="width:56px;height:56px;object-fit:cover">` : (ME.first_name ? ME.first_name[0].toUpperCase() : "U");
-      // following/followers lists
-      renderFollowers();
-      renderFollowing();
-    }
+function addToStore(m){
+  if (!m || !m.id) return;
+  // Normalize & thread mapping
+  if (byId.has(m.id)){
+    byId.set(m.id, {...byId.get(m.id), ...m}); // update
+    return;
+  }
+  byId.set(m.id, m);
+  allMessages.push(m);
+  const {parent} = extractReply(m.text||"");
+  if (parent){
+    if (!repliesByParent.has(parent)) repliesByParent.set(parent, []);
+    repliesByParent.get(parent).push(m);
+  }
+}
 
-    // Simple login overlay (inlined small UI)
-    function showLoginOverlay() {
-      const overlay = document.createElement("div");
-      overlay.style = "position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.65);z-index:5000";
-      overlay.innerHTML = `
-        <div style="background:var(--panel);padding:18px;border-radius:12px;min-width:320px;border:1px solid rgba(255,255,255,0.03)">
-          <h3 style="margin:0 0 8px;color:var(--accent-purple)">Central TLKS Login</h3>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <input id="tmpHandle" placeholder="handle (no @)" style="padding:10px;border-radius:8px;background:#120026;color:#fff;border:1px solid rgba(255,255,255,0.03)">
-            <input id="tmpPin" placeholder="PIN" type="password" style="padding:10px;border-radius:8px;background:#120026;color:#fff;border:1px solid rgba(255,255,255,0.03)">
-            <div style="display:flex;gap:8px;justify-content:flex-end">
-              <button id="tmpCancel" class="btn ghost">Cancel</button>
-              <button id="tmpSubmit" class="btn">Login</button>
-            </div>
-            <div id="tmpErr" style="color:#ff7ca2"></div>
-          </div>
-        </div>`;
-      document.body.appendChild(overlay);
-      overlay.querySelector("#tmpCancel").onclick = () => overlay.remove();
-      overlay.querySelector("#tmpSubmit").onclick = async () => {
-        const handle = overlay.querySelector("#tmpHandle").value.trim().replace(/^@/,"");
-        const pin = overlay.querySelector("#tmpPin").value.trim();
-        if (!handle || !pin) { overlay.querySelector("#tmpErr").textContent = "Enter handle and PIN"; return; }
-        overlay.querySelector("#tmpErr").textContent = "";
-        try {
-          const r = await fetch(API_BASE + "/auth/login", {
-            method: "POST",
-            headers: { "Content-Type":"application/json" },
-            body: JSON.stringify({ handle, pin })
-          });
-          const j = await r.json();
-          if (!j.ok) { overlay.querySelector("#tmpErr").textContent = (j.error || "Login failed"); return; }
-          TLKS_TOKEN = j.token;
-          localStorage.setItem("tlks_token", TLKS_TOKEN);
-          overlay.remove();
-          await tryResumeLogin();
-          await loadPosts();
-        } catch (e) { overlay.querySelector("#tmpErr").textContent = "Network error"; }
-      };
-    }
+function renderFeed(){
+  const feed = $("feed");
+  feed.innerHTML = "";
+  // Top-level (no ::reply) and only for CURRENT_ROOM
+  const top = allMessages
+    .filter(m => !extractReply(m.text||"").parent && m.video_id===CURRENT_ROOM)
+    .sort((a,b)=> new Date(b.created_at) - new Date(a.created_at)); // MOST RECENT FIRST ✅
 
-    document.getElementById("introClose").addEventListener("click", ()=> document.getElementById("introModal").style.display = "none");
+  for (const m of top){
+    feed.appendChild(renderPost(m));
+  }
+}
 
-    /*****************************************************************
-     * Posts fetch + render
-     *****************************************************************/
-    const postsEl = document.getElementById("posts");
-    let lastSeen = null;
+function enhanceLinksIntoCards(container){
+  const anchors = Array.from(container.querySelectorAll('a[href^="http"]'));
+  anchors.forEach(a=>{
+    if (a.closest('.link-card')) return;
+    const url = a.getAttribute('href');
+    // Replace raw link with a preview card
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = linkCardHTML(url);
+    a.replaceWith(wrapper.firstElementChild);
+  });
+}
 
-    function renderPost(m) {
-      const div = document.createElement("div");
-      div.className = "post";
-      const avatarHtml = m.profile_image ? `<img src="${m.profile_image}" style="width:56px;height:56px;object-fit:cover;border-radius:50%">` : `<div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff">${(m.author||"U")[0]}</div>`;
-      const verified = (USERS_META[m.handle] && USERS_META[m.handle].verified) || (m.verified || "");
-      const badge = verified === "staff" ? `<span class="verified-blue" title="Verified Staff — Can moderate">✔︎</span>` : (verified === "dev" ? `<span class="verified-purple" title="Verified Developer of TLKS">✔︎</span>` : "");
-      const time = new Date(m.created_at || Date.now()).toLocaleString();
-      let imgsHtml = "";
-      if (m.images && m.images.length) {
-        imgsHtml = `<div class="p-media">${m.images.map(i => `<img src="${i}" alt="img">`).join("")}</div>`;
-      }
-      div.innerHTML = `<div class="avatar">${avatarHtml}</div>
-                       <div class="p-body">
-                         <div class="p-meta"><strong style="cursor:pointer" data-handle="${m.handle}" data-author="${m.author}">${m.author || m.handle}</strong> ${badge} <span class="small muted">@${m.handle}</span> <span class="small muted">• ${time}</span></div>
-                         <div class="p-text">${escapeHtml(m.text || "")}</div>
-                         ${imgsHtml}
-                       </div>`;
-      // profile click
-      div.querySelector("strong[data-handle]")?.addEventListener("click", (ev)=>{
-        const h = ev.currentTarget.dataset.handle;
-        const author = ev.currentTarget.dataset.author;
-        openProfilePopup(h, author);
-      });
-      return div;
-    }
+function renderPost(m){
+  const wrap = document.createElement("div");
+  wrap.className = "post";
 
-    async function loadPosts() {
-      postsEl.innerHTML = "Loading…";
-      try {
-        const res = await apiJson(`/chat/${encodeURIComponent(CURRENT_ROOM)}?limit=100`);
-        if (!res || !res.messages) { postsEl.innerHTML = "<div class='muted'>No posts</div>"; return; }
-        postsEl.innerHTML = "";
-        res.messages.forEach(m => postsEl.appendChild(renderPost(m)));
-        // update lastSeen
-        if (res.messages.length) lastSeen = res.messages[res.messages.length-1].created_at;
-      } catch (e) {
-        postsEl.innerHTML = `<div class="muted">Error loading posts</div>`;
-        console.error(e);
-      }
-    }
+  const verified = VERIFIED_STAFF.has(m.handle) ? ' <span class="check blue" title="Verified Staff">✓</span>' :
+                    (VERIFIED_DEV.has(m.handle) ? ' <span class="check purple" title="Verified Developer of TLKS">✓</span>' : '');
 
-    // Polling new messages and DM notifications
-    async function pollLoop() {
-      try {
-        const url = `/chat/${encodeURIComponent(CURRENT_ROOM)}?limit=50${lastSeen ? "&since="+encodeURIComponent(lastSeen) : ""}`;
-        const res = await apiJson(url);
-        if (res && res.messages && res.messages.length) {
-          res.messages.forEach(m => {
-            postsEl.appendChild(renderPost(m));
-            lastSeen = m.created_at;
-            // notify if DM for me
-            if (m.room && m.room.startsWith("dm_")) {
-              const members = m.room.split("dm_")[1].split("_");
-              if (ME && members.includes(ME.handle) && m.handle !== ME.handle) {
-                showNotification(`DM from @${m.handle}`, m.text || "New message");
-              }
-            }
-          });
-        }
-      } catch (e) { /* ignore */ }
-      setTimeout(pollLoop, 2000);
-    }
+  const bodyHTML = mdWithImages(extractReply(m.text||"").body);
 
-    function showNotification(title, body) {
-      if (!("Notification" in window) || Notification.permission !== "granted") return;
-      new Notification(title, { body, icon: "" });
-    }
+  wrap.innerHTML = `
+    <div class="post-header">
+      <img class="avatar" src="${m.profile_image||''}" alt="">
+      <div class="post-author">${m.author||"anon"} ${verified} <span class="handle">@${m.handle||""}</span></div>
+      <div class="meta">${fmtTime(m.created_at)}</div>
+    </div>
+    <div class="post-body">${bodyHTML}</div>
+    <div class="post-actions">
+      <button class="linkish act-reply">Reply</button>
+      <button class="linkish act-dm">Message @${m.handle||""}</button>
+      <button class="linkish view-toggle">View replies</button>
+    </div>
+    <div class="replies"></div>
+  `;
 
-    /*****************************************************************
-     * Composer: file -> base64, previews and post
-     *****************************************************************/
-    const fileInput = document.getElementById("fileInput");
-    const previews = document.getElementById("previews");
-    let imagesData = []; // data URLs
-    fileInput.addEventListener("change", async (ev) => {
-      const files = Array.from(ev.target.files || []);
-      for (const f of files) {
-        if (!f.type.startsWith("image/")) continue;
-        // convert to data url
-        const dataUrl = await fileToDataUrl(f);
-        // small optional client resizing can be added here
-        imagesData.push(dataUrl);
-        const img = document.createElement("img");
-        img.src = dataUrl;
-        img.className = "imgThumb";
-        const wrapper = document.createElement("div");
-        wrapper.style.display = "flex"; wrapper.style.flexDirection="column"; wrapper.style.alignItems="center";
-        const rem = document.createElement("button");
-        rem.textContent = "Remove";
-        rem.className = "btn ghost";
-        rem.style.marginTop = "6px";
-        rem.addEventListener("click", ()=> {
-          const i = imagesData.indexOf(dataUrl);
-          if (i >= 0) imagesData.splice(i,1);
-          wrapper.remove();
-        });
-        wrapper.appendChild(img);
-        wrapper.appendChild(rem);
-        previews.appendChild(wrapper);
-      }
-      // reset input
-      fileInput.value = "";
-    });
+  // Convert plain links to preview cards
+  enhanceLinksIntoCards(wrap.querySelector(".post-body"));
 
-    function fileToDataUrl(file) {
-      return new Promise((resolve, reject) => {
-        const fr = new FileReader();
-        fr.onload = () => resolve(fr.result);
-        fr.onerror = reject;
-        fr.readAsDataURL(file);
-      });
-    }
+  // Reply click: open modal
+  wrap.querySelector(".act-reply").onclick = () => {
+    replyingToId = m.id;
+    $("replyingTo").textContent = `Replying to @${m.handle}`;
+    replyOv.style.display="flex";
+    replyText.focus();
+  };
 
-    document.getElementById("sendPost").addEventListener("click", async () => {
-      if (!ME) { showLoginOverlay(); return; }
-      const text = document.getElementById("composeText").value.trim();
-      if (!text && imagesData.length === 0) return alert("Write something or add an image");
-      // build payload with base64 images (user requested base64 usage)
-      const payload = { text, images: imagesData.slice(0,6) };
-      try {
-        const r = await apiFetch(`/chat/${encodeURIComponent(CURRENT_ROOM)}`, {
-          method: "POST",
-          headers: { "Content-Type":"application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (!r.ok) { const txt = await r.text(); console.error(txt); alert("Post failed"); return; }
-        // clear composer
-        document.getElementById("composeText").value = "";
-        imagesData = [];
-        previews.innerHTML = "";
-        // reload posts (quick)
-        await loadPosts();
-      } catch (e) { console.error(e); alert("Network error"); }
-    });
+  // DM click: jump to DM room
+  wrap.querySelector(".act-dm").onclick = () => {
+    if (!ME){ alert("Login first."); return; }
+    const peer = (m.handle || "").toLowerCase();
+    if (!peer){ return; }
+    startDmWith(peer);
+  };
 
-    /*****************************************************************
-     * Profile popup: show last 5 posts for that user + Follow
-     *****************************************************************/
-    const profilePopup = document.getElementById("profilePopup");
-    const ppAvatar = document.getElementById("ppAvatar");
-    const ppName = document.getElementById("ppName");
-    const ppHandle = document.getElementById("ppHandle");
-    const ppDesc = document.getElementById("ppDesc");
-    const ppPosts = document.getElementById("ppPosts");
-    const ppFollow = document.getElementById("ppFollow");
-    const ppClose = document.getElementById("ppClose");
-    let currentProfile = null;
+  // View replies toggle
+  const repContainer = wrap.querySelector(".replies");
+  const toggle = wrap.querySelector(".view-toggle");
 
-    function openProfilePopup(handle, authorName) {
-      currentProfile = handle;
-      // get local info
-      ppAvatar.innerHTML = USERS_META[handle] && USERS_META[handle].profile_image ? `<img src="${USERS_META[handle].profile_image}" style="width:56px;height:56px;border-radius:50%;object-fit:cover">` : (authorName ? authorName[0].toUpperCase() : handle[0].toUpperCase());
-      ppName.textContent = authorName || handle;
-      ppHandle.textContent = "@" + handle;
-      ppDesc.textContent = USERS_META[handle] && USERS_META[handle].desc ? USERS_META[handle].desc : "No bio";
-      renderProfileFollowButton();
-      // fetch last 5 posts from current room & global attempt
-      ppPosts.innerHTML = "Loading…";
-      fetchProfilePosts(handle).then(postEls => {
-        ppPosts.innerHTML = "";
-        if (!postEls.length) ppPosts.innerHTML = `<div class='muted'>No recent posts</div>`;
-        postEls.forEach(pe => ppPosts.appendChild(pe));
-      });
-      profilePopup.style.display = "block";
-    }
+  const reps = (repliesByParent.get(m.id) || []).sort((a,b)=> a.created_at.localeCompare(b.created_at)); // oldest -> newest
+  toggle.textContent = reps.length ? `View replies (${reps.length})` : `View replies (0)`;
+  toggle.onclick = () => {
+    if (!reps.length){ repContainer.style.display="none"; return; }
+    const open = repContainer.style.display==="block";
+    if (open){ repContainer.style.display="none"; return; }
+    repContainer.innerHTML = reps.map(r => `
+      <div class="reply">
+        <div class="subtle"><b>@${r.handle}</b> · ${fmtTime(r.created_at)}</div>
+        <div class="post-body">${mdWithImages(extractReply(r.text||"").body)}</div>
+      </div>
+    `).join("");
+    // Convert links in replies too
+    repContainer.querySelectorAll('.post-body').forEach(enhanceLinksIntoCards);
+    repContainer.style.display="block";
+  };
 
-    ppClose.addEventListener("click", ()=> profilePopup.style.display = "none");
+  return wrap;
+}
 
-    function renderProfileFollowButton() {
-      const following = new Set(JSON.parse(localStorage.getItem("following") || "[]"));
-      if (following.has(currentProfile)) {
-        ppFollow.textContent = "Unfollow";
-      } else {
-        ppFollow.textContent = "Follow";
-      }
-    }
+function renderRecent(){
+  const list = $("recentList");
+  const items = allMessages
+    .filter(m=>m.video_id===CURRENT_ROOM)
+    .sort((a,b)=> new Date(b.created_at) - new Date(a.created_at))
+    .slice(0,6);
+  list.innerHTML = items.map(m=>`<div class="subtle"><b>${m.author}</b><br>${mdWithImages((extractReply(m.text||"").body||"").slice(0,80))}</div>`).join("");
+}
 
-    ppFollow.addEventListener("click", ()=> {
-      const following = new Set(JSON.parse(localStorage.getItem("following") || "[]"));
-      if (following.has(currentProfile)) {
-        following.delete(currentProfile);
-      } else {
-        following.add(currentProfile);
-      }
-      localStorage.setItem("following", JSON.stringify([...following]));
-      renderProfileFollowButton();
-      renderFollowing();
-    });
+/* ============== Settings ============== */
+const settingsOv = $("settingsOv");
+$("openSettingsBtn").onclick = ()=>{ openSettings(); };
+$("quickSettings").onclick = ()=>{ openSettings(); };
+$("settingsClose").onclick = ()=>{ settingsOv.style.display="none"; };
 
-    async function fetchProfilePosts(handle) {
-      // attempt to gather last 5 posts by scanning current room and maybe main
-      const roomsToTry = [CURRENT_ROOM, "main"];
-      let posts = [];
-      for (const r of roomsToTry) {
-        try {
-          const res = await apiJson(`/chat/${encodeURIComponent(r)}?limit=200`);
-          if (res && res.messages) {
-            posts = posts.concat(res.messages.filter(m => m.handle === handle));
-          }
-        } catch {}
-      }
-      posts = posts.sort((a,b)=> (b.created_at || 0) > (a.created_at || 0) ? 1 : -1).slice(0,5);
-      return posts.map(p => {
-        const el = document.createElement("div");
-        el.style.padding = "8px"; el.style.borderRadius = "8px"; el.style.border = "1px solid rgba(255,255,255,0.02)";
-        el.innerHTML = `<div class="small muted">${(new Date(p.created_at||Date.now())).toLocaleString()}</div><div style="margin-top:6px">${escapeHtml(p.text||"")}</div>`;
-        return el;
-      });
-    }
+const compactToggle = $("compactToggle");
+const textOnlyToggle = $("textOnlyToggle");
+const time24Toggle = $("time24Toggle");
 
-    function renderFollowers() {
-      const followers = new Set(JSON.parse(localStorage.getItem("followers") || "[]"));
-      const el = document.getElementById("followersList");
-      el.innerHTML = "";
-      followers.forEach(f => {
-        const div = document.createElement("div");
-        div.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="width:34px;height:34px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center">${f[0] || "U"}</div><div><strong>${f}</strong><div class="small muted">@${f}</div></div></div>`;
-        el.appendChild(div);
-      });
-      if (!followers.size) el.innerHTML = `<div class="muted">No followers yet</div>`;
-    }
-    function renderFollowing() {
-      const following = new Set(JSON.parse(localStorage.getItem("following") || "[]"));
-      const el = document.getElementById("followingList");
-      el.innerHTML = "";
-      following.forEach(f => {
-        const div = document.createElement("div");
-        div.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:#222;display:flex;align-items:center;justify-content:center">${f[0] || "U"}</div><div style="line-height:1">${f}<div class="small muted">@${f}</div></div></div>`;
-        el.appendChild(div);
-      });
-      if (!following.size) el.innerHTML = `<div class="muted">You are not following anyone</div>`;
-    }
+function applySettingsFromStorage(){
+  document.body.classList.toggle("compact", localStorage.getItem("tlks_compact")==="1");
+  document.body.classList.toggle("text-only", localStorage.getItem("tlks_textonly")==="1");
+  compactToggle.checked = localStorage.getItem("tlks_compact")==="1";
+  textOnlyToggle.checked = localStorage.getItem("tlks_textonly")==="1";
+  time24Toggle.checked = use24h();
+}
+function openSettings(){
+  applySettingsFromStorage();
+  settingsOv.style.display="flex";
+}
+compactToggle.onchange = () => {
+  localStorage.setItem("tlks_compact", compactToggle.checked ? "1":"0");
+  applySettingsFromStorage();
+};
+textOnlyToggle.onchange = () => {
+  localStorage.setItem("tlks_textonly", textOnlyToggle.checked ? "1":"0");
+  applySettingsFromStorage();
+};
+time24Toggle.onchange = () => {
+  localStorage.setItem("tlks_24h", time24Toggle.checked ? "1":"0");
+  renderFeed(); // re-render times
+  renderRecent();
+};
 
-    /*****************************************************************
-     * Utility helpers
-     *****************************************************************/
-    function escapeHtml(txt) {
-      if (!txt) return "";
-      return txt.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
-    }
+/* ============== DMs (Bring back) ============== */
+const newDmBtn = $("newDmBtn");
+const quickNewDm = $("quickNewDm");
+const openDmPickerBtn = $("openDmPickerBtn");
+const dmPickerOv = $("dmPickerOv");
+const dmPickerCancel = $("dmPickerCancel");
+const dmPickerGo = $("dmPickerGo");
+const dmHandleInput = $("dmHandleInput");
 
-    /*****************************************************************
-     * DM flow: clicking a profile shows DM button if following
-     *****************************************************************/
-    // add a small DM button to profile popup
-    const dmBtn = document.createElement("button");
-    dmBtn.className = "btn";
-    dmBtn.textContent = "Message (DM)";
-    dmBtn.style.marginLeft = "8px";
-    dmBtn.addEventListener("click", async () => {
-      if (!ME) { showLoginOverlay(); return; }
-      const following = new Set(JSON.parse(localStorage.getItem("following") || "[]"));
-      if (!following.has(currentProfile)) {
-        alert("You must follow this profile before you can DM them.");
-        return;
-      }
-      // Build DM room code deterministic (alphabetical)
-      const handles = [ME.handle, currentProfile].sort();
-      const room = `dm_${handles[0]}_${handles[1]}`;
-      CURRENT_ROOM = room;
-      localStorage.setItem("current_room", CURRENT_ROOM);
-      document.getElementById("currentRoomLabel").textContent = `Room: ${CURRENT_ROOM} (DM)`;
-      profilePopup.style.display = "none";
-      // Pre-fill composer with mention
-      document.getElementById("composeText").value = "";
-      await loadPosts();
-    });
-    // place DM button into popup
-    document.getElementById("profilePopup").querySelector("div").appendChild(dmBtn);
+newDmBtn.onclick = ()=> openDmPicker();
+quickNewDm.onclick = ()=> openDmPicker();
+openDmPickerBtn.onclick = ()=> openDmPicker();
+dmPickerCancel.onclick = ()=> { dmPickerOv.style.display="none"; dmHandleInput.value=""; };
+dmPickerGo.onclick = ()=> {
+  const h = (dmHandleInput.value||"").trim().replace(/^@/,"").toLowerCase();
+  if (!h){ return; }
+  startDmWith(h);
+  dmPickerCancel.onclick();
+};
 
-    /*****************************************************************
-     * Boot: render rooms, attempt login resume, and load posts
-     *****************************************************************/
-    renderRooms();
-    document.getElementById("currentRoomLabel").textContent = `Room: ${CURRENT_ROOM}`;
-    tryResumeLogin().then(loadPosts).then(()=> setTimeout(pollLoop, 2000));
+function openDmPicker(){
+  dmPickerOv.style.display="flex";
+  dmHandleInput.value="";
+  dmHandleInput.focus();
+}
+function startDmWith(peerHandle){
+  if (!ME){ alert("Login first."); return; }
+  if (peerHandle.toLowerCase() === (ME.handle||"").toLowerCase()){
+    alert("You can't DM yourself.");
+    return;
+  }
+  addDmPeer(peerHandle);
+  const room = dmIdFor(ME.handle, peerHandle);
+  CURRENT_ROOM = room;
+  const q = new URLSearchParams(location.search);
+  q.set("room", room);
+  history.replaceState(null,"","?"+q.toString());
+  loadRoom(CURRENT_ROOM, true);
+  renderRooms();
+}
 
-    // header and composer wiring
-    document.getElementById("openComposer").addEventListener("click", ()=> window.scrollTo({top:0,behavior:"smooth"}));
-    document.getElementById("openProfile").addEventListener("click", ()=> {
-      if (!ME) { showLoginOverlay(); return; }
-      openProfilePopup(ME.handle, `${ME.first_name || ""} ${ME.last_name || ""}`);
-    });
+/* ============== Bootstrap ============== */
+function setRoomUI(){
+  setRoomHeader();
+  renderRooms();
+  renderDmList();
+  $("imgChip").textContent="";
+  $("replyImgChip").textContent="";
+}
 
-    // small keyboard shortcut: press 'c' to open composer
-    window.addEventListener("keydown", (e) => { if (e.key === "c" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
-      document.getElementById("composeText").focus();
-    }});
+async function loadRoom(roomId, reset=false){
+  if (reset){
+    allMessages=[]; byId.clear(); repliesByParent.clear(); lastSeen=null;
+    $("feed").innerHTML=""; $("recentList").innerHTML="";
+  }
+  setRoomUI();
+  await fetchNew();
+}
 
-    // simple toggle images preview button
-    document.getElementById("toggleImgPreview").addEventListener("click", ()=> {
-      previews.style.display = previews.style.display === "none" ? "flex" : "none";
-    });
-
-    // basic escape handler to close profile popup
-    window.addEventListener("keydown", (e) => { if (e.key === "Escape") profilePopup.style.display = "none"; });
-
-    // initial placeholder for composer avatar when logged out
-    document.getElementById("composerAvatar").textContent = "U";
-
-  </script>
+(async () => {
+  // Prepare UI & auth
+  applySettingsFromStorage();
+  setRoomUI();
+  renderRooms();
+  renderDmList();
+  if (await ensureLogin()){
+    loadRoom(CURRENT_ROOM, true);
+  }
+  // polling
+  setInterval(fetchNew, 2000);
+})();
+</script>
 </body>
 </html>
-

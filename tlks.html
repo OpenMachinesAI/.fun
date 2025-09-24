@@ -1,8 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: https: http:; connect-src 'self' https://salexai-funserver-2-0.hf.space https:;">
+<title>Central TLKS</title>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Central TLKS</title>
 <style>
   :root{
@@ -19,13 +22,10 @@
     --bad:#ff7aa8;
     --cyan:#6be6ff;
 
-    --ring: rgba(152,96,255,.35);
-    --ring-2: rgba(152,96,255,.18);
+--ring: rgba(152,96,255,.35);
+--ring-2: rgba(152,96,255,.18);
 
-    --max-col: 680px;
-  }
-
-  *{box-sizing:border-box}
+--max-col: 680px;  }  *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:
     radial-gradient(1100px 700px at -10% -10%, #251346 10%, transparent 60%),
     radial-gradient(900px 600px at 110% -10%, #2b1456 10%, transparent 60%),
@@ -33,9 +33,7 @@
     linear-gradient(180deg, var(--bg), var(--bg-2));
     color:var(--text); font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     overflow:hidden;
-  }
-
-  /* layout */
+  }  /* layout */
   .app{display:grid; grid-template-columns: 280px minmax(0,1fr) 320px; gap:18px;
        height:100%; max-width:1600px; margin:0 auto; padding:18px;}
   @media (max-width: 1100px){
@@ -45,21 +43,15 @@
   @media (max-width: 760px){
     .app{grid-template-columns: 1fr}
     aside.left{display:none}
-  }
-
-  aside{background:linear-gradient(180deg,var(--card),var(--card-2));
+  }  aside{background:linear-gradient(180deg,var(--card),var(--card-2));
         border:1px solid var(--ring); border-radius:18px; padding:14px; overflow:auto}
-  main{display:flex; flex-direction:column; gap:14px; overflow:auto}
-
-  /* header */
+  main{display:flex; flex-direction:column; gap:14px; overflow:auto}  /* header */
   .room-header{position:sticky; top:0; z-index:10; background:linear-gradient(180deg,rgba(20,10,38,.9),rgba(20,10,38,.7));
     backdrop-filter: blur(6px); border:1px solid var(--ring); border-radius:16px; padding:14px}
   .room-title{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
   .room-actions{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap}
   .dot{width:10px; height:10px; border-radius:999px; background:var(--good); box-shadow:0 0 0 3px var(--ring-2)}
-  .subtle{color:var(--muted); font-size:13px}
-
-  /* composer */
+  .subtle{color:var(--muted); font-size:13px}  /* composer */
   .composer{max-width:var(--max-col); width:100%; margin:0 auto; background:linear-gradient(180deg, #1a0f2f, #190d2b);
     border:1px solid var(--ring); border-radius:16px; padding:12px}
   .composer-top{display:flex; gap:10px; align-items:flex-start}
@@ -70,11 +62,10 @@
   .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; border:1px solid var(--ring);
        background:linear-gradient(180deg,#231443,#1e0f39); color:var(--text); cursor:pointer; font-weight:700}
   .btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent-3)); border-color:#a281ff}
+  .btn.danger{background:linear-gradient(180deg,var(--bad),#cc4f70); border-color:#ff7aa8}
   .btn[disabled]{opacity:.55; cursor:not-allowed}
   .file-hide{display:none}
-  .img-chip{font-size:12px; color:var(--cyan)}
-
-  /* feed */
+  .img-chip{font-size:12px; color:var(--cyan)}  /* feed */
   .feed{display:flex; flex-direction:column; gap:12px; padding-bottom:80px}
   .post{max-width:var(--max-col); width:100%; margin:0 auto; background:linear-gradient(180deg,#180e2b,#160c28);
         border:1px solid var(--ring); border-radius:16px; padding:12px}
@@ -85,13 +76,26 @@
          font-size:12px; color:#fff}
   .check.blue{background:#1d9bf0}
   .check.purple{background:#9e6bff}
-  .meta{margin-left:auto; color:var(--muted); font-size:12px}
-
-  .post-body{margin-top:8px; line-height:1.45}
+  .check.gold{background:#ffd700}
+  .check.silver{background:#c0c0c0}
+  .check.green{background:#22c55e}
+  .meta{margin-left:auto; color:var(--muted); font-size:12px}  .post-body{margin-top:8px; line-height:1.45}
   .post-body img{max-width:100%; height:auto; max-height:420px; border-radius:12px; display:block; margin-top:8px; border:1px solid var(--ring)}
-  .post-actions{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap}
+  .post-actions{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; align-items:center}
   .linkish{padding:6px 10px; border-radius:8px; background:#1b0f2f; border:1px solid var(--ring); color:var(--text); cursor:pointer; font-weight:700}
   .linkish:hover{background:#201242}
+  
+  /* Vote buttons */
+  .vote-section{display:flex; align-items:center; gap:6px; margin-left:auto}
+  .vote-btn{display:flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px; border:1px solid var(--ring);
+           background:#1b0f2f; color:var(--muted); cursor:pointer; font-size:12px; font-weight:600}
+  .vote-btn:hover{background:#201242}
+  .vote-btn.active.up{background:var(--good); color:#fff; border-color:var(--good)}
+  .vote-btn.active.down{background:var(--bad); color:#fff; border-color:var(--bad)}
+
+  /* Moderation buttons */
+  .mod-actions{margin-left:8px; padding-left:8px; border-left:1px solid var(--ring)}
+  .mod-btn{padding:4px 8px; font-size:11px}
 
   /* link preview card */
   .link-card{display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--ring);
@@ -100,46 +104,37 @@
   .link-favicon img{width:20px; height:20px}
   .link-meta{display:flex; flex-direction:column; min-width:0}
   .link-host{font-weight:800; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .link-url{font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-
-  /* replies block */
+  .link-url{font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}  /* replies block */
   .replies{margin-top:8px; border-top:1px dashed var(--ring); padding-top:8px; display:none}
   .reply{background:#130a23; border:1px solid var(--ring); border-radius:12px; padding:8px 10px; margin-top:8px}
-  .view-toggle{margin-top:6px}
-
-  /* modals */
+  .view-toggle{margin-top:6px}  /* modals */
   .overlay{position:fixed; inset:0; display:none; align-items:center; justify-content:center;
            background:rgba(0,0,0,.5); z-index:50}
-  .modal{width:min(720px,92vw); background:linear-gradient(180deg,#1b0f31,#190d2c); border:1px solid var(--ring); border-radius:16px; padding:16px}
+  .modal{width:min(720px,92vw); background:linear-gradient(180deg,#1b0f31,#190d2c); border:1px solid var(--ring); border-radius:16px; padding:16px; max-height:90vh; overflow-y:auto}
   .modal h3{margin:0 0 10px}
   .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
   .w100{width:100%}
+  .form-group{margin-bottom:12px}
+  .form-group label{display:block; margin-bottom:4px; font-weight:600}
+  .form-input{width:100%; padding:10px; border-radius:8px; border:1px solid var(--ring); background:#140a26; color:var(--text)}
+  .form-select{width:100%; padding:10px; border-radius:8px; border:1px solid var(--ring); background:#140a26; color:var(--text)}
 
   /* room list */
   .room-list{display:flex; flex-direction:column; gap:6px}
   .room-item{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; border:1px solid var(--ring);
              background:linear-gradient(180deg,#1a0f2f,#160c28); cursor:pointer}
   .room-item.active{outline:2px solid #a281ff}
-  .room-item small{color:var(--muted)}
-
-  /* right panel simple list */
-  .panel-card{border:1px solid var(--ring); border-radius:16px; padding:12px; background:linear-gradient(180deg,#1a0f2f,#160c28); margin-bottom:12px}
-
-  /* DMs list */
+  .room-item small{color:var(--muted)}  /* right panel simple list */
+  .panel-card{border:1px solid var(--ring); border-radius:16px; padding:12px; background:linear-gradient(180deg,#1a0f2f,#160c28); margin-bottom:12px}  /* DMs list */
   .dm-list{display:flex; flex-direction:column; gap:6px}
   .dm-item{display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; border:1px solid var(--ring);
-           background:linear-gradient(180deg,#1a0f2f,#160c28); cursor:pointer}
-
-  /* settings toggles */
-  .toggle{display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--ring); border-radius:10px; background:#140a26}
-  .toggle label{flex:1}
-
-  /* Settings effects */
+           background:linear-gradient(180deg,#1a0f2f,#160c28); cursor:pointer}  /* settings toggles */
+  .toggle{display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--ring); border-radius:10px; background:#140a26; margin-bottom:8px}
+  .toggle label{flex:1}  /* Settings effects */
   body.compact .feed{gap:8px}
   body.compact .post{padding:10px}
   body.text-only .post-body img{display:none}
-</style>
-</head>
+</style><script src="https://puc.poecdn.net/authenticated_preview_page/syncedState.bd4eeeb8e8e02052ee92.js"></script></head>
 <body>
 
 <div class="app">
@@ -147,24 +142,24 @@
   <aside class="left">
     <div style="font-weight:900; letter-spacing:.2px; margin-bottom:12px">Central TLKS</div>
 
-    <div class="panel-card" style="margin-bottom:12px">
-      <div style="font-weight:800;margin-bottom:8px">Rooms</div>
-      <div id="roomList" class="room-list"></div>
-    </div>
+<div class="panel-card" style="margin-bottom:12px">
+  <div style="font-weight:800;margin-bottom:8px">Rooms</div>
+  <div id="roomList" class="room-list"></div>
+  <button id="createRoomBtn" class="btn" style="width:100%; margin-top:8px; display:none">Create Room</button>
+</div>
 
-    <div class="panel-card" style="margin-bottom:12px">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px">
-        <div style="font-weight:800">Direct Messages</div>
-        <button id="newDmBtn" class="btn" style="padding:6px 10px">New DM</button>
-      </div>
-      <div id="dmList" class="dm-list"></div>
-    </div>
+<div class="panel-card" style="margin-bottom:12px">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px">
+    <div style="font-weight:800">Direct Messages</div>
+    <button id="newDmBtn" class="btn" style="padding:6px 10px">New DM</button>
+  </div>
+  <div id="dmList" class="dm-list"></div>
+</div>
 
-    <div class="panel-card">
-      <div style="font-weight:800;margin-bottom:6px">Tips</div>
-      <div class="subtle">General is public. Other rooms require an invite code.</div>
-    </div>
-  </aside>
+<div class="panel-card">
+  <div style="font-weight:800;margin-bottom:6px">Tips</div>
+  <div class="subtle">General is public. Other rooms require an invite code.</div>
+</div>  </aside>
 
   <!-- CENTER -->
   <main>
@@ -181,25 +176,24 @@
       </div>
     </div>
 
-    <!-- composer -->
-    <div class="composer" id="composer">
-      <div class="composer-top">
-        <img id="meAvatar" class="avatar" alt="">
-        <textarea id="composerText" class="input" placeholder="What's happening?" maxlength="2000"></textarea>
-      </div>
-      <div class="actions">
-        <div class="row">
-          <label class="btn" for="filePick">Upload image</label>
-          <input id="filePick" type="file" accept="image/*" class="file-hide">
-          <span id="imgChip" class="img-chip"></span>
-        </div>
-        <button id="postBtn" class="btn primary">Post</button>
-      </div>
+<!-- composer -->
+<div class="composer" id="composer">
+  <div class="composer-top">
+    <img id="meAvatar" class="avatar" alt="">
+    <textarea id="composerText" class="input" placeholder="What's happening?" maxlength="2000"></textarea>
+  </div>
+  <div class="actions">
+    <div class="row">
+      <label class="btn" for="filePick">Upload image</label>
+      <input id="filePick" type="file" accept="image/*" class="file-hide">
+      <span id="imgChip" class="img-chip"></span>
     </div>
+    <button id="postBtn" class="btn primary">Post</button>
+  </div>
+</div>
 
-    <!-- feed -->
-    <div id="feed" class="feed" aria-live="polite"></div>
-  </main>
+<!-- feed -->
+<div id="feed" class="feed" aria-live="polite"></div>  </main>
 
   <!-- RIGHT -->
   <aside class="right">
@@ -233,15 +227,15 @@
       <button id="loginBtn" class="btn primary">Login</button>
     </div>
     <div id="loginErr" class="subtle" style="color:var(--bad); min-height:18px"></div>
-    <div class="subtle">Access is rolling out class-by-class. You must be invited—ask your teacher if your name or PIN doesn’t work.</div>
+    <div class="subtle">Access is rolling out class-by-class. You must be invited--ask your teacher if your name or PIN doesn't work.</div>
   </div>
 </div>
 
 <!-- Intro (first login) -->
 <div id="introOv" class="overlay">
   <div class="modal">
-    <h3>Welcome to Central TLKS 🎉</h3>
-    <p class="subtle">This is your school’s chat. <b>General</b> is public; other rooms require invite codes. Keep it respectful.</p>
+    <h3>Welcome to Central TLKS </h3>
+    <p class="subtle">This is your school's chat. <b>General</b> is public; other rooms require invite codes. Keep it respectful.</p>
     <div class="row" style="justify-content:flex-end">
       <button id="introClose" class="btn primary">Got it</button>
     </div>
@@ -272,12 +266,102 @@
 <div id="settingsOv" class="overlay">
   <div class="modal">
     <h3>Settings</h3>
-    <div class="toggle"><label for="compactToggle">Compact mode</label><input id="compactToggle" type="checkbox"></div>
-    <div class="toggle"><label for="textOnlyToggle">Text-only (hide images)</label><input id="textOnlyToggle" type="checkbox"></div>
-    <div class="toggle"><label for="time24Toggle">24-hour time</label><input id="time24Toggle" type="checkbox"></div>
-    <div class="row" style="justify-content:flex-end; margin-top:10px">
+    
+    <div style="border-bottom:1px solid var(--ring); padding-bottom:12px; margin-bottom:12px">
+      <h4 style="margin:0 0 8px">Profile Settings</h4>
+      <div class="form-group">
+        <label>Display Name</label>
+        <input id="profileDisplayName" class="form-input" placeholder="Your display name">
+      </div>
+      <div class="form-group">
+        <label>Profile Image URL</label>
+        <input id="profileImageUrl" class="form-input" placeholder="https://example.com/image.jpg">
+      </div>
+      <button id="updateProfileBtn" class="btn primary">Update Profile</button>
+      <div id="profileUpdateStatus" class="subtle" style="margin-top:6px; min-height:18px"></div>
+    </div>
+
+    <div style="border-bottom:1px solid var(--ring); padding-bottom:12px; margin-bottom:12px">
+      <h4 style="margin:0 0 8px">Display Settings</h4>
+      <div class="toggle"><label for="compactToggle">Compact mode</label><input id="compactToggle" type="checkbox"></div>
+      <div class="toggle"><label for="textOnlyToggle">Text-only (hide images)</label><input id="textOnlyToggle" type="checkbox"></div>
+      <div class="toggle"><label for="time24Toggle">24-hour time</label><input id="time24Toggle" type="checkbox"></div>
+    </div>
+
+    <div class="row" style="justify-content:flex-end">
       <button id="settingsClose" class="btn primary">Close</button>
     </div>
+  </div>
+</div>
+
+<!-- Badge Assignment Modal -->
+<div id="badgeOv" class="overlay">
+  <div class="modal">
+    <h3>Assign Badge</h3>
+    <div class="form-group">
+      <label>User Handle</label>
+      <input id="badgeUserHandle" class="form-input" placeholder="username" readonly="">
+    </div>
+    <div class="form-group">
+      <label>Badge Type</label>
+      <select id="badgeType" class="form-select">
+        <option value="none">Remove Badge</option>
+        <option value="gold">Gold Badge</option>
+        <option value="silver">Silver Badge</option>
+        <option value="green">Green Badge</option>
+      </select>
+    </div>
+    <div class="row" style="margin-top:12px; justify-content:space-between">
+      <button id="badgeCancel" class="btn">Cancel</button>
+      <button id="badgeAssign" class="btn primary">Assign Badge</button>
+    </div>
+    <div id="badgeStatus" class="subtle" style="margin-top:6px; min-height:18px"></div>
+  </div>
+</div>
+
+<!-- Create Room Modal -->
+<div id="createRoomOv" class="overlay">
+  <div class="modal">
+    <h3>Create New Room</h3>
+    <div class="form-group">
+      <label>Room Name</label>
+      <input id="newRoomName" class="form-input" placeholder="e.g. Study Group">
+    </div>
+    <div class="form-group">
+      <label>Room ID</label>
+      <input id="newRoomId" class="form-input" placeholder="e.g. study-group">
+    </div>
+    <div class="form-group">
+      <label>
+        <input id="newRoomPrivate" type="checkbox"> Private room (requires invite code)
+      </label>
+    </div>
+    <div class="form-group" id="inviteCodeGroup" style="display:none">
+      <label>Invite Code</label>
+      <input id="newRoomInvite" class="form-input" placeholder="INVITE-CODE-2024">
+    </div>
+    <div class="row" style="margin-top:12px; justify-content:space-between">
+      <button id="createRoomCancel" class="btn">Cancel</button>
+      <button id="createRoomConfirm" class="btn primary">Create Room</button>
+    </div>
+    <div id="createRoomStatus" class="subtle" style="margin-top:6px; min-height:18px"></div>
+  </div>
+</div>
+
+<!-- Room Access Modal -->
+<div id="roomAccessOv" class="overlay">
+  <div class="modal">
+    <h3>Room Access Required</h3>
+    <p id="roomAccessMessage">This private room requires an invite code.</p>
+    <div class="form-group">
+      <label>Invite Code</label>
+      <input id="roomAccessCode" class="form-input" placeholder="Enter invite code">
+    </div>
+    <div class="row" style="margin-top:12px; justify-content:space-between">
+      <button id="roomAccessCancel" class="btn">Cancel</button>
+      <button id="roomAccessSubmit" class="btn primary">Join Room</button>
+    </div>
+    <div id="roomAccessStatus" class="subtle" style="margin-top:6px; min-height:18px"></div>
   </div>
 </div>
 
@@ -302,15 +386,6 @@
 /* ================== Config ================== */
 const API_BASE = "https://salexai-funserver-2-0.hf.space";
 
-/* Rooms list + invite codes (edit here) */
-const ROOMS = [
-  { id:"main", name:"General", private:false },
-  { id:"math101", name:"Math 101", private:true, invite:"MATH-101-2024" },
-  { id:"eng101", name:"English 101", private:true, invite:"ENG-101-2024" },
-  { id:"grade6", name:"Grade 6", private:true, invite:"GRADE6-OK" },
-  { id:"grade7", name:"Grade 7", private:true, invite:"GRADE7-OK" }
-];
-
 /* Verified accounts (handles without @) */
 const VERIFIED_STAFF = new Set(["teacher1","staff","alex"]);
 const VERIFIED_DEV   = new Set(["dev","maintainer","tlksdev"]);
@@ -319,6 +394,7 @@ const VERIFIED_DEV   = new Set(["dev","maintainer","tlksdev"]);
 let TLKS_TOKEN = localStorage.getItem("tlks_token") || "";
 let CURRENT_ROOM = getRoomFromURL();
 let ME = null;
+let ROOMS = [];
 
 let allMessages = [];            // raw
 let byId = new Map();            // id -> message
@@ -345,6 +421,34 @@ function fmtTime(iso){
   }catch{ return "" }
 }
 
+function isTeacher(){
+  return ME && VERIFIED_STAFF.has(ME.handle);
+}
+
+async function apiCall(endpoint, options = {}) {
+  const defaultHeaders = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (TLKS_TOKEN) {
+    defaultHeaders['Authorization'] = `Bearer ${TLKS_TOKEN}`;
+  }
+  
+  const response = await fetch(`${API_BASE}${endpoint}`, {
+    ...options,
+    headers: {
+      ...defaultHeaders,
+      ...options.headers
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  
+  return response.json();
+}
+
 /* Link utils */
 function truncate(s, n){ return s.length>n ? s.slice(0,n-1)+"…" : s; }
 function hostnameFrom(url){
@@ -352,7 +456,7 @@ function hostnameFrom(url){
 }
 function linkCardHTML(url){
   const host = hostnameFrom(url);
-  const safeUrl = url.replace(/"/g,'&quot;');
+  const safeUrl = url.replace(/"/g,'"');
   const fav = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`;
   return `<a class="link-card" href="${safeUrl}" target="_blank" rel="noopener">
     <div class="link-favicon"><img src="${fav}" alt=""></div>
@@ -365,7 +469,7 @@ function linkCardHTML(url){
 
 /* Markdown & media */
 function mdWithImages(text){
-  // linkify http(s) – keep it minimal; cards will replace anchors later
+  // linkify http(s) -- keep it minimal; cards will replace anchors later
   text = text.replace(/(https?:\/\/[^\s)]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
   // newline -> <br>
   return text.replace(/\n/g,"<br>");
@@ -395,6 +499,118 @@ function addDmPeer(handle){
   renderDmList();
 }
 
+/* ============== API Functions ============== */
+async function fetchRooms() {
+  try {
+    const data = await apiCall('/rooms');
+    ROOMS = data.rooms;
+    renderRooms();
+  } catch (e) {
+    console.error('Failed to fetch rooms:', e);
+  }
+}
+
+async function createRoom(name, roomId, isPrivate, inviteCode) {
+  try {
+    const payload = {
+      name,
+      room_id: roomId,
+      private: isPrivate
+    };
+    if (isPrivate) {
+      payload.invite_code = inviteCode;
+    }
+    
+    const data = await apiCall('/rooms', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    
+    if (data.ok) {
+      await fetchRooms(); // Refresh room list
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('Failed to create room:', e);
+    return false;
+  }
+}
+
+async function requestRoomAccess(roomId, inviteCode) {
+  try {
+    const data = await apiCall(`/rooms/${roomId}/access`, {
+      method: 'POST',
+      body: JSON.stringify({ invite_code: inviteCode })
+    });
+    
+    return data.access_granted;
+  } catch (e) {
+    console.error('Failed to request room access:', e);
+    return false;
+  }
+}
+
+async function voteOnMessage(messageId, voteType) {
+  try {
+    const data = await apiCall(`/chat/${encodeURIComponent(CURRENT_ROOM)}/${messageId}/vote`, {
+      method: 'POST',
+      body: JSON.stringify({ vote_type: voteType })
+    });
+    
+    return data;
+  } catch (e) {
+    console.error('Failed to vote:', e);
+    return null;
+  }
+}
+
+async function assignBadge(handle, badgeType) {
+  try {
+    const data = await apiCall(`/users/${handle}/badge`, {
+      method: 'POST',
+      body: JSON.stringify({ badge_type: badgeType })
+    });
+    
+    return data.ok;
+  } catch (e) {
+    console.error('Failed to assign badge:', e);
+    return false;
+  }
+}
+
+async function deleteMessage(messageId) {
+  try {
+    const data = await apiCall(`/chat/${encodeURIComponent(CURRENT_ROOM)}/${messageId}`, {
+      method: 'DELETE'
+    });
+    
+    return data.ok;
+  } catch (e) {
+    console.error('Failed to delete message:', e);
+    return false;
+  }
+}
+
+async function updateProfile(firstName, lastName, profileImage) {
+  try {
+    const payload = {};
+    if (firstName !== undefined) payload.first_name = firstName;
+    if (lastName !== undefined) payload.last_name = lastName;
+    if (profileImage !== undefined) payload.profile_image = profileImage;
+    
+    const data = await apiCall('/me/profile', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+    
+    return data.ok;
+  } catch (e) {
+    console.error('Failed to update profile:', e);
+    return false;
+  }
+}
+
 /* ============== Auth ============== */
 const loginOv = $("loginOv"), loginHandle = $("loginHandle"), loginPIN = $("loginPIN"),
       loginBtn = $("loginBtn"), loginErr = $("loginErr");
@@ -402,29 +618,28 @@ const loginOv = $("loginOv"), loginHandle = $("loginHandle"), loginPIN = $("logi
 async function ensureLogin(){
   if (!TLKS_TOKEN) { loginOv.style.display="flex"; return false; }
   try{
-    const r = await fetch(`${API_BASE}/me`, {headers:{Authorization:`Bearer ${TLKS_TOKEN}`}});
-    if (!r.ok) throw new Error("bad");
-    const data = await r.json();
+    const data = await apiCall('/me');
     if (!data.ok) throw new Error("bad");
     ME = data.user;
     updateMeUI();
+    await fetchRooms(); // Load rooms from server
     maybeShowIntro();
     return true;
   }catch{
     TLKS_TOKEN=""; localStorage.removeItem("tlks_token"); loginOv.style.display="flex"; return false;
   }
 }
+
 loginBtn.onclick = async () => {
   loginErr.textContent = "";
   const handle = (loginHandle.value||"").trim().replace(/^@/,"");
   const pin    = (loginPIN.value||"").trim();
   if (!handle || !pin){ loginErr.textContent="Enter handle and PIN."; return; }
   try{
-    const r = await fetch(`${API_BASE}/auth/login`,{
-      method:"POST", headers:{"Content-Type":"application/json"},
+    const data = await apiCall('/auth/login', {
+      method: 'POST',
       body: JSON.stringify({handle, pin})
     });
-    const data = await r.json();
     if (!data.ok){ loginErr.textContent = data.error || "Login failed"; return; }
     TLKS_TOKEN = data.token;
     localStorage.setItem("tlks_token", TLKS_TOKEN);
@@ -433,10 +648,16 @@ loginBtn.onclick = async () => {
     loadRoom(CURRENT_ROOM, true);
   }catch{ loginErr.textContent = "Network error."; }
 };
+
 function updateMeUI(){
   $("meName").textContent = `${ME.first_name} ${ME.last_name}`;
   $("meHandle").textContent = `@${ME.handle} • ${ME.klass||""}`;
   $("meAvatar").src = ME.profile_image || "";
+  
+  // Show/hide teacher features
+  if (isTeacher()) {
+    $("createRoomBtn").style.display = "block";
+  }
 }
 
 /* First-time intro */
@@ -446,7 +667,53 @@ function maybeShowIntro(){
   if (!localStorage.getItem("tlks_intro_shown")) introOv.style.display="flex";
 }
 
-/* ============== Rooms + DMs UI ============== */
+/* ============== Profile Updates ============== */
+async function doUpdateProfile() {
+  if (!ME) return;
+  
+  const displayName = $("profileDisplayName").value.trim();
+  const imageUrl = $("profileImageUrl").value.trim();
+  
+  if (!displayName && !imageUrl) {
+    $("profileUpdateStatus").textContent = "Please enter a display name or image URL";
+    $("profileUpdateStatus").style.color = "var(--bad)";
+    return;
+  }
+  
+  let firstName = ME.first_name;
+  let lastName = ME.last_name;
+  
+  if (displayName) {
+    const parts = displayName.split(" ");
+    firstName = parts[0] || "";
+    lastName = parts.slice(1).join(" ") || "";
+  }
+  
+  const success = await updateProfile(
+    displayName ? firstName : undefined,
+    displayName ? lastName : undefined,
+    imageUrl || undefined
+  );
+  
+  if (success) {
+    // Update local ME object
+    if (displayName) {
+      ME.first_name = firstName;
+      ME.last_name = lastName;
+    }
+    if (imageUrl) {
+      ME.profile_image = imageUrl;
+    }
+    updateMeUI();
+    $("profileUpdateStatus").textContent = "Profile updated successfully!";
+    $("profileUpdateStatus").style.color = "var(--good)";
+  } else {
+    $("profileUpdateStatus").textContent = "Failed to update profile";
+    $("profileUpdateStatus").style.color = "var(--bad)";
+  }
+}
+
+/* ============== Room Management ============== */
 const roomList = $("roomList");
 function renderRooms(){
   roomList.innerHTML = "";
@@ -458,6 +725,7 @@ function renderRooms(){
     roomList.appendChild(el);
   }
 }
+
 function renderDmList(){
   const dmList = $("dmList");
   const peers = getDmPeers();
@@ -482,13 +750,20 @@ function renderDmList(){
     dmList.appendChild(el);
   }
 }
+
 async function switchRoom(r){
   if (r.id===CURRENT_ROOM) return;
-  if (r.private && !hasAccess(r.id)){
-    const code = prompt(`Invite required for ${r.name}. Enter invite code:`);
-    if (!code || code.trim()!==r.invite){ alert("Invalid code."); return; }
-    grantAccess(r.id);
+  
+  if (r.private) {
+    // Check if we have access to this private room
+    const hasAccess = hasLocalAccess(r.id);
+    if (!hasAccess) {
+      // Show access modal
+      showRoomAccessModal(r);
+      return;
+    }
   }
+  
   CURRENT_ROOM = r.id;
   const q = new URLSearchParams(location.search);
   q.set("room", r.id);
@@ -496,8 +771,19 @@ async function switchRoom(r){
   loadRoom(CURRENT_ROOM, true);
   renderRooms();
 }
-function hasAccess(roomId){ const k="room_access"; const set = new Set(JSON.parse(localStorage.getItem(k)||"[]")); return set.has(roomId) || roomId==="main"; }
-function grantAccess(roomId){ const k="room_access"; const set = new Set(JSON.parse(localStorage.getItem(k)||"[]")); set.add(roomId); localStorage.setItem(k, JSON.stringify([...set])); }
+
+function hasLocalAccess(roomId){ 
+  const k="room_access"; 
+  const set = new Set(JSON.parse(localStorage.getItem(k)||"[]")); 
+  return set.has(roomId) || roomId==="main"; 
+}
+
+function grantLocalAccess(roomId){ 
+  const k="room_access"; 
+  const set = new Set(JSON.parse(localStorage.getItem(k)||"[]")); 
+  set.add(roomId); 
+  localStorage.setItem(k, JSON.stringify([...set])); 
+}
 
 function setRoomHeader(){
   const isDm = isDmRoom(CURRENT_ROOM);
@@ -509,9 +795,207 @@ function setRoomHeader(){
     $("roomNote").textContent = "Private 1:1 room";
   }else{
     const r = ROOMS.find(x=>x.id===CURRENT_ROOM) || ROOMS[0];
-    $("roomTitle").textContent = r.name;
-    $("roomId").textContent = "· " + r.id + (r.private?" • private":"");
-    $("roomNote").textContent = r.private ? "Invite-only room" : "Public room";
+    $("roomTitle").textContent = r?.name || "Unknown Room";
+    $("roomId").textContent = "· " + CURRENT_ROOM + (r?.private?" • private":"");
+    $("roomNote").textContent = r?.private ? "Invite-only room" : "Public room";
+  }
+}
+
+/* ============== Room Access Modal ============== */
+const roomAccessOv = $("roomAccessOv");
+let pendingRoom = null;
+
+function showRoomAccessModal(room) {
+  pendingRoom = room;
+  $("roomAccessMessage").textContent = `This private room "${room.name}" requires an invite code.`;
+  $("roomAccessCode").value = "";
+  $("roomAccessStatus").textContent = "";
+  roomAccessOv.style.display = "flex";
+}
+
+$("roomAccessCancel").onclick = () => {
+  roomAccessOv.style.display = "none";
+  pendingRoom = null;
+};
+
+$("roomAccessSubmit").onclick = async () => {
+  if (!pendingRoom) return;
+  
+  const inviteCode = $("roomAccessCode").value.trim();
+  if (!inviteCode) {
+    $("roomAccessStatus").textContent = "Please enter an invite code";
+    $("roomAccessStatus").style.color = "var(--bad)";
+    return;
+  }
+  
+  const hasAccess = await requestRoomAccess(pendingRoom.id, inviteCode);
+  
+  if (hasAccess) {
+    grantLocalAccess(pendingRoom.id);
+    $("roomAccessStatus").textContent = "Access granted!";
+    $("roomAccessStatus").style.color = "var(--good)";
+    
+    setTimeout(() => {
+      roomAccessOv.style.display = "none";
+      switchRoom(pendingRoom);
+      pendingRoom = null;
+    }, 1000);
+  } else {
+    $("roomAccessStatus").textContent = "Invalid invite code";
+    $("roomAccessStatus").style.color = "var(--bad)";
+  }
+};
+
+/* ============== Room Creation ============== */
+const createRoomOv = $("createRoomOv");
+$("createRoomBtn").onclick = () => {
+  if (!isTeacher()) {
+    alert("Only teachers can create rooms");
+    return;
+  }
+  createRoomOv.style.display = "flex";
+};
+
+$("createRoomCancel").onclick = () => {
+  createRoomOv.style.display = "none";
+  $("newRoomName").value = "";
+  $("newRoomId").value = "";
+  $("newRoomInvite").value = "";
+  $("newRoomPrivate").checked = false;
+  $("inviteCodeGroup").style.display = "none";
+  $("createRoomStatus").textContent = "";
+};
+
+$("newRoomPrivate").onchange = () => {
+  $("inviteCodeGroup").style.display = $("newRoomPrivate").checked ? "block" : "none";
+};
+
+$("createRoomConfirm").onclick = async () => {
+  const name = $("newRoomName").value.trim();
+  const id = $("newRoomId").value.trim();
+  const isPrivate = $("newRoomPrivate").checked;
+  const invite = $("newRoomInvite").value.trim();
+  
+  if (!name || !id) {
+    $("createRoomStatus").textContent = "Please enter room name and ID";
+    $("createRoomStatus").style.color = "var(--bad)";
+    return;
+  }
+  
+  if (ROOMS.find(r => r.id === id)) {
+    $("createRoomStatus").textContent = "Room ID already exists";
+    $("createRoomStatus").style.color = "var(--bad)";
+    return;
+  }
+  
+  if (isPrivate && !invite) {
+    $("createRoomStatus").textContent = "Private rooms need an invite code";
+    $("createRoomStatus").style.color = "var(--bad)";
+    return;
+  }
+  
+  const success = await createRoom(name, id, isPrivate, invite);
+  
+  if (success) {
+    $("createRoomStatus").textContent = `Room "${name}" created successfully!`;
+    $("createRoomStatus").style.color = "var(--good)";
+    
+    setTimeout(() => {
+      $("createRoomCancel").onclick();
+    }, 1500);
+  } else {
+    $("createRoomStatus").textContent = "Failed to create room";
+    $("createRoomStatus").style.color = "var(--bad)";
+  }
+};
+
+/* ============== Badge Assignment ============== */
+const badgeOv = $("badgeOv");
+let badgeTargetHandle = null;
+
+$("badgeCancel").onclick = () => {
+  badgeOv.style.display = "none";
+  badgeTargetHandle = null;
+  $("badgeStatus").textContent = "";
+};
+
+$("badgeAssign").onclick = async () => {
+  if (!badgeTargetHandle) return;
+  
+  const badgeType = $("badgeType").value;
+  const success = await assignBadge(badgeTargetHandle, badgeType);
+  
+  if (success) {
+    $("badgeStatus").textContent = `Badge ${badgeType === "none" ? "removed" : "assigned"} successfully!`;
+    $("badgeStatus").style.color = "var(--good)";
+    
+    setTimeout(() => {
+      badgeOv.style.display = "none";
+      badgeTargetHandle = null;
+      $("badgeStatus").textContent = "";
+      // Re-render feed to show updated badges
+      renderFeed();
+    }, 1500);
+  } else {
+    $("badgeStatus").textContent = "Failed to assign badge";
+    $("badgeStatus").style.color = "var(--bad)";
+  }
+};
+
+function openBadgeModal(handle) {
+  if (!isTeacher()) {
+    alert("Only teachers can assign badges");
+    return;
+  }
+  
+  badgeTargetHandle = handle;
+  $("badgeUserHandle").value = handle;
+  $("badgeType").value = "none"; // Default selection
+  $("badgeStatus").textContent = "";
+  badgeOv.style.display = "flex";
+}
+
+/* ============== Message Actions ============== */
+async function doRemovePost(postId) {
+  if (!isTeacher()) {
+    alert("Only teachers can remove posts");
+    return;
+  }
+  
+  if (confirm("Are you sure you want to remove this post?")) {
+    const success = await deleteMessage(postId);
+    
+    if (success) {
+      // Remove from local state
+      allMessages = allMessages.filter(m => m.id !== postId);
+      byId.delete(postId);
+      
+      // Remove from replies mapping
+      for (const [parentId, replies] of repliesByParent.entries()) {
+        repliesByParent.set(parentId, replies.filter(r => r.id !== postId));
+      }
+      
+      renderFeed();
+      alert("Post removed successfully!");
+    } else {
+      alert("Failed to remove post");
+    }
+  }
+}
+
+async function doVotePost(postId, voteType) {
+  const result = await voteOnMessage(postId, voteType);
+  
+  if (result) {
+    // Update the message in our local state
+    const message = byId.get(postId);
+    if (message) {
+      message.upvotes = result.upvotes;
+      message.downvotes = result.downvotes;
+      message.user_vote = result.user_vote;
+    }
+    
+    renderFeed(); // Re-render to show updated vote counts
   }
 }
 
@@ -569,14 +1053,14 @@ function makeLocalMessage(text){
   return {
     id, video_id: CURRENT_ROOM, author: `${ME.first_name} ${ME.last_name}`,
     handle: ME.handle, klass: ME.klass||"", profile_image: ME.profile_image||"",
-    text, created_at: new Date().toISOString(), _local:true
+    text, created_at: new Date().toISOString(), _local:true,
+    upvotes: 0, downvotes: 0, user_vote: null
   };
 }
 
 async function postToServer(text){
-  await fetch(`${API_BASE}/chat/${encodeURIComponent(CURRENT_ROOM)}`,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${TLKS_TOKEN}` },
+  await apiCall(`/chat/${encodeURIComponent(CURRENT_ROOM)}`, {
+    method: 'POST',
     body: JSON.stringify({ text })
   });
 }
@@ -610,10 +1094,9 @@ replySend.onclick = async () => {
 /* ============== Fetch & Render ============== */
 async function fetchNew(){
   try{
-    let url = `${API_BASE}/chat/${encodeURIComponent(CURRENT_ROOM)}?limit=200`;
+    let url = `/chat/${encodeURIComponent(CURRENT_ROOM)}?limit=200`;
     if (lastSeen) url += `&since=${encodeURIComponent(lastSeen)}`;
-    const r = await fetch(url);
-    const data = await r.json();
+    const data = await apiCall(url);
     const msgs = data.messages || [];
     if (msgs.length){
       for (const m of msgs){
@@ -648,7 +1131,7 @@ function renderFeed(){
   // Top-level (no ::reply) and only for CURRENT_ROOM
   const top = allMessages
     .filter(m => !extractReply(m.text||"").parent && m.video_id===CURRENT_ROOM)
-    .sort((a,b)=> new Date(b.created_at) - new Date(a.created_at)); // MOST RECENT FIRST ✅
+    .sort((a,b)=> new Date(b.created_at) - new Date(a.created_at)); // MOST RECENT FIRST 
 
   for (const m of top){
     feed.appendChild(renderPost(m));
@@ -671,10 +1154,29 @@ function renderPost(m){
   const wrap = document.createElement("div");
   wrap.className = "post";
 
-  const verified = VERIFIED_STAFF.has(m.handle) ? ' <span class="check blue" title="Verified Staff">✓</span>' :
-                    (VERIFIED_DEV.has(m.handle) ? ' <span class="check purple" title="Verified Developer of TLKS">✓</span>' : '');
+  const staffVerified = VERIFIED_STAFF.has(m.handle) ? ' <span class="check blue" title="Verified Staff">✓</span>' : '';
+  const devVerified = VERIFIED_DEV.has(m.handle) ? ' <span class="check purple" title="Verified Developer of TLKS">✓</span>' : '';
+  
+  const userBadge = m.badge;
+  const badgeHTML = userBadge ? ` <span class="check ${userBadge}" title="${userBadge.charAt(0).toUpperCase() + userBadge.slice(1)} Badge">●</span>` : '';
+  
+  const verified = staffVerified + devVerified + badgeHTML;
 
   const bodyHTML = mdWithImages(extractReply(m.text||"").body);
+  
+  const upvotes = m.upvotes || 0;
+  const downvotes = m.downvotes || 0;
+  const userVote = m.user_vote;
+  const upActive = userVote === "up" ? " active up" : "";
+  const downActive = userVote === "down" ? " active down" : "";
+
+  // Moderation buttons for teachers
+  const modActions = isTeacher() ? `
+    <div class="mod-actions">
+      <button class="btn mod-btn" onclick="openBadgeModal('${m.handle}')">Badge</button>
+      <button class="btn mod-btn danger" onclick="doRemovePost('${m.id}')">Remove</button>
+    </div>
+  ` : '';
 
   wrap.innerHTML = `
     <div class="post-header">
@@ -687,6 +1189,15 @@ function renderPost(m){
       <button class="linkish act-reply">Reply</button>
       <button class="linkish act-dm">Message @${m.handle||""}</button>
       <button class="linkish view-toggle">View replies</button>
+      <div class="vote-section">
+        <button class="vote-btn${upActive}" onclick="doVotePost('${m.id}', 'up')">
+          ▲ ${upvotes}
+        </button>
+        <button class="vote-btn${downActive}" onclick="doVotePost('${m.id}', 'down')">
+          ▼ ${downvotes}
+        </button>
+      </div>
+      ${modActions}
     </div>
     <div class="replies"></div>
   `;
@@ -752,6 +1263,9 @@ $("settingsClose").onclick = ()=>{ settingsOv.style.display="none"; };
 const compactToggle = $("compactToggle");
 const textOnlyToggle = $("textOnlyToggle");
 const time24Toggle = $("time24Toggle");
+const updateProfileBtn = $("updateProfileBtn");
+
+updateProfileBtn.onclick = doUpdateProfile;
 
 function applySettingsFromStorage(){
   document.body.classList.toggle("compact", localStorage.getItem("tlks_compact")==="1");
@@ -760,10 +1274,17 @@ function applySettingsFromStorage(){
   textOnlyToggle.checked = localStorage.getItem("tlks_textonly")==="1";
   time24Toggle.checked = use24h();
 }
+
 function openSettings(){
   applySettingsFromStorage();
+  if (ME) {
+    $("profileDisplayName").value = `${ME.first_name} ${ME.last_name}`.trim();
+    $("profileImageUrl").value = ME.profile_image || "";
+  }
+  $("profileUpdateStatus").textContent = "";
   settingsOv.style.display="flex";
 }
+
 compactToggle.onchange = () => {
   localStorage.setItem("tlks_compact", compactToggle.checked ? "1":"0");
   applySettingsFromStorage();
@@ -778,7 +1299,7 @@ time24Toggle.onchange = () => {
   renderRecent();
 };
 
-/* ============== DMs (Bring back) ============== */
+/* ============== DMs ============== */
 const newDmBtn = $("newDmBtn");
 const quickNewDm = $("quickNewDm");
 const openDmPickerBtn = $("openDmPickerBtn");
@@ -841,8 +1362,6 @@ async function loadRoom(roomId, reset=false){
   // Prepare UI & auth
   applySettingsFromStorage();
   setRoomUI();
-  renderRooms();
-  renderDmList();
   if (await ensureLogin()){
     loadRoom(CURRENT_ROOM, true);
   }
@@ -850,5 +1369,6 @@ async function loadRoom(roomId, reset=false){
   setInterval(fetchNew, 2000);
 })();
 </script>
-</body>
-</html>
+
+
+</body></html>

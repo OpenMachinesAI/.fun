@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CyberDuck Display — OpenCV</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+
+<style>
+:root{
+  --bg:#0b0b0c;--panel:#141418;--panel2:#1a1b20;--muted:#8a8f98;--accent:#00ffd1;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#fff;font:14px "SF Pro Display",system-ui,-apple-system,Segoe UI,Roboto}
+.app{display:grid;grid-template-rows:auto 1fr auto;height:100svh}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:var(--panel);gap:12px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700}
+.brand img{height:26px}
+.status{display:flex;gap:12px;color:var(--muted);white-space:nowrap}
+.enable{background:#0e927c;color:#001;padding:8px 12px;border:none;border-radius:10px;font-weight:800;cursor:pointer}
+.enable:disabled{opacity:.6;cursor:not-allowed}
+
+.main{display:grid;grid-template-columns:34% 42% 24%;gap:10px;padding:10px}
+.card{background:var(--panel2);border-radius:14px;position:relative;overflow:hidden;min-height:180px}
+.card .title{position:absolute;top:8px;left:10px;color:#cfd3da;font-weight:700;z-index:3}
+
+.ap-wrap{display:grid;grid-template-rows:1fr auto;position:relative}
+.video-wrap{position:relative}
+video#rear{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);filter:contrast(1.15) saturate(1.10) brightness(1.05)}
+canvas.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ap-hud{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#0f1116}
+.speed{font-size:48px;font-weight:800;letter-spacing:.5px}
+#turnSmall{color:var(--muted)}
+
+#map{height:100%;width:100%}
+.red-dot{background:#ff3b30;border-radius:50%;width:14px;height:14px;border:2px solid #fff}
+.turn-next{position:absolute;top:8px;right:8px;background:#0f1116;padding:6px 8px;border-radius:8px;z-index:2}
+.turnlist{position:absolute;bottom:8px;left:8px;right:8px;background:#0f1116;padding:6px;border-radius:8px;max-height:34%;overflow:auto;z-index:2}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px}
+.kv{background:#10131a;padding:8px;border-radius:10px}
+.kv .k{color:var(--muted)}.kv .v{font-size:18px;font-weight:700}
+.gauges{display:flex;gap:8px;justify-content:center;padding:6px}
+.gauges canvas{background:#0e1117;border-radius:12px}
+.compass{display:flex;justify-content:center;align-items:center;padding:10px}
+#compassCanvas{width:160px;height:160px}
+
+.bottombar{background:var(--panel);padding:6px 10px;color:var(--muted);display:flex;justify-content:space-between}
+
+@media (max-width: 980px){
+  .main{grid-template-columns:1fr;grid-template-rows:auto auto auto}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <img alt="duck" src="https://upload.wikimedia.org/wikipedia/commons/8/88/Duck_icon.svg"/>
+      <span>CyberDuck</span>
+    </div>
+    <div class="status">
+      <span id="gps-head">—°</span>
+      <span id="gps-alt">—m</span>
+      <span id="trip">0.0mi</span>
+    </div>
+    <button id="enable" class="enable">Enable</button>
+  </div>
+
+  <div class="main">
+    <!-- AUTOPILOT -->
+    <section class="card ap-wrap">
+      <div class="title">Autopilot</div>
+      <div class="video-wrap">
+        <video id="rear" autoplay muted playsinline></video>
+        <!-- overlay for lanes -->
+        <canvas id="laneCanvas" class="overlay"></canvas>
+      </div>
+      <div class="ap-hud">
+        <div class="speed" id="speed">0</div>
+        <div id="turnSmall">Tap map</div>
+      </div>
+    </section>
+
+    <!-- MAP -->
+    <section class="card">
+      <div id="map"></div>
+      <div class="turn-next" id="turnNext">Next: —</div>
+      <div class="turnlist" id="turnList"></div>
+    </section>
+
+    <!-- TELEMETRY -->
+    <section class="card">
+      <div class="title">Telemetry</div>
+      <div class="stats">
+        <div class="kv"><div class="k">Speed</div><div class="v" id="stat-speed">0</div></div>
+        <div class="kv"><div class="k">AccelX</div><div class="v" id="stat-x">0</div></div>
+        <div class="kv"><div class="k">AccelY</div><div class="v" id="stat-y">0</div></div>
+        <div class="kv"><div class="k">AccelZ</div><div class="v" id="stat-z">0</div></div>
+      </div>
+      <div class="gauges">
+        <canvas id="gX" width="110" height="110"></canvas>
+        <canvas id="gY" width="110" height="110"></canvas>
+        <canvas id="gZ" width="110" height="110"></canvas>
+      </div>
+      <div class="compass"><canvas id="compassCanvas" width="160" height="160"></canvas></div>
+    </section>
+  </div>
+
+  <div class="bottombar">
+    <div>CyberDuck Prototype UI</div><div>72° • AUTO</div>
+  </div>
+</div>
+
+<!-- libs -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+<!-- OpenCV.js (async) -->
+<script async src="https://docs.opencv.org/4.x/opencv.js" onload="onOpenCvReady()"></script>
+
+<script>
+/* ========= ELEMENTS ========= */
+const speedEl = document.getElementById("speed");
+const statSpeed = document.getElementById("stat-speed");
+const gpsHead = document.getElementById("gps-head");
+const gpsAlt = document.getElementById("gps-alt");
+const tripEl = document.getElementById("trip");
+const turnSmall = document.getElementById("turnSmall");
+const turnList = document.getElementById("turnList");
+const turnNext = document.getElementById("turnNext");
+const enableBtn = document.getElementById("enable");
+
+const rearVideo = document.getElementById("rear");
+const laneCanvas = document.getElementById("laneCanvas");
+const laneCtx = laneCanvas.getContext("2d");
+const gX = document.getElementById("gX");
+const gY = document.getElementById("gY");
+const gZ = document.getElementById("gZ");
+const compassCanvas = document.getElementById("compassCanvas");
+
+/* ========= MAP / ROUTING ========= */
+const map = L.map("map",{zoomControl:false}).setView([37.77,-122.41], 15);
+function setTheme(){
+  const h=(new Date()).getHours();
+  const dark=(h>=18||h<7);
+  const url=dark
+    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  L.tileLayer(url,{maxZoom:19, attribution:'&copy; OpenStreetMap'}).addTo(map);
+}
+setTheme();
+const redDot=L.divIcon({className:"red-dot",iconSize:[14,14]});
+const me=L.marker([37.77,-122.41],{icon:redDot}).addTo(map);
+const routing=L.Routing.control({waypoints:[],addWaypoints:false,show:false,routeWhileDragging:false}).addTo(map);
+map.on("click",e=>routing.setWaypoints([me.getLatLng(),e.latlng]));
+routing.on("routesfound",e=>{
+  const s = (e.routes?.[0]?.instructions)||[];
+  turnNext.textContent = s[0] ? ("Next: "+s[0].text) : "Next: —";
+  turnList.innerHTML = s.map((st,i)=>`<div>${i+1}. ${st.text}</div>`).join("");
+  turnSmall.textContent = s[0] ? s[0].text : "Route ready";
+});
+
+/* ========= GEO / SPEED / COMPASS ========= */
+let lastPos=null, tripMeters=0;
+let headingDeg=0;
+
+if ("geolocation" in navigator){
+  navigator.geolocation.watchPosition(p=>{
+    const {latitude,longitude,speed,heading,altitude} = p.coords;
+    me.setLatLng([latitude,longitude]);
+    map.setView([latitude,longitude], map.getZoom(), {animate:true});
+
+    if (lastPos){
+      tripMeters += haversine(lastPos.lat,lastPos.lng,latitude,longitude);
+    }
+    lastPos={lat:latitude,lng:longitude};
+
+    const mph = (speed!=null && !Number.isNaN(speed)) ? speed*2.236936 : 0;
+    speedEl.textContent = Math.round(mph);
+    statSpeed.textContent = Math.round(mph);
+    gpsAlt.textContent = (altitude!=null && !isNaN(altitude)) ? altitude.toFixed(0)+"m" : "—m";
+    tripEl.textContent = (tripMeters/1609.344).toFixed(1)+"mi";
+
+    if (heading!=null && !isNaN(heading)) headingDeg = heading;
+    drawCompass(headingDeg);
+  }, console.warn, {enableHighAccuracy:true, maximumAge:1000, timeout:10000});
+}
+
+function haversine(a1,o1,a2,o2){
+  const R=6371000,toRad=x=>x*Math.PI/180;
+  const dLat=toRad(a2-a1),dLon=toRad(o2-o1);
+  const A=Math.sin(dLat/2)**2+Math.cos(toRad(a1))*Math.cos(toRad(a2))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(A));
+}
+
+/* DeviceOrientation for heading (iOS Safari provides webkitCompassHeading) */
+window.addEventListener("deviceorientation", (ev)=>{
+  let h = ev.webkitCompassHeading ?? (360 - ev.alpha); // alpha is CW from device top relative to Earth
+  if (h!=null && !isNaN(h)) {
+    headingDeg = (h+360)%360;
+    gpsHead.textContent = Math.round(headingDeg)+"°";
+    drawCompass(headingDeg);
+  }
+});
+
+/* ========= MOTION GAUGES ========= */
+function gauge(ctx,val,label){
+  const c = ctx.canvas;
+  // ensure DPR crispness
+  const dpr = window.devicePixelRatio||1;
+  const cssW = c.clientWidth, cssH = c.clientHeight;
+  if (c.width !== Math.round(cssW*dpr) || c.height !== Math.round(cssH*dpr)){
+    c.width = Math.round(cssW*dpr); c.height = Math.round(cssH*dpr);
+  }
+  const r=c.width/2;
+  ctx.reset?.();
+  ctx.clearRect(0,0,c.width,c.height);
+
+  // ring
+  ctx.beginPath(); ctx.arc(r,r,r-8,0,Math.PI*2);
+  ctx.strokeStyle="#333"; ctx.lineWidth=6; ctx.stroke();
+
+  // needle
+  ctx.save(); ctx.translate(r,r);
+  // val scaled down; clamp rotation so it doesn’t spin wildly
+  const rot = Math.max(-Math.PI, Math.min(Math.PI, val/10));
+  ctx.rotate(rot);
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(r-18,0);
+  ctx.lineWidth=6; ctx.lineCap="round"; ctx.strokeStyle="#0fd"; ctx.stroke();
+  ctx.restore();
+
+  // label
+  ctx.fillStyle="#aaa"; ctx.font = `${14*dpr}px system-ui, sans-serif`;
+  ctx.textAlign="center";
+  ctx.fillText(`${label}:${val.toFixed(1)}`, r, c.height-10*dpr);
+}
+
+function onMotion(ev){
+  const ax = ev.acceleration?.x ?? ev.accelerationIncludingGravity?.x ?? 0;
+  const ay = ev.acceleration?.y ?? ev.accelerationIncludingGravity?.y ?? 0;
+  const az = ev.acceleration?.z ?? ev.accelerationIncludingGravity?.z ?? 0;
+
+  document.getElementById("stat-x").textContent = ax.toFixed(1);
+  document.getElementById("stat-y").textContent = ay.toFixed(1);
+  document.getElementById("stat-z").textContent = az.toFixed(1);
+
+  gauge(gX.getContext("2d"), ax, "X");
+  gauge(gY.getContext("2d"), ay, "Y");
+  gauge(gZ.getContext("2d"), az, "Z");
+}
+window.addEventListener("devicemotion", onMotion);
+
+/* ========= COMPASS ========= */
+function drawCompass(heading){
+  const c=compassCanvas,ctx=c.getContext("2d");
+  // scale to CSS size
+  const dpr = window.devicePixelRatio||1;
+  const cssW = c.clientWidth, cssH = c.clientHeight;
+  if (c.width !== Math.round(cssW*dpr) || c.height !== Math.round(cssH*dpr)){
+    c.width = Math.round(cssW*dpr); c.height = Math.round(cssH*dpr);
+  }
+  const r=c.width/2; ctx.clearRect(0,0,c.width,c.height);
+
+  // circle
+  ctx.beginPath(); ctx.arc(r,r,r-6,0,2*Math.PI); ctx.strokeStyle="#555"; ctx.lineWidth=4; ctx.stroke();
+
+  // needle
+  ctx.save(); ctx.translate(r,r); ctx.rotate((heading||0)*Math.PI/180);
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-r+14); ctx.strokeStyle="#f33"; ctx.lineWidth=6; ctx.lineCap="round"; ctx.stroke();
+  ctx.restore();
+
+  ctx.fillStyle="#aaa"; ctx.font=`${16*dpr}px system-ui, sans-serif`; ctx.textAlign="center";
+  ctx.fillText(Math.round(heading)+"°", r, c.height-12*dpr);
+}
+
+/* ========= CAMERA ========= */
+async function startCamera(){
+  const constraints = { video: { facingMode: { ideal: "environment" } }, audio: false };
+  const stream = await navigator.mediaDevices.getUserMedia(constraints);
+  rearVideo.srcObject = stream;
+  await rearVideo.play().catch(()=>{});
+}
+
+/* ========= OpenCV LANE DETECTION ========= */
+let cvReady=false, laneLoopRunning=false;
+let frameCanvas, frameCtx;
+
+function onOpenCvReady(){
+  cvReady = true;
+  // no-op here; we start pipeline after both video & cv ready
+}
+
+function resizeOverlays(){
+  const rect = rearVideo.getBoundingClientRect();
+  // size lane canvas to CSS pixel size, but set backing store with DPR
+  const dpr = window.devicePixelRatio||1;
+  laneCanvas.style.width = rect.width+"px";
+  laneCanvas.style.height = rect.height+"px";
+  laneCanvas.width = Math.max(2, Math.round(rect.width*dpr));
+  laneCanvas.height = Math.max(2, Math.round(rect.height*dpr));
+  // internal frame grab canvas
+  frameCanvas.width = Math.round(rect.width);
+  frameCanvas.height = Math.round(rect.height);
+}
+window.addEventListener("resize", ()=>{ if (rearVideo.videoWidth) resizeOverlays(); });
+
+function startLaneLoop(){
+  if (laneLoopRunning || !cvReady || rearVideo.readyState < 2) return;
+  laneLoopRunning = true;
+
+  frameCanvas = document.createElement("canvas");
+  frameCtx = frameCanvas.getContext("2d",{willReadFrequently:true});
+  resizeOverlays();
+
+  const src = new cv.Mat();
+  const gray = new cv.Mat();
+  const blur = new cv.Mat();
+  const edges = new cv.Mat();
+  const masked = new cv.Mat();
+  const lines = new cv.Mat();
+
+const process = ()=>{
+  if (!laneLoopRunning) return;
+
+  // draw current video frame to canvas
+  frameCtx.drawImage(rearVideo, 0, 0, frameCanvas.width, frameCanvas.height);
+
+  // get pixels
+  let imgData = frameCtx.getImageData(0,0,frameCanvas.width,frameCanvas.height);
+  
+  // prepare src mat (correct dimensions first)
+  src.create(frameCanvas.height, frameCanvas.width, cv.CV_8UC4);
+  src.data.set(imgData.data);
+
+  // pipeline
+  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+  cv.GaussianBlur(gray, blur, new cv.Size(5,5), 0, 0, cv.BORDER_DEFAULT);
+  cv.Canny(blur, edges, 60, 150, 3, false);
+
+  // ROI mask
+  const mask = new cv.Mat.zeros(edges.rows, edges.cols, cv.CV_8UC1);
+  const h = edges.rows, w = edges.cols;
+  const pts = cv.matFromArray(4, 1, cv.CV_32SC2, [
+    Math.round(w*0.12), h-1,
+    Math.round(w*0.40), Math.round(h*0.55),
+    Math.round(w*0.60), Math.round(h*0.55),
+    Math.round(w*0.88), h-1
+  ]);
+  const ptsVec = new cv.MatVector(); ptsVec.push_back(pts);
+  cv.fillPoly(mask, ptsVec, new cv.Scalar(255));
+  cv.bitwise_and(edges, mask, masked);
+  pts.delete(); ptsVec.delete(); mask.delete();
+
+  // Hough
+  cv.HoughLinesP(masked, lines, 1, Math.PI/180, 50, 30, 120);
+
+  // analyze lines
+  const left=[], right=[];
+  const arr = lines.data32S; // typed array of ints
+  for (let i=0; i<arr.length; i+=4){
+    const x1=arr[i], y1=arr[i+1], x2=arr[i+2], y2=arr[i+3];
+    const dx=x2-x1, dy=y2-y1;
+    if (dx===0) continue;
+    const slope=dy/dx;
+    if (Math.abs(slope)<0.4) continue;
+    const intercept = y1 - slope*x1;
+    if (slope<0) left.push({slope,intercept});
+    else right.push({slope,intercept});
+  }
+
+  // average into lane lines
+  const laneLines = [];
+  const y1=h-1, y2=Math.round(h*0.58);
+  function avgLine(arr){
+    if (!arr.length) return null;
+    const s=arr.reduce((a,b)=>a+b.slope,0)/arr.length;
+    const b=arr.reduce((a,c)=>a+c.intercept,0)/arr.length;
+    const x1=Math.round((y1-b)/s);
+    const x2=Math.round((y2-b)/s);
+    if (Number.isFinite(x1)&&Number.isFinite(x2)) return {x1,y1,x2,y2};
+    return null;
+  }
+  const L=avgLine(left), R=avgLine(right);
+  if (L) laneLines.push(L);
+  if (R) laneLines.push(R);
+
+  // draw overlay
+  drawLaneOverlay(laneLines, w, h);
+
+  requestAnimationFrame(process);
+};
+
+  // allocate src now that size known
+  src.create(frameCanvas.height, frameCanvas.width, cv.CV_8UC4);
+  requestAnimationFrame(process);
+
+  // cleanup on tab hide (optional)
+  document.addEventListener("visibilitychange", ()=>{
+    if (document.hidden) laneLoopRunning=false;
+  });
+}
+
+function drawLaneOverlay(lines, w, h){
+  // scale to DPR
+  const dpr = window.devicePixelRatio||1;
+  laneCtx.clearRect(0,0,laneCanvas.width,laneCanvas.height);
+
+  // draw dimmed road mask for vibe
+  laneCtx.save();
+  laneCtx.globalAlpha = 0.15;
+  laneCtx.fillStyle = "#00ffd1";
+  const p = new Path2D();
+  p.moveTo(w*0.12*dpr, h*dpr);
+  p.lineTo(w*0.40*dpr, h*0.55*dpr);
+  p.lineTo(w*0.60*dpr, h*0.55*dpr);
+  p.lineTo(w*0.88*dpr, h*dpr);
+  p.closePath();
+  laneCtx.fill(p);
+  laneCtx.restore();
+
+  laneCtx.lineWidth = 6*dpr;
+  laneCtx.strokeStyle = "rgba(0,255,209,0.95)";
+  laneCtx.lineCap = "round";
+
+  for (const ln of lines){
+    laneCtx.beginPath();
+    laneCtx.moveTo(ln.x1*dpr, ln.y1*dpr);
+    laneCtx.lineTo(ln.x2*dpr, ln.y2*dpr);
+    laneCtx.stroke();
+  }
+
+  // draw center guide if both lanes exist
+  if (lines.length===2){
+    const mid = {
+      x1: (lines[0].x1 + lines[1].x1)/2,
+      y1: (lines[0].y1 + lines[1].y1)/2,
+      x2: (lines[0].x2 + lines[1].x2)/2,
+      y2: (lines[0].y2 + lines[1].y2)/2,
+    };
+    laneCtx.setLineDash([14*dpr, 10*dpr]);
+    laneCtx.strokeStyle = "rgba(255,255,255,0.85)";
+    laneCtx.lineWidth = 4*dpr;
+    laneCtx.beginPath();
+    laneCtx.moveTo(mid.x1*dpr, mid.y1*dpr);
+    laneCtx.lineTo(mid.x2*dpr, mid.y2*dpr);
+    laneCtx.stroke();
+    laneCtx.setLineDash([]);
+  }
+}
+
+/* ========= PERMISSIONS + BOOT ========= */
+async function requestMotionPermissions(){
+  try{
+    if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function"){
+      const r = await DeviceMotionEvent.requestPermission();
+      console.log("DeviceMotion permission:", r);
+    }
+    if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function"){
+      const r2 = await DeviceOrientationEvent.requestPermission();
+      console.log("DeviceOrientation permission:", r2);
+    }
+  }catch(e){ console.warn(e); }
+}
+
+enableBtn.addEventListener("click", async ()=>{
+  enableBtn.disabled = true;
+  try{
+    await startCamera();
+    await requestMotionPermissions();
+    // compass label update immediately
+    gpsHead.textContent = Math.round(headingDeg)+"°";
+    // start lane processing when video can play
+    if (rearVideo.readyState >= 2){
+      startLaneLoop();
+    }else{
+      rearVideo.addEventListener("loadeddata", startLaneLoop, {once:true});
+    }
+  }catch(e){
+    console.error(e);
+    alert("Failed to start camera or sensors. Check site permissions and HTTPS.");
+    enableBtn.disabled = false;
+  }
+});
+
+/* keep overlays in sync when metadata loads / orientation changes */
+rearVideo.addEventListener("loadedmetadata", ()=>{ resizeOverlays(); });
+
+</script>
+</body>
+</html>

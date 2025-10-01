@@ -465,12 +465,13 @@ function rarityEmoji(r){
        : "●";
 }
 async function sendDiscord(payload){
+  const formData = new FormData();
+  formData.append('payload_json', JSON.stringify(payload));
   try{
     await fetch(WEBHOOK_URL, {
       method:"POST",
-      mode:"no-cors", // patched
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify(payload)
+      mode:"no-cors",
+      body: formData
     });
   }catch(e){ console.error("Webhook error:", e); }
 }

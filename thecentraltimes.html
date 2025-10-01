@@ -1,286 +1,371 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
-  <title>Central School News</title>
+  <title>The Central Times</title>
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
   <style>
-    /* Body & Background */
     body {
+      font-family: "Times New Roman", serif;
+      background: #fdfcf7;
+      background-image: repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0.03) 0px,
+        rgba(0,0,0,0.03) 1px,
+        transparent 1px,
+        transparent 24px
+      );
+      color: #222;
       margin: 0;
       padding: 0;
-      font-family: 'Comic Neue', cursive;
-      background: linear-gradient(135deg, #6a0dad, #0000ff);
-      color: #f0e6fa;
+      line-height: 1.6;
     }
+
     header {
       text-align: center;
-      padding: 20px;
-      font-size: 2.5em;
-      background: rgba(0,0,0,0.3);
-      border-bottom: 4px double #dda0dd;
+      border-bottom: 4px double #000;
+      padding: 1rem;
+      background: rgba(255,255,255,0.8);
     }
-    /* Top featured section */
-    .featured-section {
-      display: flex;
-      gap: 20px;
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
+
+    h1 {
+      font-family: "UnifrakturCook", serif;
+      font-size: 3rem;
+      margin: 0;
+      text-transform: capitalize;
     }
-    .featured-video {
-      flex: 2;
-      background: #fff;
-      padding: 10px;
-      border: 4px solid #4b0082;
-      box-shadow: 5px 5px 0 #000;
+
+    #edition-label {
+      font-style: italic;
+      font-size: 1rem;
+      margin-top: .5rem;
     }
-    .featured-video video {
-      width: 100%;
-      height: auto;
-      display: block;
+
+    #weather-date {
+      font-size: .95rem;
+      margin-top: .5rem;
+      color: #444;
     }
-    .featured-title {
-      margin-top: 10px;
-      font-size: 1.5em;
-      color: #4b0082;
-    }
-    .previous-videos {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    .prev-card {
-      display: flex;
-      gap: 10px;
-      background: #f3e5f5;
-      padding: 5px;
-      border: 3px solid #4b0082;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .prev-card:hover { transform: scale(1.02); }
-    .prev-card img {
-      width: 100px;
-      height: 56px;
-      object-fit: cover;
-      border: 2px solid #4b0082;
-    }
-    .prev-card .prev-title {
-      font-size: 1em;
-      color: #4b0082;
-      align-self: center;
-    }
-    /* All videos grid */
-    .all-videos {
-      max-width: 1200px;
-      margin: 20px auto;
+
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 15px;
-      padding: 0 20px 40px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      padding: 0 1rem;
     }
-    .video-card {
-      background-color: #f3e5f5;
-      border: 3px solid #4b0082;
-      padding: 10px;
+
+    .article {
+      border: 1px solid #000;
+      background: #fff;
+      padding: 1rem;
+      transition: transform .4s ease, box-shadow .4s ease, opacity .6s ease;
       cursor: pointer;
-      transition: transform 0.3s, box-shadow 0.3s;
+      text-decoration: none;
+      color: inherit;
+      opacity: 0;
+      animation: fadeIn .8s forwards;
     }
-    .video-card:hover {
-      transform: scale(1.05);
-      box-shadow: 5px 5px 0 #000;
+
+    .article:hover {
+      transform: rotateX(3deg) rotateY(-3deg) scale(1.02);
+      box-shadow: 5px 5px 12px rgba(0,0,0,.3);
     }
-    .video-card img {
-      width: 100%;
-      height: auto;
-      aspect-ratio: 16/9;
-      object-fit: cover;
-      border: 4px solid #4b0082;
+
+    .article h2 {
+      font-size: 1.3rem;
+      margin: 0 0 .5rem;
     }
-    .video-card h2 {
-      margin: 10px 0 0;
-      font-size: 1.1em;
-      color: #4b0082;
+
+    .article p {
+      margin: 0 0 .5rem;
     }
-    /* Modal */
-    .modal-overlay {
+
+    #show-all {
+      display: block;
+      margin: 1rem auto;
+      padding: 0.5rem 1rem;
+      border: 2px solid #000;
+      background: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+
+    #show-all:hover {
+      background: #f0f0f0;
+    }
+
+    footer {
+      border-top: 4px double #000;
+      text-align: center;
+      padding: 1rem;
+      font-size: .9rem;
+      background: rgba(255,255,255,0.8);
+    }
+
+    footer a {
+      text-decoration: underline;
+      cursor: pointer;
+      color: inherit;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Overlay for zoomed PDF + credits */
+    .overlay {
       position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
       display: none;
       align-items: center;
       justify-content: center;
-      animation: fadeIn 0.5s;
+      z-index: 1000;
     }
-    .modal-window {
-      background: #ddd;
-      border: 2px solid #4b0082;
-      width: 80%;
-      max-width: 800px;
-      box-shadow: 5px 5px 0 #000;
-      animation: slideDown 0.5s ease-out;
-    }
-    .modal-header {
-      background: #4b0082;
-      color: #fff;
-      padding: 5px;
+
+    .overlay.show {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      animation: fadeIn .3s forwards;
     }
-    .modal-header button {
-      background: #e0d7f3;
-      border: 2px outset #fff;
-      cursor: pointer;
-      margin-left: 5px;
-    }
-    .modal-content {
-      padding: 10px;
+
+    .overlay iframe {
+      width: 80%;
+      height: 80%;
+      border: none;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
       background: #fff;
+      transform: scale(0.9);
+      animation: zoomIn .3s forwards;
     }
-    .modal-content video {
-      width: 100%;
-      height: auto;
-      max-height: 80vh;
-      display: block;
+
+    .overlay.hideAnim iframe {
+      animation: zoomOut .3s forwards;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; } to { opacity: 1; }
+
+    #close-btn, #close-credits {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #fff;
+      border: 2px solid #000;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      font-weight: bold;
     }
-    @keyframes slideDown {
-      from { transform: translateY(-20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+
+    /* Credits content */
+    #credits-content {
+      background: #fff;
+      color: #000;
+      max-width: 600px;
+      padding: 2rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+      text-align: left;
+      font-size: 1rem;
+      transform: scale(0.9);
+      animation: zoomIn .3s forwards;
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes zoomOut {
+      from { transform: scale(1); opacity: 1; }
+      to { transform: scale(0.7); opacity: 0; }
+    }
+
+    /* Mobile support */
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; }
+      .overlay iframe { width: 95%; height: 85%; }
+      #credits-content { width: 90%; font-size: 0.9rem; }
     }
   </style>
 </head>
 <body>
-  <header>Central School News (CSN)</header>
+  <header>
+    <h1>The Central Times</h1>
+    <p id="edition-label"></p>
+    <p id="weather-date"></p>
+  </header>
 
-  <div class="featured-section">
-    <div class="featured-video" id="featured-video">
-      <video id="featured-player" controls>
-        <source id="featured-source" src="" type="video/mp4">
-        Your browser doesn’t support video.
-      </video>
-      <div class="featured-title" id="featured-title">Loading...</div>
-    </div>
-    <div class="previous-videos" id="previous-videos">
-      <!-- JS will inject 3 previous clips here -->
-    </div>
+  <main id="articles"></main>
+  <button id="show-all">Show All Articles</button>
+
+  <footer>
+    <p>© 2025 The Central Times — Updated Weekly | <a id="credits-link">Credits</a></p>
+  </footer>
+
+  <!-- Overlay for PDFs -->
+  <div id="overlay" class="overlay">
+    <button id="close-btn">X Close</button>
+    <iframe id="pdf-frame"></iframe>
   </div>
 
-  <div class="all-videos" id="video-list">
-    <!-- JS will inject all clips here when you scroll -->
-  </div>
-
-  <div class="modal-overlay" id="modal-overlay">
-    <div class="modal-window">
-      <div class="modal-header">
-        <span id="modal-title">Video Player</span>
-        <div>
-          <button id="fullscreen-btn">Full Screen</button>
-          <button id="close-btn">Close</button>
-        </div>
-      </div>
-      <div class="modal-content">
-        <video id="modal-video" controls>
-          <source id="video-source" src="" type="video/mp4">
-          Your browser doesn’t support video.
-        </video>
-      </div>
+  <!-- Overlay for Credits -->
+  <div id="credits-overlay" class="overlay">
+    <button id="close-credits">X Close</button>
+    <div id="credits-content">
+      <h2>Credits</h2>
+      <p><strong>Editor-in-Chief:</strong> Alex Ross</p>
+      <p><strong>Design:</strong> Central School Fun Team</p>
+      <p><strong>Special Thanks:</strong> Central Middle School Community</p>
+      <p>Built with ❤️ in 2025</p>
     </div>
   </div>
+
+  <!-- Articles JSON inside HTML -->
+  <script type="application/json" id="articles-data">
+  [
+    {
+      "title": "Cafeteria Revamps Menu With Local Produce",
+      "author": "Staff Reporter",
+      "date": "2025-09-28",
+      "summary": "New veggie-forward options arrive just in time for fall.",
+      "url": "sample.pdf"
+    },
+    {
+      "title": "Rocket Project Nears Launch Day",
+      "author": "Science Desk",
+      "date": "2025-09-27",
+      "summary": "The 'In Thrust We Trust' vehicle adds camera and flight computer.",
+      "url": "rocket.pdf"
+    },
+    {
+      "title": "Rehearsals Begin for Central Musical Revival",
+      "author": "Arts & Letters",
+      "date": "2025-09-25",
+      "summary": "Cast returns to the stage with new choreography and sharper book.",
+      "url": "musical.pdf"
+    },
+    {
+      "title": "New Library Wing Opens",
+      "author": "Campus Beat",
+      "date": "2025-09-20",
+      "summary": "Students welcome expanded study spaces and digital archives.",
+      "url": "library.pdf"
+    },
+    {
+      "title": "Local Team Wins Debate Championship",
+      "author": "Sports Desk",
+      "date": "2025-09-18",
+      "summary": "Central debaters take home regional title after a tense final round.",
+      "url": "debate.pdf"
+    }
+  ]
+  </script>
 
   <script>
-    let allVideos = [];
-    const featuredPlayer = document.getElementById('featured-player');
-    const featuredSource = document.getElementById('featured-source');
-    const featuredTitle = document.getElementById('featured-title');
-    const prevContainer = document.getElementById('previous-videos');
-    const videoList = document.getElementById('video-list');
-    const modalOverlay = document.getElementById('modal-overlay');
-    const modalVideo = document.getElementById('modal-video');
-    const modalSource = document.getElementById('video-source');
-    const modalTitle = document.getElementById('modal-title');
+    function formatDate(str) {
+      const d = new Date(str);
+      return d.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      });
+    }
 
-    async function fetchVideos() {
-      try {
-        const res = await fetch('https://salexai-funserver.hf.space/album/B2c5nhQSTu4wFQC');
-        const data = await res.json();
-        allVideos = data.videos;
-        setupFeatured(allVideos);
-        renderPrevious(allVideos.slice(1,4));
-        renderAll(allVideos);
-      } catch (e) {
-        console.error('Fetch failed:', e);
+    function updateEditionLabel() {
+      const label = document.getElementById("edition-label");
+      const today = new Date();
+      const monday = new Date(today);
+      monday.setDate(today.getDate() - (today.getDay() + 6) % 7);
+      label.textContent = `Weekly Edition — Week of ${monday.toLocaleDateString(undefined, {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      })}`;
+    }
+
+    function updateWeatherDate() {
+      const el = document.getElementById("weather-date");
+      const today = new Date();
+      const dateStr = today.toLocaleDateString(undefined, {
+        weekday: "long", year: "numeric", month: "long", day: "numeric"
+      });
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const { latitude, longitude } = pos.coords;
+          fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`)
+            .then(res => res.json())
+            .then(data => {
+              const w = data.current_weather;
+              const icon = w.weathercode < 3 ? "☀️" : (w.weathercode < 60 ? "☁️" : "🌧️");
+              el.textContent = `${dateStr} — ${w.temperature}°C ${icon}`;
+            })
+            .catch(() => {
+              el.textContent = `${dateStr} — Weather unavailable`;
+            });
+        }, () => {
+          el.textContent = `${dateStr} — Weather unavailable`;
+        });
+      } else {
+        el.textContent = `${dateStr} — Weather unavailable`;
       }
     }
 
-    function setupFeatured(videos) {
-      const vid = videos[0];
-      const title = vid.caption?.trim() || 'Unnamed Clip';
-      featuredSource.src = vid.url;
-      featuredPlayer.load();
-      featuredTitle.textContent = title;
-    }
-
-    function renderPrevious(videos) {
-      prevContainer.innerHTML = '';
-      videos.forEach(vid => {
-        const title = vid.caption?.trim() || 'Unnamed Clip';
-        const thumb = vid.poster?.trim() || 'https://via.placeholder.com/100x56?text=No+Preview';
-        const card = document.createElement('div');
-        card.className = 'prev-card';
+    function renderArticles(showAll=false) {
+      const data = document.getElementById("articles-data").textContent;
+      const articles = JSON.parse(data);
+      const container = document.getElementById("articles");
+      container.innerHTML = "";
+      const toShow = showAll ? articles : articles.slice(0,3);
+      toShow.forEach((article, i) => {
+        const card = document.createElement("div");
+        card.className = "article";
+        card.style.animationDelay = `${i*0.1}s`;
         card.innerHTML = `
-          <img src="${thumb}" alt="thumb">
-          <div class="prev-title">${title}</div>
+          <h2>${article.title}</h2>
+          <p><em>${article.author}</em> — ${formatDate(article.date)}</p>
+          <p>${article.summary}</p>
         `;
-        card.addEventListener('click', () => {
-          featuredSource.src = vid.url;
-          featuredPlayer.load();
-          featuredTitle.textContent = title;
-        });
-        prevContainer.appendChild(card);
+        card.addEventListener("click", () => openPDF(article.url));
+        container.appendChild(card);
       });
     }
 
-    function renderAll(videos) {
-      videoList.innerHTML = '';
-      videos.forEach(vid => {
-        const title = vid.caption?.trim() || 'Unnamed Clip';
-        const thumb = vid.poster?.trim() || 'https://via.placeholder.com/320x180?text=No+Preview';
-        const card = document.createElement('div');
-        card.className = 'video-card';
-        card.innerHTML = `
-          <img src="${thumb}" alt="thumb">
-          <h2>${title}</h2>
-        `;
-        card.addEventListener('click', () => openModal(title, vid.url));
-        videoList.appendChild(card);
-      });
+    function openPDF(url) {
+      const overlay = document.getElementById("overlay");
+      overlay.classList.add("show");
+      document.getElementById("pdf-frame").src = url;
     }
 
-    function openModal(title, url) {
-      modalTitle.textContent = title;
-      modalSource.src = url;
-      modalVideo.load();
-      modalOverlay.style.display = 'flex';
+    function closePDF() {
+      const overlay = document.getElementById("overlay");
+      overlay.classList.add("hideAnim");
+      setTimeout(() => {
+        overlay.classList.remove("show","hideAnim");
+        document.getElementById("pdf-frame").src = "";
+      }, 300);
     }
-    document.getElementById('close-btn').addEventListener('click', () => {
-      modalVideo.pause();
-      modalOverlay.style.display = 'none';
+
+    document.getElementById("close-btn").addEventListener("click", closePDF);
+
+    // Credits overlay
+    document.getElementById("credits-link").addEventListener("click", () => {
+      document.getElementById("credits-overlay").classList.add("show");
     });
-    document.getElementById('fullscreen-btn').addEventListener('click', () => {
-      if (modalVideo.requestFullscreen) modalVideo.requestFullscreen();
-      else if (modalVideo.webkitRequestFullscreen) modalVideo.webkitRequestFullscreen();
-      else if (modalVideo.msRequestFullscreen) modalVideo.msRequestFullscreen();
+    document.getElementById("close-credits").addEventListener("click", () => {
+      document.getElementById("credits-overlay").classList.remove("show");
     });
 
-    fetchVideos();
+    updateEditionLabel();
+    updateWeatherDate();
+    renderArticles();
+
+    document.getElementById("show-all").addEventListener("click", () => {
+      renderArticles(true);
+      document.getElementById("show-all").style.display = "none";
+    });
   </script>
 </body>
 </html>

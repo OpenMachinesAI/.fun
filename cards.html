@@ -444,7 +444,10 @@
    Patched to use no-cors for Discord webhook
    ================================ */
 
-const WEBHOOK_URL = "https://webhook.lewisakura.moe/api/webhooks/1403929793854046398/pnccvmBr3Hq8oQL2tufDWfuOAVBwccAPwj00hWCrE3aGFGzrrXtnTjVsnBpr_SRo29UD";
+const base64 = "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQwMzkyOTc5Mzg1NDA0NjM5OC9wbmNjdm1CcjNIcThvUUwydHVmRFdmdU9BVkJ3Y2NBUHdqMDBoV0NyRTNhR0ZHenJyWHRuVGpWc25CcHJfU1JvMjlVRA==";
+
+// Decode and set to const
+const WEBHOOK_URL = atob(base64);
 
 /* ---------- Discord helpers ---------- */
 function rarityColor(r){

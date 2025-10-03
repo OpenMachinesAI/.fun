@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Central Archives Board</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      overflow: hidden;
+      font-family: sans-serif;
+      position: relative;
+      height: 100vh;
+    }
+    /* Boot / splash screens */
+    .splash {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background: black;
+      color: white;
+      z-index: 1000;
+    }
+    .splash.red {
+      background: darkred;
+    }
+    .splash.hidden {
+      display: none;
+    }
+
+    /* Info bar */
+    #info-bar {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      background: #111;
+      color: #0f0;
+      font-size: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      height: 30px;
+      line-height: 30px;
+      z-index: 500;
+    }
+    #info-text {
+      display: inline-block;
+      padding-left: 100%;
+      animation: scroll-text 20s linear infinite;
+    }
+    @keyframes scroll-text {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Slideshow */
+    #slideshow-container {
+      position: absolute;
+      top: 30px; bottom: 0;
+      left: 0; right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #slideshow {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+    }
+    #slideshow.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Boot splash, shown on startup -->
+  <div id="splash-boot" class="splash">
+    <h1>Central Archives Board</h1>
+    <p>Initializing…</p>
+  </div>
+
+  <!-- Error splash (no images) -->
+  <div id="splash-error" class="splash red hidden">
+    <h1>Error: No images found</h1>
+    <p>Please contact Alex at <a href="mailto:alexosthebestnet@gmail.com" style="color:yellow;">alexosthebestnet@gmail.com</a></p>
+  </div>
+
+  <!-- New images splash -->
+  <div id="splash-new" class="splash hidden">
+    <h1>New images added!</h1>
+    <p>Updating slideshow…</p>
+  </div>
+
+  <!-- Info bar -->
+  <div id="info-bar">
+    <div id="info-text">Loading info…</div>
+  </div>
+
+  <!-- Slideshow -->
+  <div id="slideshow-container">
+    <img id="slideshow" src="" alt="Archive Image">
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbymxg0FFYNx1d0vfibCXzjKudW1naU4HB-8wqJCbBm3-HEf8epazH_RRRHlc-o7UVQijg/exec";
+
+    // Coordinates for Victoria
+    const LAT = 48.4284;
+    const LON = -123.3656;
+
+    let images = [];
+    let currentIdx = 0;
+    let lastCount = 0;
+
+    const splashBoot = document.getElementById("splash-boot");
+    const splashError = document.getElementById("splash-error");
+    const splashNew = document.getElementById("splash-new");
+    const infoTextEl = document.getElementById("info-text");
+    const imgEl = document.getElementById("slideshow");
+
+    function hideAllSplashes() {
+      splashBoot.classList.add("hidden");
+      splashError.classList.add("hidden");
+      splashNew.classList.add("hidden");
+    }
+
+    async function fetchDataFromAppsScript() {
+      try {
+        const resp = await fetch(API_URL);
+        if (!resp.ok) throw new Error("Script responded not OK");
+        const obj = await resp.json();
+        return obj;
+      } catch (err) {
+        console.error("Error fetching script data:", err);
+        return null;
+      }
+    }
+
+    async function fetchWeather() {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true`;
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error("Weather fetch error");
+        const w = await resp.json();
+        return w.current_weather;
+      } catch (err) {
+        console.error("Weather fetch failed:", err);
+        return null;
+      }
+    }
+
+    function formatDateTime() {
+      const d = new Date();
+      const options = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
+      return d.toLocaleString("en-CA", options);
+    }
+
+    // Some fun tidbits
+    const TIDBITS = [
+      "Made by Alex!",
+      "Central — preserving the past.",
+      "Smile, you're viewing history.",
+      "Did you know? This board auto-updates.",
+      "Central’s legacy lives on.",
+      "Archives are stories waiting to speak.",
+      "Every image has a tale to tell.",
+      "Your past is our future.",
+      "Sharing memory, one photo at a time.",
+      "Powered by Google Drive & Javascript magic."
+    ];
+
+    function pickTidbit() {
+      const i = Math.floor(Math.random() * TIDBITS.length);
+      return TIDBITS[i];
+    }
+
+    async function updateInfoBar() {
+      const weather = await fetchWeather();
+      const dateStr = formatDateTime();
+      let weatherStr = "";
+      if (weather) {
+        weatherStr = ` | Weather: ${weather.temperature}°C, Wind ${weather.windspeed} m/s`;
+      }
+      const tidbit = pickTidbit();
+      const info = `${dateStr}${weatherStr} | ${tidbit} | Central Archives`;
+      infoTextEl.textContent = info;
+      // to restart scroll animation:
+      infoTextEl.style.animation = "none";
+      void infoTextEl.offsetWidth;
+      infoTextEl.style.animation = "";
+    }
+
+    async function startSlideshow() {
+      const data = await fetchDataFromAppsScript();
+      if (!data || !Array.isArray(data.images)) {
+        splashBoot.classList.add("hidden");
+        splashError.classList.remove("hidden");
+        return;
+      }
+      images = data.images.map(obj => obj.url);
+      lastCount = data.count || images.length;
+
+      hideAllSplashes();
+
+      if (images.length === 0) {
+        splashError.classList.remove("hidden");
+        return;
+      }
+
+      // After hiding boot splash, show first image
+      currentIdx = 0;
+      showImage();
+
+      // Periodically change images
+      setInterval(() => {
+        nextImage();
+      }, 6000);
+
+      // Periodically refresh data and check for new images
+      setInterval(async () => {
+        const newData = await fetchDataFromAppsScript();
+        if (newData && newData.count > lastCount) {
+          // new images added
+          splashNew.classList.remove("hidden");
+          await new Promise(r => setTimeout(r, 3000));
+          splashNew.classList.add("hidden");
+          images = newData.images.map(obj => obj.url);
+          lastCount = newData.count;
+        }
+        updateInfoBar();
+      }, 30000);
+
+      // Hide boot screen after 10s
+      setTimeout(() => {
+        splashBoot.classList.add("hidden");
+      }, 10000);
+    }
+
+    function showImage() {
+      imgEl.classList.remove("show");
+      // small delay for fade-out effect
+      setTimeout(() => {
+        imgEl.src = images[currentIdx];
+        imgEl.onload = () => {
+          imgEl.classList.add("show");
+        };
+      }, 500);
+    }
+
+    function nextImage() {
+      currentIdx = (currentIdx + 1) % images.length;
+      showImage();
+    }
+
+    // Kick it off
+    (async () => {
+      await updateInfoBar();
+      startSlideshow();
+    })();
+
+  </script>
+</body>
+</html>

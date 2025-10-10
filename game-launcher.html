@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Game Launcher</title>
+  <style>
+    :root{
+      --accent:#4e7dff;
+      --ink:#f5f7ff;
+      --bg:#0c1436;
+      --panel:#101c46;
+    }
+    *{box-sizing:border-box;font-family:"Trebuchet MS","Courier New",monospace;color:var(--ink)}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#1f2f6b,#0c1436 60%);display:flex;align-items:center;justify-content:center;padding:24px}
+    .window{width:min(480px,100%);background:var(--panel);border:3px solid #fff2;border-radius:18px;box-shadow:0 18px 40px rgba(0,0,0,.55);padding:24px;display:grid;gap:18px;text-align:center}
+    .window h1{margin:0;font-size:1.6rem;text-transform:uppercase;letter-spacing:.2em;text-shadow:3px 3px 0 rgba(0,0,0,.35)}
+    .badge{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;text-transform:uppercase;letter-spacing:.2em;background:#ffffff1a;padding:6px 12px;border-radius:999px;border:1px solid #ffffff33}
+    .icon{font-size:48px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.6))}
+    .desc{font-size:.95rem;line-height:1.6;margin:0;color:#e1e6ff}
+    .cta{display:flex;flex-direction:column;gap:10px}
+    button{cursor:pointer;border:none;border-radius:999px;background:linear-gradient(135deg,var(--accent),#33ffaa);color:#03102a;font-weight:900;font-size:1rem;padding:12px 18px;text-transform:uppercase;letter-spacing:.2em;box-shadow:0 12px 24px rgba(0,0,0,.6);transition:transform .18s ease, box-shadow .18s ease}
+    button:hover{transform:translateY(-3px);box-shadow:0 18px 30px rgba(0,0,0,.65)}
+    .tip{font-size:.75rem;opacity:.75;letter-spacing:.2em;text-transform:uppercase}
+    .error{max-width:420px;text-align:center;color:#fff;background:#711b1b;padding:18px 24px;border-radius:16px;border:2px solid #ff4a4a;font-weight:700}
+  </style>
+</head>
+<body>
+  <template id="launcher-template">
+    <div class="window" style="--accent:var(--accent)">
+      <div class="icon" id="gameIcon" aria-hidden="true"></div>
+      <h1 id="gameTitle">Game Title</h1>
+      <div class="badge" id="gameBadge">Cabinet Ready</div>
+      <p class="desc" id="gameDescription">Description placeholder.</p>
+      <div class="cta">
+        <button id="startGame">Launch Game</button>
+        <span class="tip">Press restart in the Win95 bar to return here.</span>
+      </div>
+    </div>
+  </template>
+  <div id="app" role="main" aria-live="polite"></div>
+  <script>
+    (function(){
+      const params = new URLSearchParams(window.location.search);
+      const gameId = params.get('id');
+      const app = document.getElementById('app');
+      const tpl = document.getElementById('launcher-template');
+
+      function showError(message){
+        const box = document.createElement('div');
+        box.className = 'error';
+        box.textContent = message;
+        app.replaceChildren(box);
+      }
+
+      if(!gameId){
+        showError('No game specified. Launch from the Pro Gamer Den menu.');
+        return;
+      }
+
+      fetch('gamerden-games.json')
+        .then(res => {
+          if(!res.ok) throw new Error('Failed to load data');
+          return res.json();
+        })
+        .then(games => {
+          const game = games.find(g => g.id === gameId);
+          if(!game){
+            showError('Selected cabinet is offline. Try a different one.');
+            return;
+          }
+          const node = tpl.content.firstElementChild.cloneNode(true);
+          node.style.setProperty('--accent', game.color || '#4e7dff');
+          node.querySelector('#gameIcon').textContent = game.icon || '🎮';
+          node.querySelector('#gameTitle').textContent = game.title;
+          node.querySelector('#gameDescription').textContent = game.description;
+          const badge = node.querySelector('#gameBadge');
+          badge.textContent = game.isNew ? 'New arrival' : (game.subtitle || 'Arcade Classic');
+          badge.style.background = game.isNew ? '#ff4ac755' : '#ffffff1a';
+          badge.style.borderColor = game.isNew ? '#ff9ed6' : '#ffffff44';
+          badge.style.color = game.isNew ? '#ffeef9' : '#f1f4ff';
+          node.querySelector('#startGame').addEventListener('click', () => {
+            window.parent.postMessage({type:'gamerden-launch', id:game.id}, '*');
+          });
+          app.replaceChildren(node);
+        })
+        .catch(err => {
+          console.error(err);
+          showError('Could not load arcade data. Refresh the main site and try again.');
+        });
+    })();
+  </script>
+</body>
+</html>

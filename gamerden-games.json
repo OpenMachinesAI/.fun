@@ -1,0 +1,112 @@
+[
+  {
+    "id": "rocket-labs",
+    "title": "CSP Rocket Labs",
+    "subtitle": "Central Space Program",
+    "description": "Build, fly, and (maybe) land your own rockets. Student-grade chaos, pro-grade vibes.",
+    "icon": "🚀",
+    "color": "#33ffaa",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "Rocket Labs.html"
+  },
+  {
+    "id": "evil-classroom",
+    "title": "Escape the Evil Classroom",
+    "subtitle": "Multiplayer",
+    "description": "Co-op chaos with extra homework scares. Bring snacks.",
+    "icon": "🏫",
+    "color": "#ffc94d",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "EscapeTheEvilClassrom.html"
+  },
+  {
+    "id": "mr-longreed",
+    "title": "Escape Mr Longreed",
+    "subtitle": "3D Adventure",
+    "description": "Low-poly fear speedrun through the longest halls in school.",
+    "icon": "🏃",
+    "color": "#8bd0ff",
+    "isNew": false,
+    "launcher": "game-launcher.html",
+    "content": "EscapeMrLongreed.html"
+  },
+  {
+    "id": "dodge-burger",
+    "title": "Dodge Burger",
+    "subtitle": "Version 2",
+    "description": "Grease lightning. Dodge or be dodged.",
+    "icon": "🍔",
+    "color": "#33ffaa",
+    "isNew": false,
+    "launcher": "game-launcher.html",
+    "content": "DodgeBurger.html"
+  },
+  {
+    "id": "sam-vs-everything",
+    "title": "SAM VS EVERYTHING",
+    "subtitle": "Preview",
+    "description": "Unbalanced. Unfair. Unreasonably fun.",
+    "icon": "🔥",
+    "color": "#ff4ac7",
+    "isNew": false,
+    "launcher": "game-launcher.html",
+    "content": "SAM-VS-EVERYTHING.html"
+  },
+  {
+    "id": "csp-simulator",
+    "title": "Central Space Program",
+    "subtitle": "Simulator",
+    "description": "Orbit snacks. Land vibes. Sim your way across the galaxy.",
+    "icon": "🛰️",
+    "color": "#9b5bff",
+    "isNew": false,
+    "launcher": "game-launcher.html",
+    "content": "CSP_ The Game (1).html"
+  },
+  {
+    "id": "landing-game",
+    "title": "Ladining Game",
+    "subtitle": "Yes, that spelling",
+    "description": "Nailed it. Or didn’t. You decide.",
+    "icon": "🛬",
+    "color": "#ffb36b",
+    "isNew": false,
+    "launcher": "game-launcher.html",
+    "content": "CSP LADNING GAME (1).html"
+  },
+  {
+    "id": "flight-sim",
+    "title": "Central Flight Sim",
+    "subtitle": "Skybound",
+    "description": "Pilot your dreams. Turbo-props, afterburners, and crash landings—school-approved flight chaos.",
+    "icon": "✈️",
+    "color": "#3bd8ff",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "fun flight sim.html"
+  },
+  {
+    "id": "geometry-fun",
+    "title": "Totally Licensed Geometry Dash",
+    "subtitle": "Yes, really",
+    "description": "Jump, flip, rage, repeat. 100% legit and certified not-a-lawsuit… probably.",
+    "icon": "🟦",
+    "color": "#ff4ac7",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "Geometry.FUN.html"
+  },
+  {
+    "id": "marioish",
+    "title": "Super Mario (don’t sue me)",
+    "subtitle": "Classic-ish",
+    "description": "Run, jump, bonk blocks. Totally original plumber adventure, wink wink.",
+    "icon": "🍄",
+    "color": "#ffc94d",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "centralschool.fun -- games.html"
+  }
+]

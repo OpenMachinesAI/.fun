@@ -6,77 +6,130 @@
   <title>CentralSchool.fun — PRO GAMER DEN (Retro 90s)</title>
   <style>
     :root{
-      --bg:#060014;
-      --ink:#eaf3ff;
+      --bg:#050014;
+      --ink:#f8fbff;
       --accent:#8bd0ff;
-      --grid:#5b2cff;
+      --grid:#6a42ff;
       --hot:#ff4ac7;
       --gold:#ffc94d;
       --emerald:#33ffaa;
-      --panel:#0b0530;
-      --edge:#6aa8ff;
+      --panel:#0b0630e6;
+      --edge:#7cd8ff;
+      --ticket-accent:#8bd0ff;
+      --window-accent:#4e7dff;
     }
+
+    *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; color:var(--ink); font-family:"Trebuchet MS","Courier New",monospace;
-      background: radial-gradient(1200px 600px at 10% -10%, #ff4ac722, transparent),
-                  radial-gradient(1200px 600px at 110% 10%, #8bd0ff22, transparent),
-                  var(--bg);
+      margin:0;
+      color:var(--ink);
+      font-family:"Trebuchet MS","Courier New",monospace;
+      background:
+        radial-gradient(1200px 600px at -20% 0%, #ff4ac744, transparent 65%),
+        radial-gradient(900px 500px at 120% 10%, #33ffaa33, transparent 70%),
+        radial-gradient(900px 600px at 50% 100%, #8bd0ff22, transparent 80%),
+        var(--bg);
       overflow-x:hidden;
     }
 
     .gridbg{position:fixed;inset:auto 0 0 0;height:60vh;z-index:-1;
       background:
-        repeating-linear-gradient(0deg, #ffffff10 0 2px, transparent 2px 26px),
+        repeating-linear-gradient(0deg, #ffffff16 0 2px, transparent 2px 26px),
         repeating-linear-gradient(90deg, #ffffff10 0 2px, transparent 2px 46px);
       transform-origin:50% 100%;
-      transform: perspective(1000px) rotateX(60deg) translateY(25vh);
+      transform:perspective(1200px) rotateX(62deg) translateY(22vh);
       box-shadow:0 -40px 60px #7b5bff44 inset;
+      animation:gridFloat 12s ease-in-out infinite;
     }
+    @keyframes gridFloat{
+      0%,100%{transform:perspective(1200px) rotateX(62deg) translateY(22vh)}
+      50%{transform:perspective(1200px) rotateX(60deg) translateY(18vh)}
+    }
+
     .scanlines::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:5;
       background:linear-gradient(rgba(255,255,255,.05) 50%,rgba(0,0,0,0) 50%);
-      background-size:100% 2px;mix-blend-mode:overlay;opacity:.35}
+      background-size:100% 2px;mix-blend-mode:overlay;opacity:.3}
 
-    header{position:sticky;top:0;z-index:10;border-bottom:3px solid #ffffff44;backdrop-filter:blur(6px)}
-    .bar{display:flex;align-items:center;gap:12px;padding:10px 12px;
-      background:linear-gradient(90deg,#ff4ac7,#9b5bff,#2f9dff,#33ffaa);}
-    .mark{width:60px;height:48px;border:2px solid #fff;border-radius:8px;position:relative;overflow:hidden;background:#0003}
+    header{position:sticky;top:0;z-index:10;border-bottom:3px solid #ffffff44;backdrop-filter:blur(8px)}
+    .bar{display:flex;align-items:center;gap:16px;padding:12px 16px;
+      background:linear-gradient(90deg,#ff4ac7,#ffb36b,#33ffaa,#2f9dff,#c28bff);box-shadow:0 6px 18px rgba(0,0,0,.45)}
+    .mark{width:64px;height:52px;border:2px solid #fff;border-radius:10px;position:relative;overflow:hidden;background:#0003}
     .mark svg{position:absolute;inset:0}
-    h1{margin:0;font-weight:900;text-shadow:2px 2px 0 #000}
-    .sub{font-size:12px;opacity:.9;margin-top:2px}
+    h1{margin:0;font-weight:900;text-shadow:3px 3px 0 #000}
+    .sub{font-size:12px;opacity:.9;margin-top:2px;text-transform:uppercase;letter-spacing:.3em}
 
-    .ribbon{display:flex;justify-content:center;align-items:center;gap:10px;padding:8px;border-top:2px solid #fff;border-bottom:2px solid #fff;
-      background:linear-gradient(90deg,var(--gold),#fff3 40%,var(--gold));color:#2b2100;font-weight:900}
-    .ribbon a{background:#fff;border:2px solid #0007;border-radius:8px;padding:6px 10px;color:#111;text-decoration:none}
-    .ribbon a:hover{filter:brightness(1.05)}
+    .ribbon{display:flex;justify-content:center;align-items:center;gap:10px;padding:10px 16px;border-top:2px solid #fff;border-bottom:2px solid #fff;
+      background:linear-gradient(90deg,var(--gold),#fff6 40%,var(--emerald));color:#251700;font-weight:900;text-transform:uppercase;flex-wrap:wrap}
+    .ribbon span{display:flex;align-items:center;gap:6px}
+    .ribbon strong{background:#fff;border:2px solid #0005;border-radius:999px;padding:4px 10px;color:#0b0630;box-shadow:0 2px 0 #0007}
 
-    main{padding:16px}
+    main{padding:24px;max-width:1100px;margin:0 auto}
 
-    .board{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-    .ticket{position:relative;text-decoration:none;color:var(--ink);background:var(--panel);
-      border:3px dashed var(--edge);padding:14px;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.5);
-      transition:transform .15s ease, box-shadow .15s ease;cursor:pointer}
-    .ticket:hover{transform:translateY(-4px) rotate(.4deg);box-shadow:0 18px 34px rgba(0,0,0,.6)}
-    .ticket.new::after{content:"NEW";position:absolute;top:-10px;right:-10px;background:var(--hot);color:#fff;border:3px solid #fff;padding:4px 8px;border-radius:999px;font-weight:900;transform:rotate(6deg)}
-    .tt{display:flex;align-items:center;gap:8px;font-weight:900}
-    .tt svg{width:28px;height:28px;filter:drop-shadow(0 0 6px #000)}
-    .desc{opacity:.9;font-size:13px;margin-top:6px}
+    .intro{display:grid;gap:12px;margin-bottom:18px}
+    .intro p{margin:0;font-size:14px;line-height:1.6;background:#0d0840aa;padding:12px 16px;border-radius:12px;border:2px solid #ffffff22;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 
-    .ads{display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0}
-    .ad{border:3px double #ff9; background:#220000; color:#fff; padding:8px; font-weight:900; text-shadow:1px 1px 0 #000; animation:flash 1.4s linear infinite}
-    @keyframes flash{0%,100%{background:#3a0000}50%{background:#5a2000}}
+    .ads{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:10px 0 22px}
+    .ad{border:3px double #fffa;background:#320010;color:#fff;padding:10px;font-weight:900;text-shadow:1px 1px 0 #000;
+      animation:flash 1.4s linear infinite;border-radius:10px}
+    @keyframes flash{0%,100%{background:#3a0018}50%{background:#5a2020}}
 
-    .modal{display:none;position:fixed;inset:10% 10%;background:#c0c0c0;border:2px solid #000;box-shadow:5px 5px 15px rgba(0,0,0,.5);z-index:1000}
-    .modal.show{display:block}
-    .modal-toolbar{background:#000080;color:#fff;padding:5px;display:flex;align-items:center;justify-content:space-between;font-size:1.1em}
-    .toolbar-buttons{display:flex;gap:10px}
-    .toolbar-button{background:#c0c0c0;border:2px outset #fff;padding:2px 8px;cursor:pointer;font-weight:bold}
+    .board{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-bottom:30px}
+    .ticket{position:relative;text-decoration:none;color:var(--ink);background:linear-gradient(140deg,var(--panel),rgba(20,12,80,.8));
+      border:3px dashed #ffffff55;padding:18px;border-radius:14px;box-shadow:0 12px 26px rgba(0,0,0,.55);
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;background-clip:padding-box;cursor:pointer;
+      display:flex;flex-direction:column;align-items:flex-start;gap:10px;isolation:isolate;
+      border-image:linear-gradient(120deg,#fff8,#fff2)1;border-image-slice:1
+    }
+    .ticket::after{content:"";position:absolute;inset:0;border-radius:11px;border:3px solid transparent;pointer-events:none;
+      background:linear-gradient(130deg,transparent 0 35%,var(--ticket-accent)55%,transparent 90%);
+      mix-blend-mode:screen;opacity:.6;z-index:-1}
+    .ticket:hover{transform:translateY(-6px) rotate(.6deg);box-shadow:0 20px 34px rgba(0,0,0,.6);border-color:var(--ticket-accent)}
+    .ticket:focus-visible{outline:3px solid var(--ticket-accent);outline-offset:4px}
+    .ticket .tt{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.05rem;text-shadow:2px 2px 0 rgba(0,0,0,.45)}
+    .ticket .icon{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;
+      background:rgba(0,0,0,.4);font-size:24px;box-shadow:0 6px 14px rgba(0,0,0,.45)}
+    .ticket small{font-size:.75rem;opacity:.8;text-transform:uppercase;letter-spacing:.1em}
+    .ticket .desc{opacity:.92;font-size:13px;line-height:1.5}
+    .ticket.new::before{content:"NEW";position:absolute;top:-12px;right:-12px;background:var(--hot);color:#fff;border:3px solid #fff;
+      padding:4px 10px;border-radius:999px;font-weight:900;transform:rotate(8deg);text-shadow:1px 1px 0 #000}
+
+    .board .empty{grid-column:1 / -1;text-align:center;padding:40px 20px;background:#0d0840dd;border-radius:16px;border:2px solid #ffffff22;
+      box-shadow:0 10px 24px rgba(0,0,0,.45);font-weight:700}
+
+    .modal{display:none;position:fixed;inset:8% 6%;background:#c3c7cb;border:3px solid #000;box-shadow:12px 12px 0 rgba(0,0,0,.55);
+      z-index:1000;border-radius:10px;overflow:hidden;max-width:960px;margin:auto;transition:transform .18s ease,opacity .18s ease}
+    .modal.show{display:block;opacity:1;transform:translateY(0)}
+    .modal::backdrop{background:rgba(0,0,0,.7)}
+    .modal-toolbar{background:linear-gradient(90deg,#00139a,var(--window-accent));color:#fff;padding:6px 10px;display:flex;align-items:center;
+      justify-content:space-between;font-size:1.05em;border-bottom:3px solid #000;gap:12px}
+    .toolbar-left{display:flex;align-items:center;gap:10px}
+    .toolbar-icon{width:28px;height:28px;border:2px solid #fff;background:#0003;border-radius:6px;display:inline-flex;align-items:center;
+      justify-content:center;font-size:16px}
+    .toolbar-text{display:flex;flex-direction:column;gap:2px}
+    .toolbar-title{font-weight:900;text-shadow:2px 2px 0 rgba(0,0,0,.4)}
+    .toolbar-sub{font-size:12px;opacity:.85;text-transform:uppercase;letter-spacing:.2em}
+    .toolbar-buttons{display:flex;gap:8px}
+    .toolbar-button{background:#d4d4d4;border:2px outset #fff;padding:2px 10px;cursor:pointer;font-weight:bold;color:#000;
+      box-shadow:inset -2px -2px 0 rgba(0,0,0,.25);display:inline-flex;align-items:center;gap:6px}
     .toolbar-button:hover{background:#fff}
-    .modal-content{height:calc(100% - 40px)}
-    .modal-content iframe{width:100%;height:100%;border:none;background:#000}
+    .toolbar-button .icon{font-size:14px}
 
-    footer{display:flex;justify-content:center;opacity:.8;font-size:12px;margin:18px 0}
-    .hidden{display:none!important}
+    .modal-content{height:calc(100% - 54px);background:#000;position:relative}
+    .modal-content iframe{width:100%;height:100%;border:none;background:#000}
+    .modal-content::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 40px rgba(0,0,0,.6)}
+
+    footer{display:flex;justify-content:center;opacity:.8;font-size:12px;margin:28px 0}
+    footer a{color:var(--accent)}
+
+    button.ticket{background:none;border:none;padding:0;width:100%;text-align:left}
+
+    @media(max-width:720px){
+      header{position:static}
+      .modal{inset:6% 4%;}
+      .modal-toolbar{flex-direction:column;align-items:flex-start;gap:8px}
+      .toolbar-buttons{align-self:flex-end}
+    }
   </style>
 </head>
 <body class="scanlines">
@@ -92,9 +145,10 @@
               <stop offset="1" stop-color="#8bd0ff"/>
             </linearGradient>
           </defs>
-          <rect x="3" y="3" width="114" height="90" rx="10" fill="#0a0522" stroke="#fff"/>
+          <rect x="3" y="3" width="114" height="90" rx="12" fill="#0a0522" stroke="#fff"/>
           <path d="M12,70 L40,30 L60,54 L84,22 L108,70" fill="none" stroke="url(#g)" stroke-width="6"/>
-          <circle cx="60" cy="54" r="5" fill="#ff4ac7" />
+          <circle cx="60" cy="54" r="6" fill="#ff4ac7" />
+          <circle cx="30" cy="36" r="4" fill="#ffc94d" />
         </svg>
       </div>
       <div>
@@ -102,156 +156,183 @@
         <div class="sub">LAN vibes • CRT glow • snack meta</div>
       </div>
     </div>
-    <div class="ribbon"></div>
+    <div class="ribbon" id="newGamesRibbon">
+      <span>Loading the arcade rotation…</span>
+    </div>
   </header>
 
   <main>
+    <section class="intro">
+      <p>Welcome to the Den 2.0! Everything in this arcade is now powered by a single data file, so games, art, and neon vibes stay perfectly in sync. Smash that reload key whenever new cabinets drop.</p>
+      <p>Tip: Launch any cabinet to open its Win95-style window. Use the restart glyph inside the blue bar to bounce back to the game launcher menu at any time.</p>
+    </section>
+
     <div class="ads">
-      <div class="ad">🚀 NEW: CSP Rocket Labs — build & fly rockets (by Central Space Program). Click to launch below.</div>
+      <div class="ad">🚀 Featured: CSP Rocket Labs now supports payload shenanigans. Test flights encouraged. Bring a helmet.</div>
+      <div class="ad">🎶 PSA: The snack table playlist got remastered. Ask the DJ for track 7 if you need extra focus.</div>
     </div>
 
-    <div class="board" id="games">
-
-      <!-- Original + New Games -->
-      <a class="ticket new" data-url="Rocket%20Labs.html">
-        <div class="tt">
-          <svg viewBox="0 0 24 24" fill="#33ffaa"><path d="M12 2c3 2 5 6 5 9 0 3-2 7-5 9-3-2-5-6-5-9 0-3 2-7 5-9z"/><circle cx="12" cy="10" r="2" fill="#0b0530"/><path d="M8 15l-3 3 0-4zM16 15l3 3 0-4z" /></svg>
-          CSP Rocket Labs <small style="opacity:.7">— Central Space Program</small>
-        </div>
-        <div class="desc">Build, fly, and (maybe) land your own rockets. Student-grade chaos, pro-grade vibes.</div>
-      </a>
-
-      <a class="ticket new" data-url="EscapeTheEvilClassrom.html">
-        <div class="tt">
-          <svg viewBox="0 0 24 24" fill="#ffc94d"><path d="M4 5h16v10H4z"/><circle cx="8" cy="10" r="1.2" fill="#000"/><circle cx="16" cy="10" r="1.2" fill="#000"/></svg>
-          Escape the Evil Classroom <small style="opacity:.7">(Multiplayer)</small>
-        </div>
-        <div class="desc">Co-op chaos. Bring snacks.</div>
-      </a>
-
-      <a class="ticket" data-url="EscapeMrLongreed.html">
-        <div class="tt">
-          <svg viewBox="0 0 24 24" fill="#8bd0ff"><path d="M12 2l5 9-5 11-5-11z"/></svg>
-          Escape Mr Longreed <small style="opacity:.7">(3D)</small>
-        </div>
-        <div class="desc">Low-poly fear speedrun.</div>
-      </a>
-
-      <a class="ticket" data-url="DodgeBurger.html">
-        <div class="tt">
-          <svg viewBox="0 0 24 24" fill="#33ffaa"><rect x="4" y="8" width="16" height="8" rx="3"/></svg>
-          Dodge Burger <small style="opacity:.7">(V2)</small>
-        </div>
-        <div class="desc">Grease lightning. Dodge or be dodged.</div>
-      </a>
-
-      <a class="ticket" data-url="SAM-VS-EVERYTHING.html">
-        <div class="tt">
-          <svg viewBox="0 0 24 24" fill="#ff4ac7"><circle cx="12" cy="12" r="6"/></svg>
-          SAM VS EVERYTHING <small style="opacity:.7">(Preview)</small>
-        </div>
-        <div class="desc">Unbalanced. Unfair. Unreasonably fun.</div>
-      </a>
-
-      <a class="ticket" data-url="CSP_%20The%20Game%20(1).html">
-        <div class="tt">
-          <svg viewBox="0 0 24 24" fill="#9b5bff"><path d="M6 6h12v12H6z"/></svg>
-          Central Space Program <small style="opacity:.7">(Simulator)</small>
-        </div>
-        <div class="desc">Orbit snacks. Land vibes.</div>
-      </a>
-
-      <a class="ticket" data-url="CSP%20LADNING%20GAME%20(1).html">
-        <div class="tt">
-          <svg viewBox="0 0 24 24" fill="#ffb36b"><path d="M3 16h18v2H3z"/><circle cx="12" cy="12" r="3"/></svg>
-          Ladining Game <small style="opacity:.7">(yes that’s the spelling)</small>
-        </div>
-        <div class="desc">Nailed it. Or didn’t. You decide.</div>
-      </a>
-
-      <!-- ✅ New ones -->
-      <a class="ticket new" data-url="fun%20flight%20sim.html">
-        <div class="tt">
-          <svg viewBox="0 0 24 24" fill="#33ffaa"><path d="M2 16l20-8-20-8v6l15 2-15 2v6z"/></svg>
-          Central Flight Sim <small style="opacity:.7">(Skybound)</small>
-        </div>
-        <div class="desc">Pilot your dreams. Turbo-props, afterburners, and crash landings—school-approved flight chaos.</div>
-      </a>
-
-      <a class="ticket new" data-url="Geometry.FUN.html">
-        <div class="tt">
-          <svg viewBox="0 0 24 24" fill="#ff4ac7"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
-          Totally Licensed Geometry Dash <small style="opacity:.7">(Yes, really)</small>
-        </div>
-        <div class="desc">Jump, flip, rage, repeat. 100% legit and certified not-a-lawsuit… probably.</div>
-      </a>
-
-      <a class="ticket new" data-url="centralschool.fun%20--%20games.html">
-        <div class="tt">
-          <svg viewBox="0 0 24 24" fill="#ffc94d">
-            <circle cx="12" cy="12" r="10"/>
-            <text x="12" y="16" text-anchor="middle" font-size="10" fill="#000" font-weight="bold">M</text>
-          </svg>
-          Super Mario (don’t sue me) <small style="opacity:.7">(Classic-ish)</small>
-        </div>
-        <div class="desc">Run, jump, bonk blocks. Totally original plumber adventure, wink wink.</div>
-      </a>
-
+    <div class="board" id="gamesBoard">
+      <div class="empty">Loading cabinets…</div>
     </div>
-
-    <p class="desc" style="margin-top:10px">Tips: Click a game • <b>Enter</b> opens the highlighted one • <b>Esc</b> closes • <b>F</b> toggles fullscreen.</p>
   </main>
 
-  <div id="gameModal" class="modal" role="dialog" aria-modal="true" aria-label="Game window">
+  <div class="modal" id="gameWindow" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-toolbar">
-      <div id="modalTitle">CentralSchool.fun - Game</div>
+      <div class="toolbar-left">
+        <span class="toolbar-icon" id="windowIcon" aria-hidden="true">🎮</span>
+        <div class="toolbar-text">
+          <span class="toolbar-title" id="windowTitle">Game Launcher</span>
+          <span class="toolbar-sub" id="windowSubtitle">Select your adventure</span>
+        </div>
+      </div>
       <div class="toolbar-buttons">
-        <div class="toolbar-button" id="btnFull">Full Screen</div>
-        <div class="toolbar-button" id="btnClose">X</div>
+        <button class="toolbar-button" id="restartGame" title="Back to launcher"><span class="icon">↺</span> Restart</button>
+        <button class="toolbar-button" id="closeGame" title="Close window"><span class="icon">✖</span> Close</button>
       </div>
     </div>
     <div class="modal-content">
-      <iframe id="gameFrame" src="" title="Game frame"></iframe>
+      <iframe id="gameFrame" title="Game window" sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms"></iframe>
     </div>
   </div>
 
-  <footer>Back to <a href="index.html" style="color:#8bd0ff">Home</a> • <a href="cards.html" style="color:#ffc94d">Trading Cards</a></footer>
+  <footer>
+    <div>© CentralSchool.fun — Powered by snacks &amp; spreadsheets.</div>
+  </footer>
 
   <script>
-    const list = document.getElementById('games');
-    let idx = 0; const items = () => Array.from(list.querySelectorAll('.ticket'));
-    function highlight(i){
-      items().forEach((el,n)=>{ el.style.outline = n===i ? '3px solid '+getComputedStyle(document.documentElement).getPropertyValue('--edge') : 'none'; });
-    }
-    highlight(idx);
+    (function(){
+      const board = document.getElementById('gamesBoard');
+      const ribbon = document.getElementById('newGamesRibbon');
+      const modal = document.getElementById('gameWindow');
+      const frame = document.getElementById('gameFrame');
+      const restartBtn = document.getElementById('restartGame');
+      const closeBtn = document.getElementById('closeGame');
+      const windowIcon = document.getElementById('windowIcon');
+      const windowTitle = document.getElementById('windowTitle');
+      const windowSubtitle = document.getElementById('windowSubtitle');
 
-    function openModal(url, title){
-      const m=document.getElementById('gameModal'); const f=document.getElementById('gameFrame');
-      document.getElementById('modalTitle').textContent = 'CentralSchool.fun - '+(title||'Game');
-      f.src=url; m.classList.add('show');
-    }
-    function closeModal(){ const m=document.getElementById('gameModal'); const f=document.getElementById('gameFrame'); m.classList.remove('show'); f.src=''; }
-    function goFullScreen(){ const m=document.getElementById('gameModal'); if(m.requestFullscreen) m.requestFullscreen(); else if(m.webkitRequestFullscreen) m.webkitRequestFullscreen(); else if(m.msRequestFullscreen) m.msRequestFullscreen(); }
+      const state = {
+        games: [],
+        map: new Map(),
+        currentGame: null
+      };
 
-    items().forEach((el,n)=>{ el.addEventListener('click',()=>{ idx=n; highlight(idx); openModal(el.dataset.url, el.textContent.trim()); }); });
+      function buildRibbon(games){
+        const newOnes = games.filter(g => g.isNew);
+        if(!newOnes.length){
+          ribbon.innerHTML = '<span><strong>Arcade Stable</strong> All-time favourites are online.</span>';
+          return;
+        }
+        const marquee = newOnes.map(g => `${g.icon} ${g.title}`).join(' • ');
+        ribbon.innerHTML = `<span><strong>New Cabinets</strong> ${marquee}</span>`;
+      }
 
-    document.addEventListener('keydown',e=>{
-      const k=e.key.toLowerCase();
-      if(['arrowright','arrowdown','j'].includes(k)){ idx=(idx+1)%items().length; highlight(idx); }
-      else if(['arrowleft','arrowup','k'].includes(k)){ idx=(idx-1+items().length)%items().length; highlight(idx); }
-      else if(k==='enter'){ const el=items()[idx]; openModal(el.dataset.url, el.textContent.trim()); }
-      else if(k==='escape'){ closeModal(); }
-      else if(k==='f'){ goFullScreen(); }
-    });
+      function createCard(game){
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'ticket' + (game.isNew ? ' new' : '');
+        card.dataset.id = game.id;
+        card.style.setProperty('--ticket-accent', game.color || 'var(--edge)');
+        card.innerHTML = `
+          <span class="tt">
+            <span class="icon" style="background:linear-gradient(135deg,${game.color || '#6aa8ff'}33,rgba(0,0,0,.5))">${game.icon || '🎮'}</span>
+            <span>
+              ${game.title}
+              ${game.subtitle ? `<br><small>${game.subtitle}</small>` : ''}
+            </span>
+          </span>
+          <span class="desc">${game.description}</span>
+        `;
+        card.addEventListener('click', () => openGame(game.id));
+        return card;
+      }
 
-    document.getElementById('btnClose').onclick=closeModal;
-    document.getElementById('btnFull').onclick=goFullScreen;
+      function openGame(gameId){
+        const game = state.map.get(gameId);
+        if(!game) return;
+        state.currentGame = game;
+        windowIcon.textContent = game.icon || '🎮';
+        windowTitle.textContent = game.title;
+        windowSubtitle.textContent = game.subtitle || '';
+        modal.style.setProperty('--window-accent', game.color || '#4e7dff');
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden','false');
+        loadLauncher(game);
+      }
 
-    (function tests(){
-      const out=[]; const ok=(n,c)=>out.push((c?'PASS':'FAIL')+': '+n);
-      ok('Has 10 games', document.querySelectorAll('.ticket').length===10);
-      ok('Modal elements exist', !!document.getElementById('gameModal') && !!document.getElementById('gameFrame'));
-      console.log('[Gamer Den Tests]\n'+out.join('\n'));
+      function loadLauncher(game){
+        const launcherUrl = new URL(game.launcher || 'game-launcher.html', window.location.href);
+        launcherUrl.searchParams.set('id', game.id);
+        frame.src = launcherUrl.toString();
+      }
+
+      function loadContent(game){
+        if(!game) return;
+        frame.src = encodeURI(game.content);
+      }
+
+      function closeGame(){
+        state.currentGame = null;
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden','true');
+        frame.src = 'about:blank';
+      }
+
+      restartBtn.addEventListener('click', () => {
+        if(state.currentGame){
+          loadLauncher(state.currentGame);
+        }
+      });
+      closeBtn.addEventListener('click', closeGame);
+
+      window.addEventListener('keydown', (event) => {
+        if(event.key === 'Escape' && modal.classList.contains('show')){
+          closeGame();
+        }
+      });
+
+      window.addEventListener('message', (event) => {
+        if(!event.data || typeof event.data !== 'object') return;
+        if(event.data.type === 'gamerden-launch'){
+          const game = state.map.get(event.data.id);
+          if(!game) return;
+          if(!state.currentGame || state.currentGame.id !== game.id){
+            openGame(game.id);
+          }
+          loadContent(game);
+        }
+        if(event.data.type === 'gamerden-back-to-launcher'){
+          if(state.currentGame){
+            loadLauncher(state.currentGame);
+          }
+        }
+      });
+
+      fetch('gamerden-games.json')
+        .then(res => {
+          if(!res.ok) throw new Error('Failed to load games list');
+          return res.json();
+        })
+        .then(games => {
+          state.games = games;
+          games.forEach(game => state.map.set(game.id, game));
+          buildRibbon(games);
+          board.innerHTML = '';
+          if(!games.length){
+            const empty = document.createElement('div');
+            empty.className = 'empty';
+            empty.textContent = 'No cabinets loaded. Check back after the next LAN party!';
+            board.appendChild(empty);
+            return;
+          }
+          games.forEach(game => board.appendChild(createCard(game)));
+        })
+        .catch(err => {
+          console.error(err);
+          board.innerHTML = '<div class="empty">Could not load the arcade data file. Try refreshing in a bit.</div>';
+          ribbon.innerHTML = '<span><strong>Data Error</strong> Arcade JSON could not be loaded.</span>';
+        });
     })();
   </script>
 </body>

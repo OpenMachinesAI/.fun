@@ -6,7 +6,7 @@
     "description": "Build, fly, and (maybe) land your own rockets. Student-grade chaos, pro-grade vibes.",
     "icon": "🚀",
     "color": "#33ffaa",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "Rocket Labs.html"
   },
@@ -17,7 +17,7 @@
     "description": "Co-op chaos with extra homework scares. Bring snacks.",
     "icon": "🏫",
     "color": "#ffc94d",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "EscapeTheEvilClassrom.html"
   },

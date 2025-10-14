@@ -2,7 +2,7 @@
   {
     "id": "rocket-labs",
     "title": "CSP Rocket Labs",
-    "subtitle": "Central Space Program",
+    "subtitle": "By Alex",
     "description": "Build, fly, and (maybe) land your own rockets. Student-grade chaos, pro-grade vibes.",
     "icon": "🚀",
     "color": "#33ffaa",
@@ -13,7 +13,7 @@
   {
     "id": "evil-classroom",
     "title": "Escape the Evil Classroom",
-    "subtitle": "Multiplayer",
+    "subtitle": "By Alex",
     "description": "Co-op chaos with extra homework scares. Bring snacks.",
     "icon": "🏫",
     "color": "#ffc94d",
@@ -24,7 +24,7 @@
   {
     "id": "mr-longreed",
     "title": "Escape Mr Longreed",
-    "subtitle": "3D Adventure",
+    "subtitle": "By Alex",
     "description": "Low-poly fear speedrun through the longest halls in school.",
     "icon": "🏃",
     "color": "#8bd0ff",
@@ -35,7 +35,7 @@
   {
     "id": "dodge-burger",
     "title": "Dodge Burger",
-    "subtitle": "Version 2",
+    "subtitle": "By Alex",
     "description": "Grease lightning. Dodge or be dodged.",
     "icon": "🍔",
     "color": "#33ffaa",
@@ -46,7 +46,7 @@
   {
     "id": "sam-vs-everything",
     "title": "SAM VS EVERYTHING",
-    "subtitle": "Preview",
+    "subtitle": "By Alex",
     "description": "Unbalanced. Unfair. Unreasonably fun.",
     "icon": "🔥",
     "color": "#ff4ac7",
@@ -57,7 +57,7 @@
   {
     "id": "csp-simulator",
     "title": "Central Space Program",
-    "subtitle": "Simulator",
+    "subtitle": "By Alex",
     "description": "Orbit snacks. Land vibes. Sim your way across the galaxy.",
     "icon": "🛰️",
     "color": "#9b5bff",
@@ -68,7 +68,7 @@
   {
     "id": "landing-game",
     "title": "Ladining Game",
-    "subtitle": "Yes, that spelling",
+    "subtitle": "By Alex",
     "description": "Nailed it. Or didn’t. You decide.",
     "icon": "🛬",
     "color": "#ffb36b",
@@ -79,7 +79,7 @@
   {
     "id": "flight-sim",
     "title": "Central Flight Sim",
-    "subtitle": "Skybound",
+    "subtitle": "Stolen from Scratch",
     "description": "Pilot your dreams. Turbo-props, afterburners, and crash landings—school-approved flight chaos.",
     "icon": "✈️",
     "color": "#3bd8ff",
@@ -90,7 +90,7 @@
   {
     "id": "geometry-fun",
     "title": "Totally Licensed Geometry Dash",
-    "subtitle": "Yes, really",
+    "subtitle": "Stolen from Scratch",
     "description": "Jump, flip, rage, repeat. 100% legit and certified not-a-lawsuit… probably.",
     "icon": "🟦",
     "color": "#ff4ac7",
@@ -101,7 +101,7 @@
   {
     "id": "marioish",
     "title": "Super Mario (don’t sue me)",
-    "subtitle": "Classic-ish",
+    "subtitle": "Stolen from Scratch",
     "description": "Run, jump, bonk blocks. Totally original plumber adventure, wink wink.",
     "icon": "🍄",
     "color": "#ffc94d",

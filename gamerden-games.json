@@ -108,5 +108,27 @@
     "isNew": true,
     "launcher": "game-launcher.html",
     "content": "centralschool.fun -- games.html"
+  },
+  {
+    "id": "flappy-shortreed",
+    "title": "Flappy Shortreed",
+    "subtitle": "By Cole",
+    "description": "Tap to flap your way past hallway pipes. Totally not rage-inducing.",
+    "icon": "🐦",
+    "color": "#66ff99",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "FlappyShortreed.html"
+  },
+  {
+    "id": "astro-dodge",
+    "title": "Astro Dodge",
+    "subtitle": "By Cole",
+    "description": "Dodge asteroids, survive the stars, and maybe impress Shortreed.",
+    "icon": "☄️",
+    "color": "#9b5bff",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "AstroDodge.html"
   }
 ]

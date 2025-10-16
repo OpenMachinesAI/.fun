@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>How do you want to play?</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#6ee7b7;--muted:#9aa6b2}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#071023 0%, #07162a 100%);color:#e6eef6}
+    .wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;box-sizing:border-box}
+    .card{background:rgba(255,255,255,0.03);border-radius:16px;padding:28px;max-width:880px;width:100%;box-shadow:0 8px 30px rgba(2,6,23,0.6);text-align:center}
+    h1{font-size:36px;margin:0 0 10px}
+    p.lead{color:var(--muted);margin:0 0 22px}
+
+    /* Big play button */
+    .big-action{display:block;margin:18px auto;padding:28px 36px;border-radius:14px;background:linear-gradient(90deg,var(--accent),#4fd1c5);color:#062024;font-weight:700;font-size:20px;box-shadow:0 10px 30px rgba(34,197,94,0.12);cursor:pointer;border:none}
+
+    /* Developer link */
+    .dev-link{display:block;margin-top:18px;color:var(--muted);font-size:14px;text-decoration:underline;cursor:pointer;background:none;border:none}
+
+    /* Scanner area */
+    .scanner{display:none;margin-top:18px}
+    video{max-width:100%;border-radius:8px}
+    .status{margin-top:12px;color:var(--muted)}
+    .small{font-size:13px}
+
+    /* developer panel */
+    .dev-panel{display:none;margin-top:16px;text-align:left}
+    .row{display:flex;gap:8px}
+    input[type=text],input[type=url]{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:inherit}
+    button.btn{padding:8px 12px;border-radius:8px;border:none;background:#1f2937;color:#e6eef6;cursor:pointer}
+
+    footer{margin-top:14px;color:var(--muted);font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>How do you want to play?</h1>
+      <p class="lead">Choose Classroom Play to scan a QR code from the webcam. If it matches the kiosk code, the game will open.</p>
+
+      <button id="playBtn" class="big-action">Play using Classroom Play</button>
+
+      <div id="scanner" class="scanner">
+        <video id="video" playsinline autoplay></video>
+        <div class="status" id="status">Initializing camera…</div>
+        <div class="small">Hold a QR code up to the webcam. You can also enter the code manually below.</div>
+        <div style="margin-top:10px;" class="row">
+          <input id="manualCode" placeholder="Enter QR text manually" />
+          <button id="manualCheck" class="btn">Open</button>
+        </div>
+      </div>
+
+      <button id="devBtn" class="dev-link">I'm a Developer</button>
+
+      <div id="devPanel" class="dev-panel">
+        <div class="small" style="margin-bottom:8px">.</div>
+        <div class="row">
+          <input id="jsonUrl" type="url" value="https://www.centralschool.fun/gamecode.json" />
+          <button id="fetchBtn" class="btn">Fetch JSON</button>
+        </div>
+        <pre id="jsonOut" style="margin-top:10px;background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;max-height:160px;overflow:auto;color:var(--muted)"></pre>
+      </div>
+
+      <footer>Please ask teacher permision before using</footer>
+    </div>
+  </div>
+
+  <!-- jsQR from unpkg (small, MIT). If you want to bundle it, download and include locally on the kiosk. -->
+  <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+  <script>
+    // Config
+    const JSON_URL_DEFAULT = 'https://centralschool.fun/gamecode.json';
+
+    const playBtn = document.getElementById('playBtn');
+    const scanner = document.getElementById('scanner');
+    const video = document.getElementById('video');
+    const status = document.getElementById('status');
+    const manualCode = document.getElementById('manualCode');
+    const manualCheck = document.getElementById('manualCheck');
+    const devBtn = document.getElementById('devBtn');
+    const devPanel = document.getElementById('devPanel');
+    const fetchBtn = document.getElementById('fetchBtn');
+    const jsonUrl = document.getElementById('jsonUrl');
+    const jsonOut = document.getElementById('jsonOut');
+
+    let stream = null;
+    let checking = false;
+    let currentCodeJson = null; // cached JSON from the server
+
+    async function startCamera(){
+      try{
+        stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+        video.srcObject = stream;
+        await video.play();
+        status.textContent = 'Camera started — scanning for QR codes...';
+        scanLoop();
+      }catch(err){
+        status.textContent = 'Camera unavailable: ' + err.message;
+      }
+    }
+
+    function stopCamera(){
+      if(stream){
+        stream.getTracks().forEach(t=>t.stop());
+        stream = null;
+      }
+    }
+
+   // canvas for scanning
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    async function scanLoop(){
+      if(!video || video.readyState !== video.HAVE_ENOUGH_DATA) { requestAnimationFrame(scanLoop); return; }
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video,0,0,canvas.width,canvas.height);
+      const imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+      if(code && code.data){
+        // found QR
+        status.textContent = 'QR code found — checking…';
+        handleScannedCode(code.data.trim());
+        // pause scanning briefly to avoid double-open
+        await new Promise(r=>setTimeout(r,1500));
+      }
+      requestAnimationFrame(scanLoop);
+    }
+
+    async function handleScannedCode(scanned){
+      if(checking) return;
+      checking = true;
+      try{
+        status.textContent = 'Fetching code file…';
+        const resp = await fetch(JSON_URL_DEFAULT, {cache: 'no-store'});
+        if(!resp.ok) throw new Error('Could not fetch code file: ' + resp.status);
+        const json = await resp.json();
+        currentCodeJson = json; // save for developer panel
+        // expected format: { "code": "SOME-TEXT", "url": "https://..." }
+        if(!json || !json.code || !json.url){
+          status.textContent = 'JSON missing required fields (code, url).';
+          checking = false;
+          return;
+        }
+        if(String(scanned) === String(json.code)){
+          status.textContent = 'Code matched — opening game…';
+          // small delay so user sees the success
+          setTimeout(()=>{ window.location.href = json.url; }, 700);
+        }else{
+          status.textContent = 'Code did not match. Scanned: ' + scanned;
+        }
+      }catch(err){
+        status.textContent = 'Error: ' + err.message;
+      }finally{ checking = false; }
+    }
+
+    playBtn.addEventListener('click',()=>{
+      scanner.style.display = 'block';
+      playBtn.style.display = 'none';
+      startCamera();
+    });
+
+    manualCheck.addEventListener('click',async ()=>{
+      const val = manualCode.value.trim();
+      if(!val) return status.textContent = 'Enter a code first.';
+      status.textContent = 'Checking manual code…';
+      await handleScannedCode(val);
+    });
+
+    devBtn.addEventListener('click',()=>{
+      devPanel.style.display = devPanel.style.display === 'block' ? 'none' : 'block';
+    });
+
+    fetchBtn.addEventListener('click',async ()=>{
+      const u = jsonUrl.value.trim() || JSON_URL_DEFAULT;
+      jsonOut.textContent = 'Fetching ' + u + ' …';
+      try{
+        const r = await fetch(u + (u.includes('?')? '&':'?') + 'cachebust=' + Date.now(), {cache:'no-store'});
+        if(!r.ok) throw new Error('Fetch failed: ' + r.status);
+        const j = await r.json();
+        jsonOut.textContent = JSON.stringify(j, null, 2);
+        currentCodeJson = j;
+      }catch(e){
+        jsonOut.textContent = 'Error: ' + e.message;
+      }
+    });
+
+    // cleanup if user navigates away
+    window.addEventListener('beforeunload', ()=> stopCamera());
+
+    // helpful note: if you run this on a kiosk without HTTPS or cross-origin issues, you might need to host this file
+    // on the same domain as the JSON or enable CORS on centralschool.fun. For offline kiosks, bundle the JSON locally and
+    // set JSON_URL_DEFAULT to './gamecode.json'.
+  </script>
+</body>
+</html>

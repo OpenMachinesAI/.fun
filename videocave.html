@@ -524,6 +524,24 @@ body, header {
       from { transform: translateY(-20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
+
+    .status-banner {
+      display: none;
+      margin: 12px auto 0;
+      padding: 12px 18px;
+      max-width: 600px;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 14px;
+      background: linear-gradient(90deg, #ff1744, #ff9100);
+      box-shadow: 0 0 18px rgba(255, 68, 68, 0.6);
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .status-banner.visible {
+      display: block;
+    }
 #toast {
   opacity: 0;
   transition: opacity 0.6s ease;
@@ -560,6 +578,8 @@ body, header {
   <div class="logo">CCP</div>
   <div class="subtext">(Central Content Pool)</div>
   <div class="fineprint">(Not Communist!)</div>
+
+  <div id="hf-status" class="status-banner"></div>
 
   <div class="container">
     <!-- Search + Lucky -->
@@ -667,6 +687,17 @@ const searchInput = document.getElementById('search-input');
 const categoryBar = document.getElementById('category-bar');
 const totalCount = document.getElementById('total-count');
 const commentsWindow = document.getElementById("comments-window");
+const hfStatusBanner = document.getElementById('hf-status');
+
+function setContentPoolStatus(isDown) {
+  if (!hfStatusBanner) return;
+  if (isDown) {
+    hfStatusBanner.textContent = "Content Pool is down. Please try again later.";
+    hfStatusBanner.classList.add('visible');
+  } else {
+    hfStatusBanner.classList.remove('visible');
+  }
+}
 
 
 // =======================
@@ -788,41 +819,65 @@ async function fetchAllCategories() {
 
   // Reset General so it builds fresh
   allVideosByCategory = {};
+  setContentPoolStatus(false);
 
-  const fetchAlbum = async (cat, album) => {
-    try {
-      const res = await fetch(`https://salexai-funserver-2-0.hf.space/album/${album}`);
-      const data = await res.json();
-      allVideosByCategory[cat] = data.videos || [];
-
-      // Update General immediately
-      rebuildGeneral();
-
-      // Update running total (skip General & Cole Content Crate)
-      if (cat !== "General" && cat !== "Cole Content Crate") {
-        const prev = total;
-        total += (data.videos || []).length;
-        animateCounter(totalCount, prev, total, 600); // animate from old total → new
-      }
-    } catch {
-      showErrorToast(cat, album);
+  const fetchAlbumData = async (cat, album) => {
+    const res = await fetch(`https://salexai-funserver-2-0.hf.space/album/${album}`);
+    if (!res.ok) {
+      throw new Error(`HF Space responded with ${res.status}`);
     }
+    const data = await res.json();
+    return data.videos || [];
   };
 
-  // Instead of Promise.all, loop sequentially (or you could do Promise.allSettled for parallel)
-  for (const [cat, { album }] of Object.entries(categories)) {
-    await fetchAlbum(cat, album);
-  }
+  const categoryEntries = Object.entries(categories);
+  const results = await Promise.all(
+    categoryEntries.map(([cat, { album }]) =>
+      fetchAlbumData(cat, album)
+        .then(videos => {
+          allVideosByCategory[cat] = videos;
 
-  preloadMusic();
+          if (cat !== "General" && cat !== "Cole Content Crate") {
+            const prev = total;
+            total += videos.length;
+            animateCounter(totalCount, prev, total, 600);
+          }
+
+          return { cat, success: true };
+        })
+        .catch(error => {
+          allVideosByCategory[cat] = allVideosByCategory[cat] || [];
+          showErrorToast(cat, album);
+          return { cat, success: false, error };
+        })
+    )
+  );
+
+  rebuildGeneral();
+
+  const allFailed = results.every(result => !result.success);
 
   if (soundsEnabled) {
     sounds.loading.pause();
     sounds.loading.currentTime = 0;
-    sounds.success.play();
+    if (allFailed) {
+      sounds.error.play();
+    } else {
+      sounds.success.play();
+    }
   }
 
   hideLoadingToast();
+
+  if (allFailed) {
+    setContentPoolStatus(true);
+    toastify("Content Pool is down. Please try again later.", "error", { duration: 6000 });
+    return;
+  }
+
+  setContentPoolStatus(false);
+  preloadMusic();
+
   Toastify({
     text: "All videos loaded ✅",
     duration: 3000,
@@ -843,6 +898,7 @@ async function retryFetchCategory(cat, album, _toastElIgnored) {
     if (currentCategory === cat) renderVideos(allVideosByCategory[cat]);
 
     if (soundsEnabled) sounds.success.play();
+    setContentPoolStatus(false);
     toastify(`${cat} loaded`, "success");
   } catch {
     showErrorToast(cat, album);

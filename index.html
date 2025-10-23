@@ -7,36 +7,27 @@
   <style>
     :root{
       --ink:#f9fbff;
-      --bgBase1:#12033b;
-      --bgBase2:#0b0130;
-      --bgHighlight1:#ff58b811;
-      --bgHighlight2:#64fff20e;
-      --skyTop:#2a1e7a;
-      --skyMid:#1a0e5a;
-      --skyBottom:#0b0130;
-      --skyGlow:#ff9ecf55;
-      --gridColor:#a66cff33;
+      --bg1:#0b0130; --bg2:#1a0e5a; --bg3:#2a1e7a;
       --hot:#ff68d8; --aqua:#64fff2; --gold:#ffd66b; --lime:#9dffa8; --sky:#8fc8ff;
       --panel:#0f0940; --edge:#a7c8ff;
-      --bannerText:#2a1e00;
     }
     html,body{height:100%}
     body{
       margin:0; color:var(--ink); font-family:"Trebuchet MS","Comic Sans MS",Verdana,Tahoma,sans-serif;
-      background: radial-gradient(1200px 600px at 80% -20%, var(--bgHighlight1), transparent),
-                  radial-gradient(900px 500px at -10% 110%, var(--bgHighlight2), transparent),
-                  linear-gradient(var(--bgBase1), var(--bgBase2));
+      background: radial-gradient(1200px 600px at 80% -20%, #ff58b811, transparent),
+                  radial-gradient(900px 500px at -10% 110%, #64fff20e, transparent),
+                  linear-gradient(#12033b, #0b0130);
       overflow-x:hidden;
     }
 
     /* Vaporwave horizon grid */
     .sky { position:fixed; inset:0; z-index:-2;
-      background: radial-gradient(circle at 50% 20%, var(--skyGlow) 0 20%, transparent 22%),
-                  linear-gradient(180deg, var(--skyTop) 0, var(--skyMid) 40%, var(--skyBottom) 70%);
+      background: radial-gradient(circle at 50% 20%, #ff9ecf55 0 20%, transparent 22%),
+                  linear-gradient(180deg, #2a1e7a 0, #1a0e5a 40%, #0b0130 70%);
     }
     .grid { position:fixed; inset:auto 0 0 0; height:55vh; z-index:-1;
-      background: repeating-linear-gradient(0deg, var(--gridColor) 0 2px, transparent 2px 28px),
-                  repeating-linear-gradient(90deg, var(--gridColor) 0 2px, transparent 2px 48px);
+      background: repeating-linear-gradient(0deg, #a66cff33 0 2px, transparent 2px 28px),
+                  repeating-linear-gradient(90deg, #a66cff33 0 2px, transparent 2px 48px);
       transform-origin:50% 100%;
       transform: perspective(900px) rotateX(60deg) translateY(30vh);
       filter: drop-shadow(0 -20px 40px #a66cff66);
@@ -44,8 +35,7 @@
 
     /* Header: VHS bar + banner */
     header{ position:sticky; top:0; z-index:10; backdrop-filter: blur(6px); border-bottom:3px solid #fff3; }
-    .vhs { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; background: linear-gradient(90deg,#f0f,#90f,#0bf,#0ff); color:#102; text-shadow:1px 1px 0 #fff8; flex-wrap:wrap; }
-    .brand{display:flex;align-items:center;gap:12px;min-width:200px}
+    .vhs { display:flex; align-items:center; gap:12px; padding:10px 12px; background: linear-gradient(90deg,#f0f,#90f,#0bf,#0ff); color:#102; text-shadow:1px 1px 0 #fff8; }
     .logo{ width:54px;height:54px;border-radius:10px;border:2px solid #fff;
       background: conic-gradient(from 0deg,#fff, #0ff, #0bf, #90f, #f0f, #ff6, #0f9, #f66, #fff);
       box-shadow:0 0 10px #fff, 0 0 20px #0ff inset;
@@ -53,20 +43,7 @@
     .title{margin:0;font-weight:900}
     .sub{font-size:12px;opacity:.9}
 
-    .greeting{font-weight:900;font-size:18px;text-align:center;flex:1;min-width:180px;color:#12033b;text-shadow:none}
-    .greeting span{display:block;font-size:12px;font-weight:600;color:#2c1b57}
-
-    .account-controls{position:relative;display:flex;align-items:center;gap:8px}
-    .account-btn{padding:8px 12px;border:2px solid #102;border-radius:999px;background:#fff;color:#20144e;font-weight:800;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2);}
-    .account-btn:hover{transform:translateY(-1px);}
-    .account-menu{position:absolute;top:110%;right:0;background:#0f0a3c;border:2px solid #66a2ff;border-radius:12px;min-width:200px;padding:12px;display:none;box-shadow:0 10px 24px rgba(0,0,0,.4);z-index:20}
-    .account-menu.show{display:block}
-    .account-menu h4{margin:0 0 6px;font-size:15px}
-    .account-menu button{width:100%;padding:8px 10px;border:2px solid #fff;background:#160d4a;color:#fff;font-weight:700;cursor:pointer;border-radius:8px}
-    .account-menu button:hover{background:#1f1361}
-
     .banner { display:flex;justify-content:center;align-items:center;gap:10px; background:linear-gradient(90deg,var(--gold),#fff3 40%,var(--gold)); color:#2a1e00;font-weight:900;padding:8px 10px;border-top:2px solid #fff;border-bottom:2px solid #fff; }
-    .banner{color:var(--bannerText)}
     .banner a{ text-decoration:none;background:#fff;border:2px solid #0007;border-radius:10px; padding:6px 10px;color:#111; transition: transform .15s ease; }
     .banner a:hover{ transform: translateY(-1px) scale(1.03) }
 
@@ -98,11 +75,6 @@
     .dock a:hover{ transform: translateY(-2px); filter: brightness(1.1) }
     .dock svg{width:20px;height:20px}
 
-    .requires-account{display:none}
-    body.is-auth .requires-account{display:block}
-    .locked{position:relative;pointer-events:auto;cursor:not-allowed;filter:saturate(.3);}
-    .locked::after{content:"🔒";position:absolute;top:8px;right:12px;font-size:16px}
-
     /* Modal (More) */
     .modal{ position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; z-index:30; opacity:0; transition:opacity .2s ease }
     .modal.show{ display:flex; opacity:1 }
@@ -119,40 +91,16 @@
     .confetti.show{ animation: drop 1.2s ease-out forwards }
     @keyframes drop{ 0%{opacity:1; transform:translateY(-10px) translateX(var(--x,0)) rotate(0)} 100%{opacity:0; transform:translateY(100vh) translateX(calc(var(--x,0) * 3)) rotate(260deg)} }
 
-    .theme-picker{margin:24px 0 12px; background:rgba(10,5,40,.7); border:3px dashed var(--edge); padding:16px; border-radius:16px; box-shadow:0 10px 26px rgba(0,0,0,.45); display:none}
-    .theme-picker h2{margin:0 0 12px;font-size:18px;text-align:center}
-    .theme-options{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-    .theme-chip{padding:8px 14px;border:2px solid var(--edge);border-radius:14px;background:rgba(20,12,60,.7);color:var(--ink);font-weight:700;cursor:pointer;transition:transform .15s ease,background .15s ease}
-    .theme-chip:hover{transform:translateY(-2px)}
-    .theme-chip.active{background:var(--hot);color:#140336;border-color:#fff}
-    .theme-chip:disabled{opacity:.4;cursor:not-allowed;transform:none}
-
-    .auth-overlay{position:fixed;inset:0;background:rgba(6,4,25,.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:60;opacity:0;transition:opacity .2s ease}
-    .auth-overlay.show{display:flex;opacity:1}
-    .auth-card{background:#11093c;border:3px solid #66a2ff;border-radius:18px;max-width:520px;width:92%;padding:18px;box-shadow:0 16px 40px rgba(0,0,0,.55)}
-    .auth-card h2{margin:0 0 8px;font-size:22px}
-    .auth-card p{margin:0 0 10px;opacity:.85}
-    .auth-tabs{display:flex;gap:8px;margin-bottom:12px}
-    .auth-tabs button{flex:1;padding:8px 0;border:2px solid #66a2ff;background:#1b0f4f;color:#fff;font-weight:800;border-radius:999px;cursor:pointer}
-    .auth-tabs button.active{background:#8a5cff;border-color:#fff;color:#0b0130}
-    .auth-form{display:none;flex-direction:column;gap:10px}
-    .auth-form.active{display:flex}
-    .auth-form label{font-weight:700;font-size:13px}
-    .auth-form input{padding:10px;border-radius:10px;border:2px solid #2f1c66;background:#0b0430;color:#fff;font-weight:600}
-    .auth-form small{color:#ff7aa8;font-size:12px;min-height:16px}
-    .auth-actions{display:flex;justify-content:flex-end;gap:10px}
-    .auth-actions button{padding:8px 16px;border:2px solid #fff;background:linear-gradient(90deg,#8a5cff,#5e39d7);color:#fff;font-weight:800;border-radius:999px;cursor:pointer}
-    .auth-footer{margin-top:14px;text-align:center}
-    .auth-footer button{padding:8px 14px;border:2px solid #fff;background:transparent;color:#fff;font-weight:700;border-radius:10px;cursor:pointer}
-
-    .notice{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:rgba(5,3,25,.9);border:2px solid #8a5cff;border-radius:12px;padding:10px 18px;color:#fff;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:70}
-    .notice.show{opacity:1}
-
-    @media (max-width:720px){
-      .vhs{flex-direction:column;align-items:flex-start}
-      .greeting{text-align:left}
-      .account-controls{align-self:flex-end}
-    }
+    /* New Visitor Popup (NVP) */
+    .nvp{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,3,20,.6); backdrop-filter: blur(6px); z-index:50; opacity:0; transition:opacity .2s ease }
+    .nvp.show{ display:flex; opacity:1 }
+    .nvp-card{ background:#0f0a3c; border:3px solid #66a2ff; max-width:520px; width:92%; padding:16px; box-shadow:0 10px 30px #0008 }
+    .nvp-title{ font-weight:900; font-size:20px; margin:0 0 8px }
+    .nvp-msg{ opacity:.95; line-height:1.3; margin-bottom:12px }
+    .nvp-actions{ display:flex; gap:10px; flex-wrap:wrap }
+    .btn{ padding:8px 12px; border:2px solid #fff; cursor:pointer; font-weight:800 }
+    .btn-rainbow{ background:linear-gradient(90deg,#f0f,#90f,#0bf,#0ff,#0f9,#ff6); color:#021 }
+    .btn-ghost{ background:transparent; color:#fff }
   </style>
 </head>
 <body>
@@ -161,29 +109,15 @@
 
   <header>
     <div class="vhs">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <div>
-          <h1 class="title">CentralSchool.fun</h1>
-          <div class="sub">Alex’s sandbox • experiments • retro mischief</div>
-        </div>
-      </div>
-      <div class="greeting" id="greeting">
-        Welcome to CentralSchool.fun
-        <span>Sign in to unlock everything</span>
-      </div>
-      <div class="account-controls">
-        <button class="account-btn" id="accountBtn" type="button">Sign In</button>
-        <div class="account-menu" id="accountMenu">
-          <h4 id="accountMenuName">Guest Mode</h4>
-          <div id="accountMenuHandle" style="font-size:12px;opacity:.75;margin-bottom:10px"></div>
-          <button id="logoutBtn" type="button">Log out</button>
-        </div>
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1 class="title">CentralSchool.fun</h1>
+        <div class="sub">Alex’s sandbox • experiments • retro mischief</div>
       </div>
     </div>
     <div class="banner">
       <span>🃏 Trading Cards now available!</span>
-      <a href="cards.html" id="tcLink" data-protected data-feature="cards">Open Trading Cards</a>
+      <a href="cards.html" id="tcLink">Open Trading Cards</a>
     </div>
     <div class="ticker">
       <div class="flap-track" id="flaps"></div>
@@ -193,7 +127,7 @@
   <main>
     <!-- Stickerboard tiles (unique look vs shop) -->
     <div class="board">
-      <a class="sticker" href="cards.html" data-protected data-feature="cards" style="--i:0; --rot:-4deg">
+      <a class="sticker" href="cards.html" style="--i:0; --rot:-4deg">
         <span class="tag new">NEW</span>
         <div class="st-title">
           <svg viewBox="0 0 24 24" fill="#ffd66b"><rect x="3" y="3" width="18" height="12" rx="2"/><path d="M7 8h10" stroke="#112" stroke-width="2"/></svg>
@@ -229,7 +163,7 @@
         <div class="st-desc">Clips, mixes, and bloopers that made the cut.</div>
       </a>
 
-      <a class="sticker" href="ImageGen.html" data-protected data-feature="images" style="--i:4; --rot:-1.4deg">
+      <a class="sticker" href="ImageGen.html" style="--i:4; --rot:-1.4deg">
         <span class="tag fun">FUN</span>
         <div class="st-title">
           <svg viewBox="0 0 24 24" fill="#ffd66b"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="12" cy="12" r="4" fill="#051227"/></svg>
@@ -265,7 +199,7 @@
         <div class="st-desc">Central Tlks is a group chat for the entire school! It's currently in beta. Report bugs to Alex or Cole</div>
       </a>
 
-      <a class="sticker" href="#" id="openMore" data-protected data-feature="tools" style="--i:8; --rot:2.4deg">
+      <a class="sticker" href="#" id="openMore" style="--i:8; --rot:2.4deg">
         <span class="tag">MORE</span>
         <div class="st-title">
           <svg viewBox="0 0 24 24" fill="#8fc8ff"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
@@ -275,36 +209,25 @@
       </a>
     </div>
 
-    <section id="themePicker" class="theme-picker requires-account" aria-label="Theme picker">
-      <h2>Choose your .fun vibe</h2>
-      <div class="theme-options">
-        <button type="button" class="theme-chip" data-theme="classic">Classic Midnight</button>
-        <button type="button" class="theme-chip" data-theme="aurora">Aurora Glow</button>
-        <button type="button" class="theme-chip" data-theme="sunset">Sunset Arcade</button>
-        <button type="button" class="theme-chip" data-theme="forest">Mystic Forest</button>
-        <button type="button" class="theme-chip" data-theme="terminal">Matrix Pulse</button>
-      </div>
-    </section>
-
     <!-- Dock quick links -->
     <div class="dock">
-      <a href="minecraft.html" title="Minecraft (scuffed)" data-protected data-feature="cmscraft">
+      <a href="minecraft.html" title="Minecraft (scuffed)">
         <svg viewBox="0 0 24 24" fill="#3ad16a"><rect x="3" y="3" width="18" height="18" stroke="#000" stroke-width="1.5" fill="none"/></svg>
         <span>CMSCraft</span>
       </a>
-      <a href="centralcast.html" title="Central Podcast" data-protected data-feature="tools">
+      <a href="centralcast.html" title="Central Podcast">
         <svg viewBox="0 0 24 24" fill="#ffd27a"><circle cx="12" cy="12" r="3" fill="#001a33"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="#ffd27a" stroke-width="1.6"/></svg>
         <span>Central Podcast</span>
       </a>
-      <a href="hell.html" title="Tab Hell" data-protected data-feature="tools">
+      <a href="hell.html" title="Tab Hell">
         <svg viewBox="0 0 24 24" fill="#ff5858"><path d="M5 4h14v6H5z"/><path d="M5 10h14v6H5z" opacity=".7"/></svg>
         <span>Tab Hell</span>
       </a>
-      <a href="slurp.html" title="Email Slurper" data-protected data-feature="tools">
+      <a href="slurp.html" title="Email Slurper">
         <svg viewBox="0 0 24 24" fill="#7affe0"><path d="M3 6h18l-9 8z"/><rect x="3" y="6" width="18" height="12" fill="none" stroke="#7affe0" stroke-width="1.3"/></svg>
         <span>Get Email Codes from your Chromebook</span>
       </a>
-      <a href="error!%20(crash%20apple).html" title="Crash Apple" data-protected data-feature="tools">
+      <a href="error!%20(crash%20apple).html" title="Crash Apple">
         <svg viewBox="0 0 24 24" fill="#ffb1b1"><path d="M12 2l4 6-4 6-4-6z"/></svg>
         <span>Crash Apple</span>
       </a>
@@ -323,384 +246,73 @@
   <!-- Footer (visitor counter removed) -->
   <footer><span>CentralSchool.fun</span></footer>
 
-  <div class="auth-overlay" id="authOverlay" aria-hidden="true" role="dialog" aria-labelledby="authTitle">
-    <div class="auth-card">
-      <h2 id="authTitle">Sign in to CentralSchool.fun</h2>
-      <p>Unlock trading cards, CMSCraft, Images.fun, and more school-only experiments.</p>
-      <div class="auth-tabs" role="tablist">
-        <button type="button" data-mode="login" class="active" role="tab" aria-selected="true">Login</button>
-        <button type="button" data-mode="signup" role="tab" aria-selected="false">Sign Up</button>
-      </div>
-      <form id="loginForm" class="auth-form active" autocomplete="on">
-        <label for="loginUsername">Username</label>
-        <input id="loginUsername" name="username" autocomplete="username" placeholder="e.g. alex123" required>
-        <label for="loginPin">PIN</label>
-        <input id="loginPin" name="pin" type="password" autocomplete="current-password" placeholder="4+ digits" required>
-        <small id="loginError"></small>
-        <div class="auth-actions">
-          <button type="submit">Sign In</button>
-        </div>
-      </form>
-      <form id="signupForm" class="auth-form" autocomplete="off">
-        <label for="signupName">Display name</label>
-        <input id="signupName" name="display" placeholder="Your name" required>
-        <label for="signupUsername">Username</label>
-        <input id="signupUsername" name="username" placeholder="letters & numbers" required>
-        <label for="signupPin">Choose a PIN</label>
-        <input id="signupPin" name="pin" type="password" placeholder="4+ digits" required>
-        <small id="signupError"></small>
-        <div class="auth-actions">
-          <button type="submit">Create account</button>
-        </div>
-      </form>
-      <div class="auth-footer">
-        <button type="button" id="guestBtn">Continue without an account</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="notice" class="notice" role="status" aria-live="polite"></div>
-
 <script>
-const $ = (sel, parent=document) => parent.querySelector(sel);
-const $$ = (sel, parent=document) => Array.from(parent.querySelectorAll(sel));
-
-const ACCOUNT_KEY = 'fun_accounts_v1';
-const SESSION_KEY = 'fun_session_v1';
-const GUEST_KEY = 'fun_guest_continue_v1';
-
-const THEMES = [
-  { id: 'classic', label: 'Classic Midnight', vars: {
-      '--ink':'#f9fbff','--bgBase1':'#12033b','--bgBase2':'#0b0130','--bgHighlight1':'#ff58b811','--bgHighlight2':'#64fff20e',
-      '--skyTop':'#2a1e7a','--skyMid':'#1a0e5a','--skyBottom':'#0b0130','--skyGlow':'#ff9ecf55','--gridColor':'#a66cff33',
-      '--hot':'#ff68d8','--aqua':'#64fff2','--gold':'#ffd66b','--lime':'#9dffa8','--sky':'#8fc8ff',
-      '--panel':'#0f0940','--edge':'#a7c8ff','--bannerText':'#2a1e00'
-    }
-  },
-  { id: 'aurora', label: 'Aurora Glow', vars: {
-      '--ink':'#eafcff','--bgBase1':'#021436','--bgBase2':'#010b1e','--bgHighlight1':'#3dfbd422','--bgHighlight2':'#2ac6ff22',
-      '--skyTop':'#083d73','--skyMid':'#072855','--skyBottom':'#010b1e','--skyGlow':'#42ffe255','--gridColor':'#3ef7ff44',
-      '--hot':'#6af7ff','--aqua':'#65ffcd','--gold':'#f0ff81','--lime':'#6fff97','--sky':'#63d8ff',
-      '--panel':'#04183c','--edge':'#6fe2ff','--bannerText':'#03283a'
-    }
-  },
-  { id: 'sunset', label: 'Sunset Arcade', vars: {
-      '--ink':'#fff5f2','--bgBase1':'#4d0035','--bgBase2':'#0f011e','--bgHighlight1':'#ff8a3c33','--bgHighlight2':'#ff2d9922',
-      '--skyTop':'#ff5f7a','--skyMid':'#a9196c','--skyBottom':'#140021','--skyGlow':'#ffad6f55','--gridColor':'#ff3b6f55',
-      '--hot':'#ff6f91','--aqua':'#ffd166','--gold':'#ffc15e','--lime':'#ff9f68','--sky':'#ffc7f3',
-      '--panel':'#2a0a28','--edge':'#ff84c6','--bannerText':'#3b0416'
-    }
-  },
-  { id: 'forest', label: 'Mystic Forest', vars: {
-      '--ink':'#f4ffee','--bgBase1':'#0d1f16','--bgBase2':'#020e08','--bgHighlight1':'#2bb67322','--bgHighlight2':'#0e8f5a22',
-      '--skyTop':'#1e6b44','--skyMid':'#0f4c32','--skyBottom':'#020e08','--skyGlow':'#5bffb755','--gridColor':'#4dd19344',
-      '--hot':'#8bff9d','--aqua':'#64ffd9','--gold':'#d6ff79','--lime':'#7bff83','--sky':'#9afcd9',
-      '--panel':'#10281b','--edge':'#6bffa4','--bannerText':'#0d301c'
-    }
-  },
-  { id: 'terminal', label: 'Matrix Pulse', vars: {
-      '--ink':'#d5ffe1','--bgBase1':'#000b16','--bgBase2':'#000308','--bgHighlight1':'#00ff5c1d','--bgHighlight2':'#00d1ff1d',
-      '--skyTop':'#062a1b','--skyMid':'#041d12','--skyBottom':'#000308','--skyGlow':'#00ff7f55','--gridColor':'#16ff5c33',
-      '--hot':'#00ff9c','--aqua':'#42f2ff','--gold':'#a8ff60','--lime':'#54ff8b','--sky':'#4fffea',
-      '--panel':'#031116','--edge':'#38ff9c','--bannerText':'#011d11'
-    }
-  }
-];
-
-let accounts = [];
-let currentUser = null;
-let guestMode = false;
-let activeTheme = 'classic';
-let noticeTimer;
-
-function loadAccounts(){
+// ===== New Visitor Popup (JSON toggleable) =====
+const NVP_CONFIG = {
+  enabled: true,
+  key: 'new-csf_seen_v1',
+  cooldownDays: 90,
+  title: 'Welcome to the new CentralSchool.fun',
+  message: 'This entire website has been updated. Explore new pages and enjoy... Hopefuly',
+  link: { href: 'index.html', label: 'Continue' },
+  cancelLabel: 'Stop Showing This'
+};
+function nvpSeen(){
   try{
-    const raw = localStorage.getItem(ACCOUNT_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  }catch{
-    return [];
+    const ts = +localStorage.getItem(NVP_CONFIG.key) || 0;
+    if(!ts) return false;
+    return Date.now() - ts < (NVP_CONFIG.cooldownDays*24*60*60*1000);
+  }catch{ return false }
+}
+function nvpMarkSeen(){
+  try{ localStorage.setItem(NVP_CONFIG.key, Date.now()); }catch{}
+  document.cookie = `${NVP_CONFIG.key}=1; max-age=${NVP_CONFIG.cooldownDays*86400}; path=/`;
+}
+function ensureNvpDom(){
+  let overlay = document.getElementById('nvp');
+  if(overlay) return overlay;
+  overlay = document.createElement('div');
+  overlay.className = 'nvp';
+  overlay.id = 'nvp';
+  overlay.setAttribute('aria-hidden','true');
+  overlay.innerHTML = `
+    <div class="nvp-card" role="dialog" aria-labelledby="nvpTitle" aria-describedby="nvpMsg">
+      <h3 class="nvp-title" id="nvpTitle"></h3>
+      <div class="nvp-msg" id="nvpMsg"></div>
+      <div class="nvp-actions" id="nvpActions"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e)=>{ if(e.target===overlay){ nvpMarkSeen(); overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); } });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && overlay.classList.contains('show')){ nvpMarkSeen(); overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); } });
+  return overlay;
+}
+function initNVP(){
+  if(!NVP_CONFIG.enabled || nvpSeen()) return;
+  const overlay = ensureNvpDom();
+  const title = overlay.querySelector('#nvpTitle');
+  const msg = overlay.querySelector('#nvpMsg');
+  const actions = overlay.querySelector('#nvpActions');
+  title.textContent = NVP_CONFIG.title||'Notice';
+  msg.textContent = NVP_CONFIG.message||'';
+  actions.innerHTML = '';
+  if(NVP_CONFIG.link && NVP_CONFIG.link.href){
+    const go=document.createElement('button');
+    go.className='btn btn-rainbow';
+    go.textContent=NVP_CONFIG.link.label||'Open';
+    go.onclick=()=>{ nvpMarkSeen(); window.location.href=NVP_CONFIG.link.href; };
+    actions.appendChild(go);
   }
-}
-
-function saveAccounts(){
-  try{ localStorage.setItem(ACCOUNT_KEY, JSON.stringify(accounts)); }catch{}
-}
-
-function findAccount(handle){
-  const needle = (handle||'').toLowerCase();
-  return accounts.find(acc => acc.handleLower === needle) || null;
-}
-
-function setSession(handle){
-  if(handle){
-    localStorage.setItem(SESSION_KEY, handle.toLowerCase());
-  }else{
-    localStorage.removeItem(SESSION_KEY);
-  }
-}
-
-function applyTheme(themeId){
-  const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
-  activeTheme = theme.id;
-  const base = THEMES[0].vars;
-  const root = document.documentElement.style;
-  Object.keys(base).forEach(key => {
-    const val = theme.vars[key] ?? base[key];
-    root.setProperty(key, val);
-  });
-}
-
-function showAuthOverlay(mode='login'){
-  setOverlayMode(mode);
-  const overlay = $('#authOverlay');
+  const cancel=document.createElement('button');
+  cancel.className='btn btn-ghost';
+  cancel.textContent=NVP_CONFIG.cancelLabel||'Dismiss';
+  cancel.onclick=()=>{ nvpMarkSeen(); overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); };
+  actions.appendChild(cancel);
   overlay.classList.add('show');
   overlay.setAttribute('aria-hidden','false');
 }
 
-function hideAuthOverlay(){
-  const overlay = $('#authOverlay');
-  overlay.classList.remove('show');
-  overlay.setAttribute('aria-hidden','true');
-}
-
-function setOverlayMode(mode){
-  $$('.auth-tabs button').forEach(btn => {
-    const active = btn.dataset.mode === mode;
-    btn.classList.toggle('active', active);
-    btn.setAttribute('aria-selected', active ? 'true' : 'false');
-  });
-  $$('.auth-form').forEach(form => {
-    form.classList.toggle('active', form.id === (mode==='login' ? 'loginForm' : 'signupForm'));
-  });
-}
-
-function showNotice(msg){
-  const notice = $('#notice');
-  if(!notice) return;
-  notice.textContent = msg;
-  notice.classList.add('show');
-  clearTimeout(noticeTimer);
-  noticeTimer = setTimeout(()=> notice.classList.remove('show'), 2800);
-}
-
-function updateProtectedLinks(){
-  const authed = Boolean(currentUser);
-  $$('[data-protected]').forEach(link => {
-    if(!link.dataset.targetHref){
-      link.dataset.targetHref = link.getAttribute('href') || '#';
-    }
-    if(authed){
-      link.classList.remove('locked');
-      link.setAttribute('href', link.dataset.targetHref);
-      link.setAttribute('aria-disabled','false');
-    }else{
-      link.classList.add('locked');
-      link.setAttribute('href', '#');
-      link.setAttribute('aria-disabled','true');
-    }
-  });
-}
-
-function updateThemeControls(){
-  const authed = Boolean(currentUser);
-  $$('.theme-chip').forEach(btn => {
-    btn.disabled = !authed;
-    btn.classList.toggle('active', authed && btn.dataset.theme === activeTheme);
-  });
-}
-
-function updateGreeting(){
-  const greeting = $('#greeting');
-  if(!greeting) return;
-  if(currentUser){
-    greeting.innerHTML = '';
-    greeting.append(document.createTextNode(`Welcome back, ${currentUser.name || currentUser.handle}!`));
-    const span = document.createElement('span');
-    span.textContent = 'You now have full access to .fun';
-    greeting.append(span);
-  }else{
-    greeting.innerHTML = 'Welcome to CentralSchool.fun<span>Sign in to unlock everything</span>';
-  }
-}
-
-function updateAccountMenu(){
-  const btn = $('#accountBtn');
-  const menu = $('#accountMenu');
-  const handleLine = $('#accountMenuHandle');
-  const nameLine = $('#accountMenuName');
-  if(currentUser){
-    btn.textContent = currentUser.name || currentUser.handle;
-    nameLine.textContent = currentUser.name || 'Student';
-    handleLine.textContent = `@${currentUser.handle}`;
-  }else{
-    btn.textContent = guestMode ? 'Guest' : 'Sign In';
-    nameLine.textContent = 'Guest Mode';
-    handleLine.textContent = guestMode ? 'Limited access' : 'Sign in to unlock features';
-    menu.classList.remove('show');
-  }
-}
-
-function updateUI(){
-  document.body.classList.toggle('is-auth', Boolean(currentUser));
-  updateProtectedLinks();
-  updateThemeControls();
-  updateGreeting();
-  updateAccountMenu();
-}
-
-function login(handle, pin){
-  const account = findAccount(handle);
-  if(!account) return { ok:false, error:'Account not found' };
-  if(account.pin !== pin) return { ok:false, error:'Incorrect PIN' };
-  currentUser = account;
-  guestMode = false;
-  sessionStorage.removeItem(GUEST_KEY);
-  setSession(account.handle);
-  applyTheme(account.theme || 'classic');
-  updateUI();
-  hideAuthOverlay();
-  showNotice(`Hi ${account.name || account.handle}!`);
-  return { ok:true };
-}
-
-function createAccount(name, handle, pin){
-  if(findAccount(handle)) return { ok:false, error:'That username is taken' };
-  const account = {
-    name: name.trim(),
-    handle: handle.trim(),
-    handleLower: handle.trim().toLowerCase(),
-    pin: pin.trim(),
-    theme: 'classic'
-  };
-  accounts.push(account);
-  saveAccounts();
-  currentUser = account;
-  guestMode = false;
-  sessionStorage.removeItem(GUEST_KEY);
-  setSession(account.handle);
-  applyTheme('classic');
-  updateUI();
-  hideAuthOverlay();
-  showNotice('Account created! Welcome in.');
-  return { ok:true };
-}
-
-function logout(){
-  currentUser = null;
-  setSession('');
-  applyTheme('classic');
-  updateUI();
-  showAuthOverlay('login');
-}
-
 document.addEventListener('DOMContentLoaded', ()=>{
-  accounts = loadAccounts();
-  guestMode = sessionStorage.getItem(GUEST_KEY) === '1';
-
-  const storedHandle = localStorage.getItem(SESSION_KEY);
-  if(storedHandle){
-    const account = findAccount(storedHandle);
-    if(account){
-      currentUser = account;
-      applyTheme(account.theme || 'classic');
-    }else{
-      setSession('');
-      applyTheme('classic');
-    }
-  }else{
-    applyTheme('classic');
-  }
-
-  if(!currentUser && !guestMode){
-    showAuthOverlay('login');
-  }
-
-  updateUI();
-
-  $$('.theme-chip').forEach(btn => {
-    btn.addEventListener('click', ()=>{
-      if(!currentUser){ showNotice('Sign in to change themes.'); return; }
-      const themeId = btn.dataset.theme;
-      applyTheme(themeId);
-      currentUser.theme = themeId;
-      saveAccounts();
-      updateThemeControls();
-      const label = THEMES.find(t=>t.id===themeId)?.label || 'Theme';
-      showNotice(`${label} applied!`);
-    });
-  });
-
-  $$('.auth-tabs button').forEach(btn => {
-    btn.addEventListener('click', ()=> setOverlayMode(btn.dataset.mode));
-  });
-
-  $('#loginForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const handle = $('#loginUsername').value.trim();
-    const pin = $('#loginPin').value.trim();
-    if(!handle || !pin){ $('#loginError').textContent = 'Enter username and PIN.'; return; }
-    const result = login(handle, pin);
-    if(!result.ok){ $('#loginError').textContent = result.error; } else { $('#loginError').textContent = ''; }
-  });
-
-  $('#signupForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const name = $('#signupName').value.trim();
-    const handle = $('#signupUsername').value.trim();
-    const pin = $('#signupPin').value.trim();
-    const error = $('#signupError');
-    error.textContent = '';
-    if(handle.length < 3){ error.textContent='Pick a username with 3+ characters.'; return; }
-    if(!/^\w+$/i.test(handle)){ error.textContent='Use only letters, numbers, and underscores.'; return; }
-    if(pin.length < 4){ error.textContent='PIN must be at least 4 characters.'; return; }
-    const result = createAccount(name, handle, pin);
-    if(!result.ok){ error.textContent = result.error; }
-  });
-
-  $('#guestBtn').addEventListener('click', ()=>{
-    guestMode = true;
-    sessionStorage.setItem(GUEST_KEY, '1');
-    hideAuthOverlay();
-    updateUI();
-    showNotice('Browsing in guest mode. Some features stay locked.');
-  });
-
-  $('#accountBtn').addEventListener('click', ()=>{
-    if(currentUser){
-      $('#accountMenu').classList.toggle('show');
-    }else{
-      showAuthOverlay('login');
-    }
-  });
-
-  document.addEventListener('click', (e)=>{
-    const menu = $('#accountMenu');
-    if(!menu) return;
-    if(menu.contains(e.target) || $('#accountBtn').contains(e.target)) return;
-    menu.classList.remove('show');
-  });
-
-  $('#logoutBtn').addEventListener('click', ()=>{
-    $('#accountMenu').classList.remove('show');
-    logout();
-  });
-
-  $('#authOverlay').addEventListener('click', (e)=>{
-    if(e.target === e.currentTarget && !currentUser){ return; }
-    if(e.target === e.currentTarget){ hideAuthOverlay(); }
-  });
-
-  $$('[data-protected]').forEach(link => {
-    link.addEventListener('click', e => {
-      if(!currentUser){
-        e.preventDefault();
-        if(link.id === 'tcLink' || link.id === 'openMore') return;
-        showNotice('Sign in to use this feature.');
-        showAuthOverlay('login');
-      }
-    });
-  });
+  initNVP();
 
   // ===== Flap ticker =====
   const lines = [
@@ -714,7 +326,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const flaps = document.getElementById('flaps');
   function loadFlaps(){
     flaps.innerHTML = "";
-    const seq = [...lines, ...lines.slice(0,2)];
+    const seq = [...lines, ...lines.slice(0,2)]; // loop smooth
     seq.forEach(text=>{
       const d=document.createElement('div');
       d.className='flap'; d.textContent=text;
@@ -735,11 +347,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     {name:"Crash Apple", url:"error!%20(crash%20apple).html"}
   ];
   function openModal(){
-    if(!currentUser){
-      showNotice('Sign in to explore the lab tools.');
-      showAuthOverlay('login');
-      return;
-    }
     moreList.innerHTML='';
     moreData.forEach((m,i)=>{
       const a=document.createElement('a');
@@ -756,8 +363,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.addEventListener('keydown',e=>{ if(e.key==='Escape' && moreModal.classList.contains('show')) closeModal(); });
 
   // ===== Banner confetti =====
-  document.getElementById('tcLink').addEventListener('click', (e)=>{
-    if(!currentUser){ e.preventDefault(); showNotice('Sign in to access the trading cards.'); showAuthOverlay('login'); return; }
+  document.getElementById('tcLink').addEventListener('click', ()=>{
     for(let i=0;i<24;i++){
       const s=document.createElement('div'); s.className='confetti show';
       s.style.left=(50+Math.random()*20-10)+'%';
@@ -772,14 +378,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   (function tests(){
     const out=[];
     function ok(name,cond){ out.push((cond?'PASS':'FAIL')+': '+name); }
-    const tc = document.getElementById('tcLink');
-    ok('Trading card link protected', tc?.dataset.protected !== undefined && tc?.dataset.targetHref === 'cards.html');
+    ok('Banner link points to cards.html', (document.getElementById('tcLink')||{}).getAttribute?.('href')==='cards.html');
     ok('Flaps loaded', document.querySelectorAll('.flap').length>3);
     ok('Stickers exist', document.querySelectorAll('.sticker').length>=6);
-    ok('Theme chips exist', document.querySelectorAll('.theme-chip').length===5);
-    openModal();
-    ok('More items render when allowed', currentUser ? document.querySelectorAll('#moreList .more-item').length===moreData.length : document.querySelectorAll('#moreList .more-item').length===0);
-    closeModal();
+    // Modal open/close
+    openModal(); ok('More items render', document.querySelectorAll('#moreList .more-item').length===moreData.length); closeModal();
     console.log('[Stickerboard Home Tests]\n'+out.join('\n'));
   })();
 });

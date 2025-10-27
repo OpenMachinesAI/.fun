@@ -188,6 +188,7 @@
       </div>
       <div class="toolbar-buttons">
         <button class="toolbar-button" id="restartGame" title="Back to launcher"><span class="icon">↺</span> Restart</button>
+        <button class="toolbar-button" id="fullscreenGame" title="Toggle fullscreen"><span class="icon">⛶</span> Fullscreen</button>
         <button class="toolbar-button" id="closeGame" title="Close window"><span class="icon">✖</span> Close</button>
       </div>
     </div>
@@ -207,6 +208,7 @@
       const modal = document.getElementById('gameWindow');
       const frame = document.getElementById('gameFrame');
       const restartBtn = document.getElementById('restartGame');
+      const fullscreenBtn = document.getElementById('fullscreenGame');
       const closeBtn = document.getElementById('closeGame');
       const windowIcon = document.getElementById('windowIcon');
       const windowTitle = document.getElementById('windowTitle');
@@ -276,6 +278,12 @@
         state.currentGame = null;
         modal.classList.remove('show');
         modal.setAttribute('aria-hidden','true');
+        if(document.fullscreenElement){
+          const exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+          if(typeof exitFullscreen === 'function'){
+            exitFullscreen.call(document);
+          }
+        }
         frame.src = 'about:blank';
       }
 
@@ -284,6 +292,40 @@
           loadLauncher(state.currentGame);
         }
       });
+
+      function updateFullscreenState(){
+        if(!fullscreenBtn) return;
+        const isFull = !!document.fullscreenElement;
+        fullscreenBtn.innerHTML = `<span class="icon">${isFull ? '🗗' : '⛶'}</span> ${isFull ? 'Exit Fullscreen' : 'Fullscreen'}`;
+        fullscreenBtn.setAttribute('aria-pressed', isFull ? 'true' : 'false');
+      }
+
+      if(fullscreenBtn){
+        fullscreenBtn.addEventListener('click', () => {
+          if(document.fullscreenElement){
+            const exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+            if(typeof exitFullscreen === 'function'){
+              exitFullscreen.call(document);
+            }
+            return;
+          }
+          const target = frame || modal;
+          if(!target) return;
+          const request = target.requestFullscreen || target.webkitRequestFullscreen || target.msRequestFullscreen;
+          if(typeof request === 'function'){
+            const result = request.call(target);
+            if(result && typeof result.catch === 'function'){
+              result.catch(() => {
+                // ignore fullscreen errors
+              });
+            }
+          }
+        });
+        document.addEventListener('fullscreenchange', updateFullscreenState);
+        document.addEventListener('fullscreenerror', updateFullscreenState);
+        updateFullscreenState();
+      }
+
       closeBtn.addEventListener('click', closeGame);
 
       window.addEventListener('keydown', (event) => {

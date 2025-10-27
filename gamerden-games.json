@@ -83,7 +83,7 @@
     "description": "Pilot your dreams. Turbo-props, afterburners, and crash landings—school-approved flight chaos.",
     "icon": "✈️",
     "color": "#3bd8ff",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "fun flight sim.html"
   },
@@ -94,7 +94,7 @@
     "description": "Jump, flip, rage, repeat. 100% legit and certified not-a-lawsuit… probably.",
     "icon": "🟦",
     "color": "#ff4ac7",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "Geometry.FUN.html"
   },
@@ -105,7 +105,7 @@
     "description": "Run, jump, bonk blocks. Totally original plumber adventure, wink wink.",
     "icon": "🍄",
     "color": "#ffc94d",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "centralschool.fun -- games.html"
   },
@@ -116,7 +116,7 @@
     "description": "Tap to flap your way past hallway pipes. Totally not rage-inducing.",
     "icon": "🐦",
     "color": "#66ff99",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "flappy%20reed.html"
   },
@@ -127,8 +127,19 @@
     "description": "Dodge asteroids, survive the stars, and maybe impress Shortreed.",
     "icon": "☄️",
     "color": "#9b5bff",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "Astro Niran Dodge.html"
+  },
+  {
+    "id": "parking-game",
+    "title": "Parking Game",
+    "subtitle": "By Alex",
+    "description": "Slide into the perfect spot without a scratch.",
+    "icon": "🅿️",
+    "color": "#4d94ff",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "parking-game.html"
   }
 ]

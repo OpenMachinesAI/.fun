@@ -118,7 +118,7 @@
     "color": "#66ff99",
     "isNew": false,
     "launcher": "game-launcher.html",
-    "content": "flappy%20reed.html"
+    "content": "flappy reed.html"
   },
   {
     "id": "astro-dodge",
@@ -141,5 +141,27 @@
     "isNew": true,
     "launcher": "game-launcher.html",
     "content": "parking-game.html"
+  },
+  {
+    "id": "papercraft",
+    "title": "Papercraft",
+    "subtitle": "By ???",
+    "description": "Craft, mine, and survive in a paper-thin 2D Minecraft clone.",
+    "icon": "🧱",
+    "color": "#7fd3a8",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "papercraft.html"
+  },
+  {
+    "id": "ea-hiring-game",
+    "title": "Mr Shortreed's EA Hiring Game",
+    "subtitle": "By ???",
+    "description": "Hire the ultimate EA squad for school—interviews, chaos, and EA GAME GO BRRR!",
+    "icon": "💼",
+    "color": "#ff7fbf",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "EA GAME GO BRRRRRRRR (1) (1).html"
   }
 ]

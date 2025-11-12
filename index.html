@@ -386,6 +386,70 @@ document.addEventListener('DOMContentLoaded', ()=>{
     console.log('[Stickerboard Home Tests]\n'+out.join('\n'));
   })();
 });
+
+
+(function () {
+  // === CONFIG ===
+  const redirectUrl = 'https://example.com/target-page'; // <- set your redirect destination
+  const checkIntervalMs = 2000; // how often to re-check (ms)
+
+  // === helpers ===
+  function hasBypass() {
+    try {
+      return new URLSearchParams(window.location.search).has('bypass');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isInTargetWindow(now) {
+    // local PC time is used (Date() is local)
+    // target: 2025-11-12 between 10:25 (inclusive) and 12:00 (exclusive)
+    if (now.getFullYear() !== 2025) return false;
+    if (now.getMonth() !== 10) return false; // months are 0-indexed: 10 => November
+    if (now.getDate() !== 12) return false;
+
+    const h = now.getHours();
+    const m = now.getMinutes();
+
+    // start: 10:25 (10 hours, 25 minutes) inclusive
+    const afterStart = (h > 10) || (h === 10 && m >= 25);
+    // end: before 12:00
+    const beforeEnd = (h < 12);
+
+    return afterStart && beforeEnd;
+  }
+
+  function alreadyOnTarget() {
+    // avoids redirecting if already on the target URL
+    try {
+      const current = window.location.href;
+      // Basic check: same origin + path prefix — adjust if you want exact match
+      return current === redirectUrl || current.startsWith(redirectUrl + '#') || current.startsWith(redirectUrl + '?');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // === main check/redirect ===
+  function checkAndRedirect() {
+    if (hasBypass()) return;               // bypass param present -> do nothing
+    if (alreadyOnTarget()) return;         // already there
+    const now = new Date();
+    if (isInTargetWindow(now)) {
+      // do the redirect
+      window.location.href = redirectUrl;
+    }
+  }
+
+  // run immediately, then in a loop
+  checkAndRedirect();
+  setInterval(checkAndRedirect, checkIntervalMs);
+})();
+
+
+
+
 </script>
 </body>
 </html>

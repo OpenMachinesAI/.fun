@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Central Space Program</title>
+  <title>Shortie Reedi!</title>
   <style>
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
     body { margin: 0; min-height: 100svh; display: grid; place-items: center; background: #f6f7fb; }
@@ -29,18 +29,17 @@
 <body>
   <div id="notice" class="card" role="dialog" aria-labelledby="msg" aria-modal="true">
     <h1 id="msg">Make sure your on a school google account (Email ending in @sd61learn.ca) </h1>
-    <button id="okBtn" type="button" aria-label="I understand">Continue</button>
-    <small>This website contains student images so its only avalible if your logged in to a chromebook or a school account on your home device, It will 404 if you do not meet this requirment. Thanks for understanding!"
-      
-      
- If your a parent ask your child to sign in</small>
+    <button id="okBtn" type="button" aria-label="I understand">Listen to Tracks</button>
+    <small> The page ahead contains some images of students so its only avalible if your logged in to a school chromebook or using a teacher / student google account to view it.
+   This is required for privacy reasons. the page contains some images of students"
+      If your a parent ask your child to sign in</small>
   </div>
 
   <script>
     document.getElementById('okBtn').addEventListener('click', () => {
       document.getElementById('notice').classList.add('hidden');
       
-     window.location.href = "https://sites.google.com/sd61learn.ca/space";
+     window.location.href = "https://sites.google.com/sd61learn.ca/rap/home";
     });
   </script>
 </body>

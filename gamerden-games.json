@@ -163,5 +163,16 @@
     "isNew": true,
     "launcher": "game-launcher.html",
     "content": "EA GAME GO BRRRRRRRR (1) (1).html"
+  },
+  {
+    "id": "airship-dont-hit-da-kidz",
+    "title": "AirShip: Don't Hit Da Kidz",
+    "subtitle": "By Central Students",
+    "description": "Fly the RC AirShip across the field and keep it from crashing into anyone.",
+    "icon": "🛩️",
+    "color": "#5bc0de",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "airshipgame.html"
   }
 ]

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Games.Fun</title>
+  <style>
+    /* 90s Neon Palette */
+    :root {
+      --bg: #0b0022;
+      --ink: #e0eaff;
+      --accent: #ff37f0;
+      --accent2: #33ffcc;
+      --grid: #6f2aff;
+      --hot: #ff0055;
+      --gold: #fffa33;
+      --emerald: #33ff66;
+      --panel: #0f0033cc;
+      --edge: #ff66cc;
+      --scan-opacity: 0.15;
+      --crt-font: 'Press Start 2P', monospace;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    * { box-sizing: border-box }
+    html, body { height: 100%; margin: 0; font-family: var(--crt-font); color: var(--ink); background: var(--bg); overflow-x: hidden; }
+
+    /* CRT Scanlines */
+    .scanlines::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      background: linear-gradient(rgba(255,255,255,var(--scan-opacity)) 50%, rgba(0,0,0,0) 50%);
+      background-size: 100% 2px;
+      mix-blend-mode: overlay;
+    }
+
+    /* Grid floor */
+    .gridbg {
+      position: fixed; inset: auto 0 0 0; height: 60vh; z-index: -1;
+      background:
+        repeating-linear-gradient(0deg, #ffffff16 0 2px, transparent 2px 26px),
+        repeating-linear-gradient(90deg, #ffffff10 0 2px, transparent 2px 46px);
+      transform-origin: 50% 100%;
+      transform: perspective(1200px) rotateX(62deg) translateY(22vh);
+      animation: gridFloat 12s ease-in-out infinite;
+    }
+    @keyframes gridFloat {
+      0%,100% { transform: perspective(1200px) rotateX(62deg) translateY(22vh) }
+      50%    { transform: perspective(1200px) rotateX(60deg) translateY(18vh) }
+    }
+
+    header {
+      position: sticky; top: 0; z-index: 10; backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.6); border-bottom: 2px solid var(--accent);
+      display: flex; align-items: center; padding: 8px 16px; gap: 12px;
+    }
+    .back-btn {
+      font-size: 0.75rem; color: var(--hot); background: none; border: 2px solid var(--hot);
+      padding: 4px 8px; border-radius: 4px; cursor: pointer; text-shadow: 1px 1px #000;
+    }
+    .bar {
+      flex: 1; display: flex; align-items: center; gap: 12px;
+    }
+    h1 {
+      margin: 0; font-size: 1.25rem; text-shadow: 2px 2px #000;
+    }
+    .sub {
+      font-size: 0.6rem; opacity: 0.8; letter-spacing: 0.2em; margin-top: 2px;
+    }
+
+    /* Ribbon */
+    .ribbon {
+      width: 100%; text-align: center; padding: 6px 0; 
+      background: linear-gradient(90deg, var(--gold), var(--emerald));
+      color: #251700; font-weight: bold; text-transform: uppercase; font-size: 0.7rem;
+    }
+
+    main { padding: 16px; max-width: 1000px; margin: 0 auto }
+    .controls {
+      display: flex; gap: 12px; align-items: center; margin-bottom: 14px;
+    }
+    .controls input[type="search"] {
+      flex: 1; padding: 6px 10px; border: 2px solid var(--accent2); border-radius: 4px;
+      background: #0008; color: var(--ink); font-family: var(--crt-font);
+    }
+    .controls label {
+      display: flex; align-items: center; gap: 4px; font-size: 0.75rem;
+    }
+    .controls input[type="checkbox"] { accent-color: var(--accent2); }
+
+    .board {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 14px;
+    }
+    .ticket {
+      position: relative; background: var(--panel); border: 3px dashed var(--ink);
+      padding: 14px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      cursor: pointer; text-align: left; transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .ticket.new::before {
+      content: "NEW"; position: absolute; top: -10px; right: -10px;
+      background: var(--hot); color: #fff; padding: 2px 6px; border-radius: 4px;
+      font-size: 0.6rem; text-shadow: 1px 1px #000;
+    }
+    .ticket:hover {
+      animation: pulse 1s infinite; transform: scale(1.04);
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 8px var(--accent), 0 0 20px var(--accent2); }
+      50%     { box-shadow: 0 0 12px var(--hot), 0 0 28px var(--hot); }
+    }
+    .tt { display: flex; align-items: center; gap: 8px; font-weight: bold; }
+    .icon {
+      width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.5); border-radius: 6px; font-size: 1.2rem;
+    }
+    .desc { margin-top: 8px; font-size: 0.75rem; line-height: 1.4; opacity: 0.9; }
+
+    .empty { grid-column: 1/-1; text-align: center; padding: 40px; background: #0008; border-radius: 8px; }
+
+    /* Modal */
+    .modal { display: none; position: fixed; inset: 8% 6%; background: #0a0a0a; border: 3px solid var(--accent);
+      border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); z-index: 20; }
+    .modal.show { display: block; }
+    .modal-toolbar {
+      background: linear-gradient(90deg, #001144, var(--edge)); color: var(--ink);
+      padding: 6px 12px; display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 2px solid var(--accent);
+    }
+    .toolbar-title { font-size: 0.9rem; }
+    .toolbar-buttons button {
+      background: var(--accent2); border: none; padding: 4px 8px; border-radius: 4px;
+      font-size: 0.7rem; cursor: pointer; text-shadow: 1px 1px #000;
+    }
+    .modal-content { height: calc(100% - 42px); background: #000; position: relative; }
+    .modal-content iframe { width: 100%; height: 100%; border: none; }
+
+    footer { text-align: center; font-size: 0.6rem; opacity: 0.7; margin: 24px 0; }
+  </style>
+</head>
+<body class="scanlines">
+  <div class="gridbg"></div>
+
+  <header>
+    <button class="back-btn" onclick="history.back()">← BACK</button>
+    <div class="bar">
+      <h1>PRO GAMER DEN</h1>
+      <div class="sub">Designed By Alex Rose</div>
+    </div>
+  </header>
+  <div class="ribbon" id="newGamesRibbon">
+    <span>Loading the arcade rotation…</span>
+  </div>
+
+  <main>
+    <div class="controls">
+      <input type="search" id="gameSearch" placeholder="Search Games…" />
+      <label><input type="checkbox" id="showNewOnly" /> Show New Only</label>
+    </div>
+
+    <section class="board" id="gamesBoard">
+      <div class="empty">Loading cabinets…</div>
+    </section>
+  </main>
+
+  <div class="modal" id="gameWindow" role="dialog" aria-modal="true" aria-labelledby="windowTitle">
+    <div class="modal-toolbar">
+      <span class="toolbar-title" id="windowTitle">Game Launcher</span>
+      <div class="toolbar-buttons">
+        <button onclick="closeGame()">Close ✖</button>
+      </div>
+    </div>
+    <div class="modal-content">
+      <iframe id="gameFrame" sandbox="allow-scripts allow-same-origin allow-pointer-lock"></iframe>
+    </div>
+  </div>
+
+  <footer>© CentralSchool.fun — Powered by snacks & spreadsheets.</footer>
+
+  <script>
+    const board     = document.getElementById('gamesBoard');
+    const ribbon    = document.getElementById('newGamesRibbon');
+    const searchBox = document.getElementById('gameSearch');
+    const newOnly   = document.getElementById('showNewOnly');
+    const modal     = document.getElementById('gameWindow');
+    const frame     = document.getElementById('gameFrame');
+
+    let games = [];
+    let map   = new Map();
+
+    function buildRibbon(list) {
+      const fresh = list.filter(g => g.isNew);
+      ribbon.innerHTML = fresh.length
+        ? `<span><strong>New Cabinets</strong> ${fresh.map(g=>g.icon+' '+g.title).join(' • ')}</span>`
+        : `<span><strong>Arcade Stable</strong> All-time favourites are online.</span>`;
+    }
+
+    function filterGames() {
+      const term = searchBox.value.toLowerCase();
+      board.innerHTML = '';
+      const filtered = games.filter(g => {
+        const matchSearch = g.title.toLowerCase().includes(term) || g.description.toLowerCase().includes(term);
+        const matchNew    = !newOnly.checked || g.isNew;
+        return matchSearch && matchNew;
+      });
+
+      if (!filtered.length) {
+        board.innerHTML = `<div class="empty">No games match your criteria.</div>`;
+        return;
+      }
+      filtered.forEach(g => board.appendChild(createCard(g)));
+    }
+
+    function createCard(game) {
+      const btn = document.createElement('button');
+      btn.className = 'ticket' + (game.isNew ? ' new' : '');
+      btn.innerHTML = `
+        <div class="tt">
+          <div class="icon">${game.icon||'🎮'}</div>
+          <div>
+            ${game.title}<br><small>${game.subtitle||''}</small>
+          </div>
+        </div>
+        <div class="desc">${game.description}</div>
+      `;
+      btn.onclick = () => openGame(game);
+      return btn;
+    }
+
+    function openGame(game) {
+      modal.classList.add('show');
+      document.getElementById('windowTitle').textContent = game.title;
+      frame.src = new URL(game.launcher||'game-launcher.html', location.href) + `?id=${game.id}`;
+    }
+
+    function closeGame() {
+      modal.classList.remove('show');
+      frame.src = 'about:blank';
+    }
+
+    // load JSON:
+    fetch('gamerden-games.json').then(r=>r.json()).then(list=>{
+      games = list;
+      buildRibbon(list);
+      filterGames();
+    }).catch(_=>{
+      board.innerHTML = `<div class="empty">Could not load the games Try refreshing.</div>`;
+      ribbon.innerHTML = `<span><strong>Data Error</strong> Arcade could not be loaded.</span>`;
+    });
+
+    // event listeners:
+    searchBox.addEventListener('input', filterGames);
+    newOnly.addEventListener('change', filterGames);
+    document.addEventListener('keydown', e => {
+      if (e.key==='Escape' && modal.classList.contains('show')) closeGame();
+    });
+  </script>
+</body>
+</html>

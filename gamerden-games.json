@@ -154,6 +154,17 @@
     "content": "papercraft.html"
   },
   {
+    "id": "crazy-cattle-3d",
+    "title": "Crazy Cattle 3D",
+    "subtitle": "From Yoplay",
+    "description": "Herd, stack, and wrangle your way through barnyard 3D chaos.",
+    "icon": "🐄",
+    "color": "#9ed4ff",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "crazy-cattle-3d.html"
+  },
+  {
     "id": "ea-hiring-game",
     "title": "Mr Shortreed's EA Hiring Game",
     "subtitle": "By ???",

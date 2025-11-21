@@ -165,6 +165,17 @@
     "content": "crazy-cattle-3d.html"
   },
   {
+    "id": "crazy-mouse-battle",
+    "title": "Crazy Mouse Battle",
+    "subtitle": "From Yoplay",
+    "description": "Just like Crazy Cattle—only now it's a M O U S E showdown.",
+    "icon": "🐭",
+    "color": "#9ed4ff",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "crazy-mouse-battle.html"
+  },
+  {
     "id": "ea-hiring-game",
     "title": "Mr Shortreed's EA Hiring Game",
     "subtitle": "By ???",

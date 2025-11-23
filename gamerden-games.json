@@ -196,5 +196,16 @@
     "isNew": true,
     "launcher": "game-launcher.html",
     "content": "airshipgame.html"
+  },
+  {
+    "id": "five-nights-at-central",
+    "title": "Five Nights at Central",
+    "subtitle": "By Alex",
+    "description": "Survive after hours in Central with a Five Nights at Freddy's-inspired watch shift.",
+    "icon": "🎥",
+    "color": "#ff5252",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "FANC.HTML"
   }
 ]

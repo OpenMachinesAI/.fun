@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GamesFun.html - RADICAL RETRO ARCADE</title>
+    <style>
+        :root {
+            --bg: #000022;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --neon-blue: #00ffff;
+            --neon-yellow: #ffff00;
+            --grid-color: #ff00ff44;
+            --text-main: #00ff00;
+            --card-bg: #111;
+        }
+
+        @font-face {
+            font-family: 'PixelFont';
+            src: local('Courier New'), monospace;
+            /* Fallback */
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center top;
+            perspective: 1000px;
+        }
+
+        /* CRT Scanline Effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 9999;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% {
+                opacity: 0.9;
+            }
+
+            50% {
+                opacity: 0.95;
+            }
+
+            100% {
+                opacity: 0.9;
+            }
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 4px solid var(--neon-blue);
+            background: #000;
+            box-shadow: 0 0 20px var(--neon-blue);
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            color: var(--neon-yellow);
+            text-shadow: 4px 4px var(--neon-pink);
+            letter-spacing: 4px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                text-shadow: 4px 4px var(--neon-pink);
+            }
+
+            50% {
+                transform: scale(1.05);
+                text-shadow: 6px 6px var(--neon-green);
+            }
+        }
+
+        .marquee-container {
+            background: var(--neon-pink);
+            color: #fff;
+            padding: 5px 0;
+            border-top: 2px solid #fff;
+            border-bottom: 2px solid #fff;
+            overflow: hidden;
+            white-space: nowrap;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 15s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(100vw);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .intro-box {
+            border: 4px double var(--neon-green);
+            padding: 20px;
+            background: #000000cc;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 5px 5px 0 var(--neon-green);
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        /* Game Card */
+        .game-card {
+            background: var(--card-bg);
+            border: 2px solid var(--neon-blue);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .game-card:hover {
+            transform: scale(1.05) rotate(-2deg);
+            border-color: var(--neon-pink);
+            box-shadow: 10px 10px 0 var(--neon-pink);
+            z-index: 5;
+        }
+
+        .game-card .icon {
+            font-size: 60px;
+            display: block;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+        }
+
+        .game-card h3 {
+            margin: 10px 0 5px;
+            color: var(--neon-yellow);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .game-card p {
+            font-size: 0.8rem;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .new-badge {
+            position: absolute;
+            top: 5px;
+            right: -25px;
+            background: red;
+            color: yellow;
+            font-weight: bold;
+            padding: 2px 30px;
+            transform: rotate(45deg);
+            font-size: 0.8rem;
+            border: 1px solid yellow;
+            animation: blink 0.5s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-window {
+            position: fixed;
+            /* Fixed positioning to stay in viewport */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 1000px;
+            height: 85vh;
+            background: #222;
+            border: 4px solid var(--neon-green);
+            box-shadow: 0 0 30px var(--neon-green);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            background: var(--neon-green);
+            color: #000;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .modal-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-body {
+            flex: 1;
+            background: #000;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-info-panel {
+            padding: 20px;
+            color: #fff;
+            border-bottom: 2px solid #444;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .game-info-text {
+            flex: 1;
+        }
+
+        .instructions-box {
+            background: #333;
+            border: 1px dashed #fff;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            color: var(--neon-green);
+        }
+
+        .play-area {
+            flex: 1;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .control-btn {
+            background: #000;
+            color: var(--neon-green);
+            border: 2px solid #000;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .control-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .close-btn {
+            background: red;
+            color: white;
+            border: 2px solid #fff;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+        }
+
+        .close-btn:hover {
+            background: #ff5555;
+        }
+
+        .action-btn {
+            background: var(--neon-blue);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .action-btn:hover {
+            background: #fff;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 2px solid var(--neon-blue);
+            color: #666;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="scanlines"></div>
+
+    <header>
+        <h1>GAMES FUN</h1>
+        <p style="color: var(--neon-blue); margin-top: 5px;">*** THE ULTIMATE 90s ARCADE EXPERIENCE ***</p>
+    </header>
+
+    <div class="marquee-container">
+        <div class="marquee-content" id="marqueeText">
+            WELCOME TO GAMES FUN *** NEW GAMES ADDED DAILY *** PLAY NOW *** INSERT COIN *** HIGH SCORES ***
+        </div>
+    </div>
+
+    <main>
+        <div class="intro-box">
+            <h2>SELECT YOUR CARTRIDGE</h2>
+            <p>CLICK A GAME TO LOAD. TURN UP YOUR SPEAKERS!</p>
+        </div>
+
+        <div class="game-grid" id="gameGrid">
+            <!-- Games will be injected here -->
+            <div style="color: white;">LOADING...</div>
+        </div>
+    </main>
+
+    <!-- Game Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-window">
+            <div class="modal-header">
+                <span id="modalTitle">GAME TITLE</span>
+                <div class="modal-controls">
+                    <button class="control-btn" id="restartBtn" title="Restart Game">↺ Restart</button>
+                    <button class="control-btn" id="fullscreenBtn" title="Toggle Fullscreen">⛶ Fullscreen</button>
+                    <button class="close-btn" id="closeModalBtn">X</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="game-info-panel" id="gameInfoPanel">
+                    <div style="font-size: 40px;" id="modalIcon">🎮</div>
+                    <div class="game-info-text">
+                        <h3 style="margin: 0; color: var(--neon-yellow);" id="modalGameName">Game Name</h3>
+                        <p style="margin: 5px 0;" id="modalGameDesc">Description goes here.</p>
+                        <div class="instructions-box">
+                            <strong>HOW TO PLAY:</strong> <span id="modalInstructions">Instructions go here.</span>
+                        </div>
+                        <button class="action-btn" id="playBtn">START GAME</button>
+                    </div>
+                </div>
+                <div class="play-area" id="playArea" style="display:none;">
+                    <iframe id="gameFrame" src=""></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 1999 GAMES FUN INC. | BEST VIEWED IN NETSCAPE NAVIGATOR 4.0
+    </footer>
+
+    <script>
+        // Sound Effects System (Synthesized to avoid external assets)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'hover') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'click') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'open') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(600, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // State
+        const grid = document.getElementById('gameGrid');
+        const modal = document.getElementById('modalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalGameName = document.getElementById('modalGameName');
+        const modalGameDesc = document.getElementById('modalGameDesc');
+        const modalInstructions = document.getElementById('modalInstructions');
+        const playBtn = document.getElementById('playBtn');
+        const gameFrame = document.getElementById('gameFrame');
+        const playArea = document.getElementById('playArea');
+        const gameInfoPanel = document.getElementById('gameInfoPanel');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        // Embedded Data to avoid CORS issues
+        const gamesData = [
+            {
+                "id": "rocket-labs",
+                "title": "CSP Rocket Labs",
+                "subtitle": "By Alex",
+                "description": "Build, fly, and (maybe) land your own rockets. Student-grade chaos, pro-grade vibes.",
+                "instructions": "Use your mouse to assemble parts. Press SPACE to launch. WASD to control pitch and yaw during flight.",
+                "icon": "🚀",
+                "color": "#33ffaa",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "Rocket Labs.html"
+            },
+            {
+                "id": "evil-classroom",
+                "title": "Escape the Evil Classroom",
+                "subtitle": "By Alex",
+                "description": "Co-op chaos with extra homework scares. Bring snacks.",
+                "instructions": "Player 1: WASD to move. Player 2: Arrow keys. Work together to solve puzzles and avoid the teacher!",
+                "icon": "🏫",
+                "color": "#ffc94d",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "EscapeTheEvilClassrom.html"
+            },
+            {
+                "id": "mr-longreed",
+                "title": "Escape Mr Longreed",
+                "subtitle": "By Alex",
+                "description": "Low-poly fear speedrun through the longest halls in school.",
+                "instructions": "Run for your life! Arrow keys to turn, SPACE to jump over obstacles. Don't look back.",
+                "icon": "🏃",
+                "color": "#8bd0ff",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "EscapeMrLongreed.html"
+            },
+            {
+                "id": "dodge-burger",
+                "title": "Dodge Burger",
+                "subtitle": "By Alex",
+                "description": "Grease lightning. Dodge or be dodged.",
+                "instructions": "Use Left/Right arrows to dodge the falling ingredients. Catch the power-ups!",
+                "icon": "🍔",
+                "color": "#33ffaa",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "DodgeBurger.html"
+            },
+            {
+                "id": "sam-vs-everything",
+                "title": "SAM VS EVERYTHING",
+                "subtitle": "By Alex",
+                "description": "Unbalanced. Unfair. Unreasonably fun.",
+                "instructions": "Click to shoot. WASD to move. Survive as long as you can against the hordes.",
+                "icon": "🔥",
+                "color": "#ff4ac7",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "SAM-VS-EVERYTHING.html"
+            },
+            {
+                "id": "csp-simulator",
+                "title": "Central Space Program",
+                "subtitle": "By Alex",
+                "description": "Orbit snacks. Land vibes. Sim your way across the galaxy.",
+                "instructions": "Mouse to interact with cockpit controls. Monitor your fuel and trajectory carefully.",
+                "icon": "🛰️",
+                "color": "#9b5bff",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "CSP_ The Game (1).html"
+            },
+            {
+                "id": "landing-game",
+                "title": "Ladining Game",
+                "subtitle": "By Alex",
+                "description": "Nailed it. Or didn’t. You decide.",
+                "instructions": "Use Arrow keys to adjust angle. Space to thrust. Try to land gently between the flags.",
+                "icon": "🛬",
+                "color": "#ffb36b",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "CSP LADNING GAME (1).html"
+            },
+            {
+                "id": "flight-sim",
+                "title": "Central Flight Sim",
+                "subtitle": "Stolen from Scratch",
+                "description": "Pilot your dreams. Turbo-props, afterburners, and crash landings—school-approved flight chaos.",
+                "instructions": "Mouse to steer. W/S to control throttle. G for landing gear.",
+                "icon": "✈️",
+                "color": "#3bd8ff",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "fun flight sim.html"
+            },
+            {
+                "id": "geometry-fun",
+                "title": "Totally Licensed Geometry Dash",
+                "subtitle": "Stolen from Scratch",
+                "description": "Jump, flip, rage, repeat. 100% legit and certified not-a-lawsuit… probably.",
+                "instructions": "Click or Space to jump. Avoid spikes. Good luck, you'll need it.",
+                "icon": "🟦",
+                "color": "#ff4ac7",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "Geometry.FUN.html"
+            },
+            {
+                "id": "marioish",
+                "title": "Super Mario (don’t sue me)",
+                "subtitle": "Stolen from Scratch",
+                "description": "Run, jump, bonk blocks. Totally original plumber adventure, wink wink.",
+                "instructions": "Arrow keys to move. Z to jump. X to run/throw fireballs.",
+                "icon": "🍄",
+                "color": "#ffc94d",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "centralschool.fun -- games.html"
+            },
+            {
+                "id": "flappy-shortreed",
+                "title": "Flappy Shortreed",
+                "subtitle": "By Cole",
+                "description": "Tap to flap your way past hallway pipes. Totally not rage-inducing.",
+                "instructions": "Tap Space or Click to flap. Don't hit the pipes!",
+                "icon": "🐦",
+                "color": "#66ff99",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "flappy reed.html"
+            },
+            {
+                "id": "astro-dodge",
+                "title": "Astro Dodge",
+                "subtitle": "By Cole",
+                "description": "Dodge asteroids, survive the stars, and maybe impress Shortreed.",
+                "instructions": "Mouse to move your ship. Dodge the incoming asteroids.",
+                "icon": "☄️",
+                "color": "#9b5bff",
+                "isNew": false,
+                "launcher": "game-launcher.html",
+                "content": "Astro Niran Dodge.html"
+            },
+            {
+                "id": "parking-game",
+                "title": "Parking Game",
+                "subtitle": "By amazing-llama",
+                "description": "Slide into the perfect spot without a scratch.",
+                "instructions": "Arrow keys to drive. Space to brake. Park inside the yellow lines.",
+                "icon": "🅿️",
+                "color": "#4d94ff",
+                "isNew": true,
+                "launcher": "game-launcher.html",
+                "content": "parking-game.html"
+            },
+            {
+                "id": "papercraft",
+                "title": "Papercraft",
+                "subtitle": "By ???",
+                "description": "Craft, mine, and survive in a paper-thin 2D Minecraft clone.",
+                "instructions": "WASD to move. Click to mine/place blocks. E to open inventory.",
+                "icon": "🧱",
+                "color": "#7fd3a8",
+                "isNew": true,
+                "launcher": "game-launcher.html",
+                "content": "papercraft.html"
+            },
+            {
+                "id": "crazy-cattle-3d",
+                "title": "Crazy Cattle 3D",
+                "subtitle": "From Yoplay",
+                "description": "Herd, stack, and wrangle your way through barnyard 3D chaos.",
+                "instructions": "Mouse to look. WASD to move. Click to lasso cattle.",
+                "icon": "🐄",
+                "color": "#9ed4ff",
+                "isNew": true,
+                "launcher": "game-launcher.html",
+                "content": "crazy-cattle-3d.html"
+            },
+            {
+                "id": "crazy-mouse-battle",
+                "title": "Crazy Mouse Battle",
+                "subtitle": "From Yoplay",
+                "description": "Just like Crazy Cattle—only now it's a M O U S E showdown.",
+                "instructions": "Arrow keys to scurry. Space to squeak/attack. Collect the cheese!",
+                "icon": "🐭",
+                "color": "#9ed4ff",
+                "isNew": true,
+                "launcher": "game-launcher.html",
+                "content": "crazy-mouse-battle.html"
+            },
+            {
+                "id": "ea-hiring-game",
+                "title": "Mr Shortreed's EA Hiring Game",
+                "subtitle": "By ???",
+                "description": "Hire the ultimate EA squad for school—interviews, chaos, and EA GAME GO BRRR!",
+                "instructions": "Click the correct resumes to hire. Reject the bad ones. Don't run out of budget!",
+                "icon": "💼",
+                "color": "#ff7fbf",
+                "isNew": true,
+                "launcher": "game-launcher.html",
+                "content": "EA GAME GO BRRRRRRRR (1) (1).html"
+            },
+            {
+                "id": "airship-dont-hit-da-kidz",
+                "title": "AirShip: Don't Hit Da Kidz",
+                "subtitle": "By Central Students",
+                "description": "Fly the RC AirShip across the field and keep it from crashing into anyone.",
+                "instructions": "Arrow keys to fly. Avoid the students on the field!",
+                "icon": "🛩️",
+                "color": "#5bc0de",
+                "isNew": true,
+                "launcher": "game-launcher.html",
+                "content": "airshipgame.html"
+            },
+            {
+                "id": "five-nights-at-central",
+                "title": "Five Nights at Central",
+                "subtitle": "By Alex",
+                "description": "Survive after hours in Central with a Five Nights at Freddy's-inspired watch shift.",
+                "instructions": "Mouse to look around. Click light buttons to check hallways. Monitor cameras to survive until 6 AM.",
+                "icon": "🎥",
+                "color": "#ff5252",
+                "isNew": true,
+                "launcher": "game-launcher.html",
+                "content": "FANC.HTML"
+            }
+        ];
+
+        // Render Games
+        function renderGames() {
+            grid.innerHTML = '';
+            gamesData.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerHTML = `
+          ${game.isNew ? '<div class="new-badge">NEW!</div>' : ''}
+          <div class="icon">${game.icon || '👾'}</div>
+          <h3>${game.title}</h3>
+          <p>${game.description}</p>
+        `;
+
+                // Hover Sound
+                card.addEventListener('mouseenter', () => playSound('hover'));
+
+                // Click Action
+                card.addEventListener('click', () => openGameModal(game));
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Message Listener for Launcher
+        window.addEventListener('message', (event) => {
+            if (!event.data || typeof event.data !== 'object') return;
+
+            if (event.data.type === 'gamerden-launch') {
+                const gameId = event.data.id;
+                const game = gamesData.find(g => g.id === gameId);
+                if (game) {
+                    playSound('click');
+                    // Load actual game content
+                    gameFrame.src = encodeURI(game.content);
+                }
+            }
+        });
+
+        // Initialize
+        renderGames();
+
+        function openGameModal(game) {
+            playSound('open');
+            modalTitle.textContent = game.title.toUpperCase();
+            modalIcon.textContent = game.icon || '👾';
+            modalGameName.textContent = game.title;
+            modalGameDesc.textContent = game.description;
+            modalInstructions.textContent = game.instructions || "Follow on-screen instructions.";
+
+            // Reset Modal State
+            gameInfoPanel.style.display = 'flex';
+            playArea.style.display = 'none';
+            gameFrame.src = '';
+
+            // Setup Play Button
+            playBtn.onclick = () => {
+                playSound('click');
+                launchGame(game);
+            };
+
+            modal.style.display = 'block';
+        }
+
+        function launchGame(game) {
+            gameInfoPanel.style.display = 'none';
+            playArea.style.display = 'block';
+
+            // Construct Launcher URL similar to original
+            const launcherUrl = new URL(game.launcher || 'game-launcher.html', window.location.href);
+            launcherUrl.searchParams.set('id', game.id);
+
+            gameFrame.src = launcherUrl.toString();
+        }
+
+        function closeModal() {
+            playSound('click');
+            modal.style.display = 'none';
+            gameFrame.src = 'about:blank';
+        }
+
+        // Controls Logic
+        restartBtn.addEventListener('click', () => {
+            playSound('click');
+            // If we are in the launcher (gameFrame.src contains game-launcher.html), do nothing or reload launcher
+            // If we are in the game, reload the game
+            if (gameFrame.src && gameFrame.src !== 'about:blank') {
+                gameFrame.src = gameFrame.src;
+            }
+        });
+
+        fullscreenBtn.addEventListener('click', () => {
+            playSound('click');
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                const target = gameFrame.src ? gameFrame : modal;
+                if (target.requestFullscreen) target.requestFullscreen();
+                else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen(); // Safari
+                else if (target.msRequestFullscreen) target.msRequestFullscreen(); // IE11
+            }
+        });
+
+        closeModalBtn.addEventListener('click', closeModal);
+
+        // Close on outside click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Kiosk Game Launcher</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: #fff;
+        overflow: hidden;
+    }
+    #titleScreen, #gameScreen, #selectScreen {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    #gameScreen, #selectScreen {
+        display: none;
+    }
+
+    #timer {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        background: rgba(0,0,0,0.6);
+        border-radius: 6px;
+        font-size: 20px;
+    }
+
+    #closeBtn {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #c00;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    iframe {
+        width: 100vw;
+        height: 100vh;
+        border: none;
+    }
+
+    .gameOption {
+        background: #222;
+        padding: 12px 20px;
+        margin: 10px;
+        border-radius: 8px;
+        font-size: 20px;
+        cursor: pointer;
+        width: 300px;
+    }
+    .gameOption:hover {
+        background: #444;
+    }
+</style>
+</head>
+<body>
+
+<!-- TITLE SCREEN -->
+<div id="titleScreen">
+    <h1 id="gameTitle">Loading...</h1>
+    <p id="gameSubtitle"></p>
+    <p id="instructions"></p>
+    <p style="opacity:0.6; margin-top:20px;">Press SPACE to start</p>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen">
+    <div id="timer">3:00</div>
+    <div id="closeBtn">Close Game</div>
+    <iframe id="gameFrame"></iframe>
+</div>
+
+<!-- SECRET GAME SELECT SCREEN -->
+<div id="selectScreen">
+    <h1>Select a Game</h1>
+    <div id="gameList"></div>
+</div>
+
+<script>
+let games = [];
+let currentGame = null;
+
+// Timer
+let timeLeft = 180;
+let timerInterval = null;
+
+// Secret combination
+let keysDown = {};
+let keyHoldStart = null;
+let selectionMode = false;
+
+// Load saved game
+const savedGameId = localStorage.getItem("kioskGame");
+
+// Load game list
+fetch("https://www.centralschool.fun/gamerden-games.json")
+.then(r => r.json())
+.then(data => {
+    games = data;
+    loadSavedOrDefault();
+});
+
+// ---------------------------
+// Load saved game into screen
+// ---------------------------
+function loadSavedOrDefault() {
+    if (!savedGameId) {
+        document.getElementById("gameTitle").innerText = "No Game Selected";
+        document.getElementById("gameSubtitle").innerText = "";
+        document.getElementById("instructions").innerText = "Please ask alex or cole.";
+        return;
+    }
+
+    currentGame = games.find(g => g.id === savedGameId);
+
+    if (!currentGame) {
+        document.getElementById("gameTitle").innerText = "Game Not Found";
+        return;
+    }
+
+    document.getElementById("gameTitle").innerText = currentGame.title;
+    document.getElementById("gameSubtitle").innerText = currentGame.subtitle;
+    document.getElementById("instructions").innerText = currentGame.instructions;
+}
+
+// ---------------------------
+// Start Game
+// ---------------------------
+document.addEventListener("keydown", e => {
+    if (e.code === "Space" && !selectionMode) {
+        if (!currentGame) return;
+        startGame();
+    }
+});
+
+function startGame() {
+    document.getElementById("titleScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "flex";
+
+    document.getElementById("gameFrame").src = currentGame.content;
+
+    // Reset timer
+    timeLeft = 180;
+    updateTimer();
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimer();
+        if (timeLeft <= 0) endGame();
+    }, 1000);
+}
+
+function updateTimer() {
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    document.getElementById("timer").innerText = `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function endGame() {
+    clearInterval(timerInterval);
+    alert("Please let the next person play.");
+    resetLauncher();
+}
+
+// ---------------------------
+// Close Game Button
+// ---------------------------
+document.getElementById("closeBtn").addEventListener("click", resetLauncher);
+
+function resetLauncher() {
+    clearInterval(timerInterval);
+    document.getElementById("gameFrame").src = "";
+    document.getElementById("gameScreen").style.display = "none";
+    document.getElementById("titleScreen").style.display = "flex";
+    loadSavedOrDefault();
+}
+
+// ---------------------------
+// Secret: Hold 6 + 7 for 3 sec
+// ---------------------------
+document.addEventListener("keydown", e => {
+    // Support number row & numpad
+    if (e.code === "Digit6" || e.code === "Numpad6") keysDown["6"] = true;
+    if (e.code === "Digit7" || e.code === "Numpad7") keysDown["7"] = true;
+
+    // Start hold timer only if BOTH keys are down
+    if (keysDown["6"] && keysDown["7"] && !selectionMode) {
+        if (!keyHoldStart) keyHoldStart = Date.now();
+        checkHold();
+    }
+});
+
+document.addEventListener("keyup", e => {
+    if (e.code === "Digit6" || e.code === "Numpad6") delete keysDown["6"];
+    if (e.code === "Digit7" || e.code === "Numpad7") delete keysDown["7"];
+    keyHoldStart = null;
+});
+
+
+document.addEventListener("keyup", e => {
+    delete keysDown[e.key];
+    keyHoldStart = null;
+});
+
+function checkHold() {
+    if (!keysDown["6"] || !keysDown["7"]) return;
+
+    if (Date.now() - keyHoldStart >= 3000) {
+        enterSelectionMode();
+    } else {
+        requestAnimationFrame(checkHold);
+    }
+}
+
+// ---------------------------
+// GAME SELECTION MODE
+// ---------------------------
+function enterSelectionMode() {
+    selectionMode = true;
+    document.getElementById("titleScreen").style.display = "none";
+    document.getElementById("selectScreen").style.display = "flex";
+
+    const list = document.getElementById("gameList");
+    list.innerHTML = "";
+
+    games.forEach(game => {
+        const div = document.createElement("div");
+        div.className = "gameOption";
+        div.innerText = game.title;
+        div.onclick = () => selectGame(game.id);
+        list.appendChild(div);
+    });
+}
+
+function selectGame(id) {
+    localStorage.setItem("kioskGame", id);
+    currentGame = games.find(g => g.id === id);
+
+    // Return to title
+    selectionMode = false;
+    document.getElementById("selectScreen").style.display = "none";
+    document.getElementById("titleScreen").style.display = "flex";
+
+    loadSavedOrDefault();
+}
+</script>
+
+</body>
+</html>

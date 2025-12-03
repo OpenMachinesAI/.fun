@@ -1,17 +1,5 @@
 [
   {
-    "id": "rocket-labs",
-    "title": "CSP Rocket Labs",
-    "subtitle": "By Alex",
-    "description": "Build, fly, and (maybe) land your own rockets. Student-grade chaos, pro-grade vibes.",
-    "instructions": "Use your mouse to assemble parts. Press SPACE to launch. WASD + Arrow keys to control pitch and yaw during flight.",
-    "icon": "🚀",
-    "color": "#33ffaa",
-    "isNew": false,
-    "launcher": "game-launcher.html",
-    "content": "Rocket Labs.html"
-  },
-  {
     "id": "evil-classroom",
     "title": "Escape the Evil Classroom",
     "subtitle": "By Alex",

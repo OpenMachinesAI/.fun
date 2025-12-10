@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Kiosk Game Launcher</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #000; /* body background no longer matters */
+        color: #fff;
+        overflow: hidden;
+    }
+
+    /* NEW: Make screens accept gradients */
+    #titleScreen, #gameScreen, #selectScreen {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    #gameScreen, #selectScreen {
+        display: none;
+    }
+
+    #timer {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        background: rgba(0,0,0,0.6);
+        border-radius: 6px;
+        font-size: 20px;
+    }
+
+    #closeBtn {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #c00;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    iframe {
+        width: 100vw;
+        height: 100vh;
+        border: none;
+    }
+
+    .gameOption {
+        background: #222;
+        padding: 12px 20px;
+        margin: 10px;
+        border-radius: 8px;
+        font-size: 20px;
+        cursor: pointer;
+        width: 320px;
+    }
+    .gameOption:hover {
+        background: #444;
+    }
+</style>
+</head>
+<body>
+
+<!-- TITLE SCREEN -->
+<div id="titleScreen">
+    <h1 id="gameTitle">Loading...</h1>
+    <p id="instructions"></p>
+    <p style="opacity:0.6; margin-top:20px;">Press SPACE Bar to start</p>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen">
+    <div id="timer">--</div>
+    <div id="closeBtn">Reset</div>
+    <iframe id="gameFrame"></iframe>
+</div>
+
+<!-- SECRET GAME SELECT SCREEN -->
+<div id="selectScreen">
+    <h1>Select a Game</h1>
+    <div id="gameList"></div>
+</div>
+
+<script>
+/* -------------------------------
+   GAME LIST (WITH GRADIENTS)
+--------------------------------*/
+const gameList = [
+    {
+        id: "fnac",
+        title: "Five Nights at Central (FNAC)",
+        url: "https://www.centralschool.fun/FNAC.html",
+        time: Infinity,
+        gradient: "linear-gradient(135deg, #6a00ff, #000000)"
+    },
+    {
+        id: "mousebattle",
+        title: "Mouse Battle 3D",
+        url: "https://yoplay.io/crazy-mouse-battle.embed",
+        time: 250,
+        gradient: "linear-gradient(135deg, #00c3ff, #00ff6a)"
+    },
+    {
+        id: "niran",
+        title: "Niran Astro Dodge (Cole)",
+        url: "https://www.centralschool.fun/Astro%20Niran%20Dodge.html",
+        time: 120,
+        gradient: "linear-gradient(135deg, #00eaff, #006aff)"
+    },
+    {
+        id: "hiring",
+        title: "Mr Shortreed Hiring Simulator",
+        url: "https://www.centralschool.fun/EA%20GAME%20GO%20BRRRRRRRR%20(2).html",
+        time: 300,
+        gradient: "linear-gradient(135deg, #ff7b00, #ff0000)"
+    },
+    {
+        id: "airship",
+        title: "AirShip: RC Plane Simulator",
+        url: "https://www.centralschool.fun/airshipgame.html",
+        time: 300,
+        gradient: "linear-gradient(135deg, #62c8ff, #ffffff)"
+    },
+    {
+        id: "flightsim",
+        title: "Flight Sim 3D",
+        url: "https://www.centralschool.fun/fun%20flight%20sim.html",
+        time: 300,
+        gradient: "linear-gradient(135deg, #009f9f, #0067ff)"
+    },
+    {
+        id: "skibidi",
+        title: "Mr Shortreed's Skibidi Slicers",
+        url: "https://www.centralschool.fun/DodgeBurger.html",
+        time: 300,
+        gradient: "linear-gradient(135deg, #ffe259, #ff0000)"
+    }
+];
+
+let currentGame = null;
+
+/* -------------------------------
+   APPLY GRADIENT FIX
+--------------------------------*/
+function applyGradient() {
+    if (!currentGame) return;
+
+    document.getElementById("titleScreen").style.background = currentGame.gradient;
+    document.getElementById("gameScreen").style.background = currentGame.gradient;
+    document.getElementById("selectScreen").style.background = currentGame.gradient;
+}
+
+/* -------------------------------
+   LOAD SAVED GAME
+--------------------------------*/
+const savedID = localStorage.getItem("kioskGame");
+if (savedID) currentGame = gameList.find(g => g.id === savedID);
+
+function updateTitleScreen() {
+    if (!currentGame) {
+        document.getElementById("gameTitle").innerText = "No Game Selected";
+        document.getElementById("instructions").innerText =
+            "Hold 6 + 7 for 3 seconds to enter selection mode.";
+    } else {
+        document.getElementById("gameTitle").innerText = currentGame.title;
+        document.getElementById("instructions").innerText =
+            "Press SPACE to begin.";
+        applyGradient(); // ← NEW
+    }
+}
+updateTitleScreen();
+
+/* -------------------------------
+   START GAME
+--------------------------------*/
+let timerInterval = null;
+let timeLeft = 0;
+
+document.addEventListener("keydown", e => {
+    if (e.code === "Space" && currentGame) startGame();
+});
+
+function startGame() {
+    document.getElementById("titleScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "flex";
+
+    applyGradient(); // ← NEW
+
+    const frame = document.getElementById("gameFrame");
+    frame.src = currentGame.url;
+
+    timeLeft = currentGame.time;
+
+    if (timeLeft === Infinity) {
+        document.getElementById("timer").innerText = "∞";
+        return;
+    }
+
+    document.getElementById("timer").innerText = formatTime(timeLeft);
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").innerText = formatTime(timeLeft);
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("Please let the next person play.");
+            resetLauncher();
+        }
+    }, 1000);
+}
+
+function formatTime(t) {
+    const m = Math.floor(t / 60);
+    const s = t % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+/* -------------------------------
+   CLOSE BUTTON
+--------------------------------*/
+document.getElementById("closeBtn").onclick = resetLauncher;
+
+function resetLauncher() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+
+    document.getElementById("gameFrame").src = "";
+    document.getElementById("gameScreen").style.display = "none";
+    document.getElementById("titleScreen").style.display = "flex";
+
+    updateTitleScreen();
+}
+
+/* -------------------------------
+   SECRET COMBO: HOLD 6 & 7
+--------------------------------*/
+let keysDown = {};
+let holdStart = null;
+let selecting = false;
+
+document.addEventListener("keydown", e => {
+    if (e.code === "Digit6" || e.code === "Numpad6") keysDown["6"] = true;
+    if (e.code === "Digit7" || e.code === "Numpad7") keysDown["7"] = true;
+
+    if (keysDown["6"] && keysDown["7"] && !selecting) {
+        if (!holdStart) holdStart = Date.now();
+        checkHoldForSelect();
+    }
+});
+
+document.addEventListener("keyup", e => {
+    if (e.code === "Digit6" || e.code === "Numpad6") delete keysDown["6"];
+    if (e.code === "Digit7" || e.code === "Numpad7") delete keysDown["7"];
+    holdStart = null;
+});
+
+function checkHoldForSelect() {
+    if (!(keysDown["6"] && keysDown["7"])) return;
+
+    if (Date.now() - holdStart >= 3000) openSelectScreen();
+    else requestAnimationFrame(checkHoldForSelect);
+}
+
+function openSelectScreen() {
+    selecting = true;
+    document.getElementById("titleScreen").style.display = "none";
+    document.getElementById("selectScreen").style.display = "flex";
+
+    applyGradient();
+
+    const list = document.getElementById("gameList");
+    list.innerHTML = "";
+
+    gameList.forEach(g => {
+        const div = document.createElement("div");
+        div.className = "gameOption";
+        div.innerText = g.title;
+        div.onclick = () => selectGame(g);
+        list.appendChild(div);
+    });
+}
+
+function selectGame(g) {
+    localStorage.setItem("kioskGame", g.id);
+    currentGame = g;
+
+    selecting = false;
+    document.getElementById("selectScreen").style.display = "none";
+    document.getElementById("titleScreen").style.display = "flex";
+
+    updateTitleScreen();
+}
+
+/* -------------------------------
+   HOLD R FOR 3 SECONDS → RELOAD GAME
+--------------------------------*/
+let rHoldStart = null;
+let rDown = false;
+
+document.addEventListener("keydown", e => {
+    if (e.code === "KeyR") {
+        if (!rDown) rHoldStart = Date.now();
+        rDown = true;
+        checkRReload();
+    }
+});
+
+document.addEventListener("keyup", e => {
+    if (e.code === "KeyR") {
+        rDown = false;
+        rHoldStart = null;
+    }
+});
+
+function checkRReload() {
+    if (!rDown) return;
+
+    if (Date.now() - rHoldStart >= 3000) {
+        reloadIframe();
+        return;
+    }
+
+    requestAnimationFrame(checkRReload);
+}
+
+function reloadIframe() {
+    const frame = document.getElementById("gameFrame");
+    frame.src = frame.src; // soft reload
+}
+</script>
+
+</body>
+</html>

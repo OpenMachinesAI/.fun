@@ -1,47 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Brainrot Letter Picker</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brainrot Picker</title>
 
 <style>
-  :root {
-    --bg: #0f1220;
-    --card: #171a2e;
-    --accent: #7c7cff;
-    --text: #f4f4ff;
-    --muted: #9aa0ff;
-  }
-
-  * {
-    box-sizing: border-box;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  }
-
   body {
     margin: 0;
     min-height: 100vh;
-    background: radial-gradient(circle at top, #1b1f4a, var(--bg));
-    color: var(--text);
+    background: radial-gradient(circle at top, #1b1f4a, #0f1220);
+    color: #f4f4ff;
+    font-family: system-ui, sans-serif;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
   }
 
   .app {
-    background: var(--card);
+    background: #171a2e;
     padding: 24px;
     border-radius: 18px;
-    max-width: 520px;
+    max-width: 650px;
     width: 100%;
     box-shadow: 0 20px 40px rgba(0,0,0,.35);
   }
 
   h1 {
-    margin: 0 0 16px;
     text-align: center;
-    font-size: 1.6rem;
+    margin-bottom: 16px;
   }
 
   .letters {
@@ -51,118 +38,280 @@
     margin-bottom: 20px;
   }
 
-  button.letter {
-    background: transparent;
+  .letter {
     border: 1px solid #2d3270;
-    color: var(--muted);
-    border-radius: 10px;
+    background: transparent;
+    color: #9aa0ff;
     padding: 10px 0;
+    border-radius: 10px;
     cursor: pointer;
     font-weight: 600;
-    transition: all 0.15s ease;
   }
 
-  button.letter:hover {
-    background: var(--accent);
-    color: #fff;
-    transform: translateY(-2px);
+  .letter:hover {
+    background: #7c7cff;
+    color: white;
   }
 
   .result {
     background: #10132a;
     border-radius: 14px;
     padding: 24px;
+    min-height: 120px;
     text-align: center;
-    min-height: 90px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   .term {
     font-size: 1.8rem;
+    color: #7c7cff;
+    margin-bottom: 12px;
     font-weight: 700;
-    color: var(--accent);
-    animation: pop 0.2s ease;
   }
 
-  @keyframes pop {
-    from {
-      transform: scale(0.9);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
+  .info-btn {
+    border: 1px solid #7c7cff;
+    background: transparent;
+    color: #7c7cff;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .info-btn:hover {
+    background: #7c7cff;
+    color: white;
+  }
+
+  .definition {
+    margin-top: 14px;
+    font-size: 0.95rem;
+    line-height: 1.4;
   }
 
   .hint {
-    margin-top: 12px;
     text-align: center;
-    font-size: 0.85rem;
     opacity: 0.7;
+    margin-top: 12px;
+    font-size: 0.85rem;
   }
 </style>
 </head>
 
 <body>
-  <div class="app">
-    <h1>🧠 Brainrot Picker</h1>
-
-    <div class="letters" id="letters"></div>
-
-    <div class="result">
-      <div id="output">Pick a letter</div>
-    </div>
-
-    <div class="hint">One random term per letter</div>
-  </div>
+<div class="app">
+  <h1>🧠 Brainrot Picker</h1>
+  <div class="letters" id="letters"></div>
+  <div class="result" id="result">Pick a letter</div>
+  <div class="hint">Guess first, then reveal the meaning</div>
+</div>
 
 <script>
 const brainrot = {
-  A: ["aura", "ate it"],
-  B: ["baddie","based","basic","bars","BDE","beige flag","bestie","bet","bffr","big yikes","bop","brainrot","bro","bruh","bussin'","bussy"],
-  C: ["cap","caught in 4K","chopped","clanker","clapback","cook","cracked","crash out","crine"],
-  D: ["dank","dead","delusionship","dih","drip"],
-  E: ["edge"],
-  F: ["face card","fanum tax","finna","fire","fit","fit check"],
-  G: ["gagged","gas","ghost","glaze","glizzy","glow-up","GOAT","good boy","good girl","goofy ahh","gooning","gng","green flag","Gucci","gyatt","grape"],
-  H: ["hawk tuah","hb","hg","hit different","huzz"],
-  I: ["ick","icl","IJBOL","I oop","iPad kid","it's giving","it's joever","iykyk","Italian Brainrot"],
-  J: ["jit"],
-  K: ["Karen","Kirkified","KMS","KYS"],
-  L: ["L","lit","locked in","looksmaxxing","lore","lowkenuinely"],
-  M: ["main character","mew","mid","mog","moots"],
-  N: ["no cap"],
-  O: ["Ohio","OK boomer","oof","oomf","opp","out of pocket","owned"],
-  P: ["periodt","pick-me","pmo","pookie","pushing P"],
-  Q: ["queen"],
-  R: ["ratio","rage-bait","red flag","rizz","Roman Empire"],
-  S: ["salty","SDIYBT","serving cunt","sheesh","shook","STFU","sigma","simp","situationship","six-seven","skibidi","skill issue","sksksk","slaps","slay","slop","snatched","stan","sus","sussy baka","sybau","syfm"],
-  T: ["tea","touch grass","ts","tuff","tweaking","twin"],
-  U: ["unalive","unc","understood the assignment","uwu"],
-  V: ["vibe check","vro"],
-  W: ["W","washed","who is this diva?"],
-  Y: ["yap","You good?"],
-  Z: ["zesty"]
+A: [
+ {term:"aura",def:"Someone’s reputation or charisma; 'aura farming' means boosting it."},
+ {term:"ate it",def:"Performed extremely well."}
+],
+B: [
+ {term:"baddie",def:"A confident, stylish, attractive woman."},
+ {term:"based",def:"Being yourself without caring what others think; also approval."},
+ {term:"basic",def:"Mainstream tastes in fashion, music, or products."},
+ {term:"bar(s)",def:"An excellent rap lyric."},
+ {term:"BDE",def:"Big dick energy; confident and relaxed presence."},
+ {term:"beige flag",def:"A neutral personality trait."},
+ {term:"bestie",def:"Best friend (sometimes ironic)."},
+ {term:"bet",def:"Agreement or acknowledgment."},
+ {term:"bffr",def:"Be f***ing for real."},
+ {term:"big yikes",def:"Very embarrassing or cringe."},
+ {term:"bop",def:"Either a great song or a derogatory term."},
+ {term:"brainrot",def:"Mental decay from excessive online content."},
+ {term:"bro",def:"Casual term for friend."},
+ {term:"bruh",def:"Expression of disbelief or disappointment."},
+ {term:"bussin'",def:"Extremely good, especially food."},
+ {term:"bussy",def:"Slang referring to a man’s anus."}
+],
+C: [
+ {term:"cap",def:"To lie."},
+ {term:"caught in 4K",def:"Undeniably caught with evidence."},
+ {term:"chopped",def:"Unattractive."},
+ {term:"clanker",def:"Slur for robots/AI."},
+ {term:"clapback",def:"A witty response to criticism."},
+ {term:"cook",def:"To perform very well."},
+ {term:"cracked",def:"Highly skilled (or sexual context)."},
+ {term:"crash out",def:"Make a reckless decision out of anger."},
+ {term:"crine",def:"Laughing so hard you’re crying."}
+],
+D: [
+ {term:"dank",def:"High-quality or excellent."},
+ {term:"dead",def:"So funny it 'killed' you."},
+ {term:"delusionship",def:"A relationship built on unrealistic beliefs."},
+ {term:"dih",def:"Censored slang for dick."},
+ {term:"drip",def:"High-end fashion or style."}
+],
+E: [{term:"edge",def:"Prolonged arousal without climax."}],
+F: [
+ {term:"face card",def:"An attractive face."},
+ {term:"fanum tax",def:"Stealing friends’ food."},
+ {term:"finna",def:"About to do something."},
+ {term:"fire",def:"Very good or impressive."},
+ {term:"fit check",def:"Showing off an outfit."}
+],
+G: [
+ {term:"gagged",def:"Stunned or speechless."},
+ {term:"gas",def:"Very entertaining or good."},
+ {term:"ghost",def:"Cut off communication suddenly."},
+ {term:"glaze",def:"Excessive praise."},
+ {term:"glizzy",def:"Hot dog."},
+ {term:"glow-up",def:"Major self-improvement."},
+ {term:"GOAT",def:"Greatest of all time."},
+ {term:"good boy/girl",def:"Mock praise for compliance."},
+ {term:"goofy ahh",def:"Silly or ridiculous."},
+ {term:"gooning",def:"Excessive masturbation."},
+ {term:"gng",def:"Gang / close friends."},
+ {term:"green flag",def:"Positive relationship trait."},
+ {term:"Gucci",def:"Good or cool."},
+ {term:"gyatt",def:"Reaction to attractive body."},
+ {term:"grape",def:"Censored term for rape."}
+],
+H: [
+ {term:"hawk tuah",def:"Spitting during oral sex."},
+ {term:"hb/hg",def:"Homeboy / homegirl."},
+ {term:"hit different",def:"Feels uniquely better."},
+ {term:"huzz",def:"Derogatory term for women."}
+],
+I: [
+ {term:"ick",def:"Sudden attraction-killing disgust."},
+ {term:"icl",def:"I can’t lie."},
+ {term:"IJBOL",def:"I just burst out laughing."},
+ {term:"I oop",def:"Shock or embarrassment."},
+ {term:"iPad kid",def:"Child raised on screens."},
+ {term:"it’s giving",def:"Describing a vibe."},
+ {term:"it’s joever",def:"Completely over."},
+ {term:"iykyk",def:"If you know, you know."},
+ {term:"Italian Brainrot",def:"Absurd AI-generated Italian memes."}
+],
+J:[{term:"jit",def:"Young or inexperienced person."}],
+K:[
+ {term:"Karen",def:"Entitled, obnoxious person."},
+ {term:"Kirkified",def:"Charlie Kirk deepfake memes."},
+ {term:"KMS",def:"Acronym for killing myself."},
+ {term:"KYS",def:"Acronym for kill yourself."}
+],
+L:[
+ {term:"L",def:"Loss or failure."},
+ {term:"lit",def:"Fun or exciting."},
+ {term:"locked in",def:"Fully focused."},
+ {term:"looksmaxxing",def:"Trying to maximize attractiveness."},
+ {term:"lore",def:"Backstory."},
+ {term:"lowkenuinely",def:"Lowkey + genuinely."}
+],
+M:[
+ {term:"main character",def:"Center of attention mindset."},
+ {term:"mew",def:"Tongue posture for jawline."},
+ {term:"mid",def:"Average or mediocre."},
+ {term:"mog",def:"Outshining someone."},
+ {term:"moots",def:"Mutual followers."}
+],
+N:[{term:"no cap",def:"Not lying."}],
+O:[
+ {term:"Ohio",def:"Surreal internet humor."},
+ {term:"OK boomer",def:"Dismissive phrase."},
+ {term:"oof",def:"Pain or sympathy."},
+ {term:"oomf",def:"One of my followers."},
+ {term:"opp",def:"Enemy."},
+ {term:"out of pocket",def:"Too far or inappropriate."},
+ {term:"owned",def:"Dominated or defeated."}
+],
+P:[
+ {term:"periodt",def:"End of discussion."},
+ {term:"pick-me",def:"Seeks validation by putting others down."},
+ {term:"pmo",def:"Piss me off."},
+ {term:"pookie",def:"Affectionate nickname."},
+ {term:"pushing P",def:"Acting with integrity and style."}
+],
+Q:[{term:"queen",def:"Impressive or praiseworthy person."}],
+R:[
+ {term:"ratio",def:"Replies outnumber likes."},
+ {term:"rage-bait",def:"Content meant to provoke anger."},
+ {term:"red flag",def:"Warning sign in relationships."},
+ {term:"rizz",def:"Charm or flirting skill."},
+ {term:"Roman Empire",def:"Something thought about constantly."}
+],
+S:[
+ {term:"salty",def:"Bitter or resentful."},
+ {term:"SDIYBT",def:"Start digging in your butt, twin."},
+ {term:"serving cunt",def:"Bold, confident femininity."},
+ {term:"sheesh",def:"Praise or amazement."},
+ {term:"shook",def:"Shocked or disturbed."},
+ {term:"STFU",def:"Shut the f*** up."},
+ {term:"sigma",def:"Lone-wolf archetype."},
+ {term:"simp",def:"Overly devoted person."},
+ {term:"situationship",def:"Undefined romantic relationship."},
+ {term:"six-seven",def:"Nonsense meme phrase."},
+ {term:"skibidi",def:"Meaningless meme adjective."},
+ {term:"skill issue",def:"Failure due to lack of ability."},
+ {term:"sksksk",def:"Laughter keysmash."},
+ {term:"slaps",def:"Very good (music)."},
+ {term:"slay",def:"Did something well."},
+ {term:"slop",def:"Low-quality AI content."},
+ {term:"snatched",def:"Flawless appearance."},
+ {term:"stan",def:"Obsessive fan."},
+ {term:"sus",def:"Suspicious."},
+ {term:"sussy baka",def:"Playful insult."},
+ {term:"sybau",def:"Shut your bitch ass up."},
+ {term:"syfm",def:"Shut your f***ing mouth."}
+],
+T:[
+ {term:"tea",def:"Gossip or secrets."},
+ {term:"touch grass",def:"Go outside."},
+ {term:"ts",def:"This shit / type shit."},
+ {term:"tuff",def:"Tough."},
+ {term:"tweaking",def:"Acting strange."},
+ {term:"twin",def:"Close friend."}
+],
+U:[
+ {term:"unalive",def:"Algorithm-safe term for kill."},
+ {term:"unc",def:"Mocking term for older man."},
+ {term:"understood the assignment",def:"Did exactly what was needed."},
+ {term:"uwu",def:"Cute expression."}
+],
+V:[
+ {term:"vibe check",def:"Assess someone’s energy."},
+ {term:"vro",def:"Gender-neutral bro."}
+],
+W:[
+ {term:"W",def:"Win."},
+ {term:"washed",def:"Past their prime."},
+ {term:"who is this diva?",def:"Compliment for confidence."}
+],
+Y:[
+ {term:"yap",def:"Talk too much."},
+ {term:"You good?",def:"Checking on someone."}
+],
+Z:[{term:"zesty",def:"Flamboyant or fruity."}],
+"⭐":[
+ {term:"💀",def:"Laughing / unhinged."},
+ {term:"😭",def:"Laughing hard."},
+ {term:"💔",def:"Disappointment."},
+ {term:"🥀",def:"Disappointment or sadness."}
+]
 };
 
-const lettersEl = document.getElementById("letters");
-const output = document.getElementById("output");
+const lettersEl=document.getElementById("letters");
+const resultEl=document.getElementById("result");
 
-Object.keys(brainrot).forEach(letter => {
-  const btn = document.createElement("button");
-  btn.className = "letter";
-  btn.textContent = letter;
-
-  btn.onclick = () => {
-    const terms = brainrot[letter];
-    const random = terms[Math.floor(Math.random() * terms.length)];
-    output.innerHTML = `<div class="term">${random}</div>`;
+Object.keys(brainrot).forEach(letter=>{
+ const b=document.createElement("button");
+ b.className="letter";
+ b.textContent=letter;
+ b.onclick=()=>{
+  const pick=brainrot[letter][Math.floor(Math.random()*brainrot[letter].length)];
+  resultEl.innerHTML=`<div class="term">${pick.term}</div><button class="info-btn">ℹ️ What does this mean?</button>`;
+  resultEl.querySelector(".info-btn").onclick=()=>{
+    resultEl.innerHTML+=`<div class="definition">${pick.def}</div>`;
+    resultEl.querySelector(".info-btn").remove();
   };
-
-  lettersEl.appendChild(btn);
+ };
+ lettersEl.appendChild(b);
 });
 </script>
 </body>

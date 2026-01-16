@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Brainrot Letter Picker</title>
+
+<style>
+  :root {
+    --bg: #0f1220;
+    --card: #171a2e;
+    --accent: #7c7cff;
+    --text: #f4f4ff;
+    --muted: #9aa0ff;
+  }
+
+  * {
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #1b1f4a, var(--bg));
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .app {
+    background: var(--card);
+    padding: 24px;
+    border-radius: 18px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0,0,0,.35);
+  }
+
+  h1 {
+    margin: 0 0 16px;
+    text-align: center;
+    font-size: 1.6rem;
+  }
+
+  .letters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  button.letter {
+    background: transparent;
+    border: 1px solid #2d3270;
+    color: var(--muted);
+    border-radius: 10px;
+    padding: 10px 0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.15s ease;
+  }
+
+  button.letter:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: translateY(-2px);
+  }
+
+  .result {
+    background: #10132a;
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .term {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    animation: pop 0.2s ease;
+  }
+
+  @keyframes pop {
+    from {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .hint {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+</style>
+</head>
+
+<body>
+  <div class="app">
+    <h1>🧠 Brainrot Picker</h1>
+
+    <div class="letters" id="letters"></div>
+
+    <div class="result">
+      <div id="output">Pick a letter</div>
+    </div>
+
+    <div class="hint">One random term per letter</div>
+  </div>
+
+<script>
+const brainrot = {
+  A: ["aura", "ate it"],
+  B: ["baddie","based","basic","bars","BDE","beige flag","bestie","bet","bffr","big yikes","bop","brainrot","bro","bruh","bussin'","bussy"],
+  C: ["cap","caught in 4K","chopped","clanker","clapback","cook","cracked","crash out","crine"],
+  D: ["dank","dead","delusionship","dih","drip"],
+  E: ["edge"],
+  F: ["face card","fanum tax","finna","fire","fit","fit check"],
+  G: ["gagged","gas","ghost","glaze","glizzy","glow-up","GOAT","good boy","good girl","goofy ahh","gooning","gng","green flag","Gucci","gyatt","grape"],
+  H: ["hawk tuah","hb","hg","hit different","huzz"],
+  I: ["ick","icl","IJBOL","I oop","iPad kid","it's giving","it's joever","iykyk","Italian Brainrot"],
+  J: ["jit"],
+  K: ["Karen","Kirkified","KMS","KYS"],
+  L: ["L","lit","locked in","looksmaxxing","lore","lowkenuinely"],
+  M: ["main character","mew","mid","mog","moots"],
+  N: ["no cap"],
+  O: ["Ohio","OK boomer","oof","oomf","opp","out of pocket","owned"],
+  P: ["periodt","pick-me","pmo","pookie","pushing P"],
+  Q: ["queen"],
+  R: ["ratio","rage-bait","red flag","rizz","Roman Empire"],
+  S: ["salty","SDIYBT","serving cunt","sheesh","shook","STFU","sigma","simp","situationship","six-seven","skibidi","skill issue","sksksk","slaps","slay","slop","snatched","stan","sus","sussy baka","sybau","syfm"],
+  T: ["tea","touch grass","ts","tuff","tweaking","twin"],
+  U: ["unalive","unc","understood the assignment","uwu"],
+  V: ["vibe check","vro"],
+  W: ["W","washed","who is this diva?"],
+  Y: ["yap","You good?"],
+  Z: ["zesty"]
+};
+
+const lettersEl = document.getElementById("letters");
+const output = document.getElementById("output");
+
+Object.keys(brainrot).forEach(letter => {
+  const btn = document.createElement("button");
+  btn.className = "letter";
+  btn.textContent = letter;
+
+  btn.onclick = () => {
+    const terms = brainrot[letter];
+    const random = terms[Math.floor(Math.random() * terms.length)];
+    output.innerHTML = `<div class="term">${random}</div>`;
+  };
+
+  lettersEl.appendChild(btn);
+});
+</script>
+</body>
+</html>

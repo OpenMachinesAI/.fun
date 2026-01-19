@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CentralSchoolFun</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    /* 🌈 Dynamic rainbow gradient */
+    background: linear-gradient(
+      270deg,
+      #ff5f6d,
+      #ffc371,
+      #47eaff,
+      #7f7fff,
+      #ff61d2
+    );
+    background-size: 1000% 1000%;
+    animation: rainbow 25s ease infinite;
+  }
+
+  @keyframes rainbow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+  }
+
+  #splash {
+    margin-top: 8px;
+    font-size: 1.1rem;
+    color: #ffe600;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.35);
+  }
+
+  .apps {
+    display: flex;
+    gap: 28px;
+    margin-top: 60px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .app {
+    width: 130px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+
+  .app:hover {
+    transform: scale(1.08);
+  }
+
+  .icon {
+    width: 110px;
+    height: 110px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    margin: 0 auto 10px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+  }
+
+  .video { background: #b80000; }
+  .games { background: #000; color: #39ff14; }
+  .images { background: #ffee00; color: black; }
+  .cards { background: linear-gradient(135deg, #00f2ff, #ff00e6); }
+
+  .label {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .gear {
+    position: fixed;
+    bottom: 18px;
+    left: 18px;
+    font-size: 1.6rem;
+    cursor: pointer;
+    opacity: 0.8;
+  }
+
+  .gear:hover {
+    opacity: 1;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+</style>
+</head>
+<body>
+
+  <h1>CentralSchoolFun</h1>
+  <div id="splash">Loading fun…</div>
+
+  <div class="apps">
+    <a class="app" href="https://centralschool.fun/videocave.html">
+      <div class="icon video">▶</div>
+      <div class="label">VideoCave</div>
+    </a>
+
+    <a class="app" href="https://centralschool.fun/gamerden.html">
+      <div class="icon games">🎮</div>
+      <div class="label">GamerDen</div>
+    </a>
+
+    <a class="app" href="https://centralschool.fun/imagegen.html">
+      <div class="icon images">🖼️</div>
+      <div class="label">Images.Fun</div>
+    </a>
+
+    <a class="app" href="https://centralschool.fun/cards.html">
+      <div class="icon cards">🃏</div>
+      <div class="label">TradingCards</div>
+    </a>
+  </div>
+
+  <div class="gear">⚙️</div>
+
+<script>
+  const splashes = [
+    "Now loading… school, but fun",
+    "100% homework-adjacent",
+    "Made by students, survived by teachers",
+    "Not blocked (yet)",
+    "Powered by questionable decisions",
+    "Welcome to the fun side of school",
+    "Now with 47% more chaos",
+    "Approved by absolutely nobody",
+    "Educational? Debatable.",
+    "Runs best during math class",
+    "This wasn’t in the handbook",
+    "Centralized fun deployed",
+    "Better than the default homepage",
+    "Warning: may increase productivity accidentally",
+    "Built different. Literally.",
+    "One tab away from greatness",
+    "Teachers clicking nervously",
+    "Loading… please stop refreshing",
+    "Finally, a good school website",
+    "Chromebook-certified chaos",
+    "Now featuring ✨stuff✨",
+    "Student-made. School-wide.",
+    "FunServer online",
+    "Somehow still allowed",
+    "If it breaks, it’s a feature",
+    "Welcome, Central humans",
+    "The hub they didn’t know they needed",
+    "Optimized for procrastination",
+    "Runs on vibes and JavaScript",
+    "School, but less boring",
+    "This took longer than expected",
+    "Now entering the Fun Zone",
+    "You’re supposed to be working",
+    "Made with love and mild panic",
+    "CentralSchool.fun has joined the game"
+  ];
+
+  document.getElementById("splash").textContent =
+    splashes[Math.floor(Math.random() * splashes.length)];
+</script>
+
+</body>
+</html>

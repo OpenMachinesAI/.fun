@@ -181,7 +181,7 @@
         <div class="st-desc">Games that I stole from other ppl on scratch... And Skibidi Slicers!</div>
       </a>
 
-      <a class="sticker" href="thecentraltimes.html" style="--i:6; --rot:1.2deg">
+      <a class="sticker" href="thecentraltimes.html" id="centralTimesLink" style="--i:6; --rot:1.2deg">
         <span class="tag">NEWS</span>
         <div class="st-title">
           <svg viewBox="0 0 24 24" fill="#ffd66b"><rect x="3" y="4" width="8" height="14" fill="#fff"/><rect x="13" y="4" width="8" height="14" fill="#fff"/><rect x="11" y="4" width="2" height="14" fill="#c9c9c9"/></svg>
@@ -190,7 +190,7 @@
         <div class="st-desc">News-ish. Opinions optional.</div>
       </a>
 
-      <a class="sticker" href="tlks.html" style="--i:7; --rot:-3deg">
+      <a class="sticker" href="tlks.html" id="centralTlksLink" style="--i:7; --rot:-3deg">
         <span class="tag weird">Preview</span>
         <div class="st-title">
           <svg viewBox="0 0 24 24" fill="#ff8a8a"><rect x="5" y="6" width="14" height="10" rx="2"/></svg>
@@ -295,6 +295,44 @@ function ensureNvpDom(){
   document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && overlay.classList.contains('show')){ nvpMarkSeen(); overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); } });
   return overlay;
 }
+function ensureInfoPopupDom(){
+  let overlay = document.getElementById('infoPopup');
+  if(overlay) return overlay;
+  overlay = document.createElement('div');
+  overlay.className = 'nvp';
+  overlay.id = 'infoPopup';
+  overlay.setAttribute('aria-hidden','true');
+  overlay.innerHTML = `
+    <div class="nvp-card" role="dialog" aria-labelledby="infoTitle" aria-describedby="infoMsg">
+      <h3 class="nvp-title" id="infoTitle"></h3>
+      <div class="nvp-msg" id="infoMsg"></div>
+      <div class="nvp-actions" id="infoActions"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  function closePopup(){
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden','true');
+  }
+  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closePopup(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && overlay.classList.contains('show')) closePopup(); });
+  return overlay;
+}
+function showInfoPopup(titleText, messageText){
+  const overlay = ensureInfoPopupDom();
+  const title = overlay.querySelector('#infoTitle');
+  const msg = overlay.querySelector('#infoMsg');
+  const actions = overlay.querySelector('#infoActions');
+  title.textContent = titleText || 'Notice';
+  msg.textContent = messageText || '';
+  actions.innerHTML = '';
+  const close=document.createElement('button');
+  close.className='btn btn-ghost';
+  close.textContent='Close';
+  close.onclick=()=>{ overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); };
+  actions.appendChild(close);
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden','false');
+}
 function initNVP(){
   if(!NVP_CONFIG.enabled || nvpSeen()) return;
   const overlay = ensureNvpDom();
@@ -382,6 +420,21 @@ document.addEventListener('DOMContentLoaded', ()=>{
       setTimeout(()=>s.remove(), 1500);
     }
   });
+
+  const centralTimesLink = document.getElementById('centralTimesLink');
+  if(centralTimesLink){
+    centralTimesLink.addEventListener('click', (e)=>{
+      e.preventDefault();
+      showInfoPopup('The Central Times', 'Articles are coming soon via the news paper enrichment.');
+    });
+  }
+  const centralTlksLink = document.getElementById('centralTlksLink');
+  if(centralTlksLink){
+    centralTlksLink.addEventListener('click', (e)=>{
+      e.preventDefault();
+      showInfoPopup('CentralTlks', 'Tlks will arrive in the future.');
+    });
+  }
 
   // ===== Self-tests (don’t remove) =====
   (function tests(){

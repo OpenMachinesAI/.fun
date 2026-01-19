@@ -1,516 +1,675 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CentralSchool.fun</title>
   <style>
-    :root{
-      --ink:#f9fbff;
-      --bg1:#0b0130; --bg2:#1a0e5a; --bg3:#2a1e7a;
-      --hot:#ff68d8; --aqua:#64fff2; --gold:#ffd66b; --lime:#9dffa8; --sky:#8fc8ff;
-      --panel:#0f0940; --edge:#a7c8ff;
-    }
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--ink); font-family:"Trebuchet MS","Comic Sans MS",Verdana,Tahoma,sans-serif;
-      background: radial-gradient(1200px 600px at 80% -20%, #ff58b811, transparent),
-                  radial-gradient(900px 500px at -10% 110%, #64fff20e, transparent),
-                  linear-gradient(#12033b, #0b0130);
-      overflow-x:hidden;
-    }
-
-    /* Vaporwave horizon grid */
-    .sky { position:fixed; inset:0; z-index:-2;
-      background: radial-gradient(circle at 50% 20%, #ff9ecf55 0 20%, transparent 22%),
-                  linear-gradient(180deg, #2a1e7a 0, #1a0e5a 40%, #0b0130 70%);
-    }
-    .grid { position:fixed; inset:auto 0 0 0; height:55vh; z-index:-1;
-      background: repeating-linear-gradient(0deg, #a66cff33 0 2px, transparent 2px 28px),
-                  repeating-linear-gradient(90deg, #a66cff33 0 2px, transparent 2px 48px);
-      transform-origin:50% 100%;
-      transform: perspective(900px) rotateX(60deg) translateY(30vh);
-      filter: drop-shadow(0 -20px 40px #a66cff66);
+    :root {
+      /* DEFAULT THEME (Vaporwave/Dark) */
+      --bg-grad: radial-gradient(circle at 50% -20%, #2a1e7a, #0b0130 60%);
+      --card-bg: rgba(16, 12, 45, 0.85);
+      --card-border: 2px solid rgba(100, 255, 242, 0.3);
+      --text-main: #f9fbff;
+      --text-sub: #8fc8ff;
+      --accent: #ff68d8;
+      --highlight: #64fff2;
+      --splash-color: #ffd66b;
+      --font-logo: "Comic Sans MS", "Chalkboard SE", sans-serif;
+      --font-ui: "Trebuchet MS", sans-serif;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
 
-    /* Header: VHS bar + banner */
-    header{ position:sticky; top:0; z-index:10; backdrop-filter: blur(6px); border-bottom:3px solid #fff3; }
-    .vhs { display:flex; align-items:center; gap:12px; padding:10px 12px; background: linear-gradient(90deg,#f0f,#90f,#0bf,#0ff); color:#102; text-shadow:1px 1px 0 #fff8; }
-    .logo{ width:54px;height:54px;border-radius:10px;border:2px solid #fff;
-      background: conic-gradient(from 0deg,#fff, #0ff, #0bf, #90f, #f0f, #ff6, #0f9, #f66, #fff);
-      box-shadow:0 0 10px #fff, 0 0 20px #0ff inset;
+    /* LIGHT THEME OVERRIDE */
+    html[data-theme="light"] {
+      --bg-grad: linear-gradient(180deg, #e0f7fa 0%, #ffffff 100%);
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-border: 2px solid #2a1e7a;
+      --text-main: #0b0130;
+      --text-sub: #444;
+      --accent: #2a1e7a;
+      --highlight: #ff68d8;
+      --splash-color: #ff0055;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    .title{margin:0;font-weight:900}
-    .sub{font-size:12px;opacity:.9}
 
-    .banner { display:flex;justify-content:center;align-items:center;gap:10px; background:linear-gradient(90deg,var(--gold),#fff3 40%,var(--gold)); color:#2a1e00;font-weight:900;padding:8px 10px;border-top:2px solid #fff;border-bottom:2px solid #fff; }
-    .banner a{ text-decoration:none;background:#fff;border:2px solid #0007;border-radius:10px; padding:6px 10px;color:#111; transition: transform .15s ease; }
-    .banner a:hover{ transform: translateY(-1px) scale(1.03) }
-
-    /* Split-flap ticker (CSS animation) */
-    .ticker { background:#080516; border-top:2px solid #531b9c; border-bottom:2px solid #531b9c; }
-    .flap-track{display:flex;gap:6px; padding:6px 10px; overflow:hidden}
-    .flap{position:relative; min-width:max(11ch,25vw); background:#120a30; border:2px solid #40217a; padding:6px 10px; font-weight:800; color:var(--sky);
-      box-shadow:0 6px 0 #0008 inset,0 0 12px #00e1ff33; transform:perspective(600px) rotateX(8deg);
-      animation: slide 18s linear infinite;
+    /* HIGH CONTRAST OVERRIDE */
+    html[data-theme="contrast"] {
+      --bg-grad: #000;
+      --card-bg: #000;
+      --card-border: 2px solid #fff;
+      --text-main: #fff;
+      --text-sub: #ff0;
+      --accent: #0ff;
+      --highlight: #0f0;
+      --splash-color: #ff0;
+      --shadow: none;
     }
-    @keyframes slide{ from{transform:translateX(0) perspective(600px) rotateX(8deg)} to{transform:translateX(-110%) perspective(600px) rotateX(8deg)} }
 
-    main{padding:18px 14px 32px}
+    * { box-sizing: border-box; }
+    
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-ui);
+      background: var(--bg-grad);
+      background-attachment: fixed;
+      color: var(--text-main);
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-    /* Stickerboard layout */
-    .board{ display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); }
-    .sticker{ position:relative; display:block; color:var(--ink); text-decoration:none; background: var(--panel); border:3px dashed var(--edge); padding:14px 14px 16px 14px; transform: rotate(var(--rot, -2deg)); filter: drop-shadow(0 8px 16px rgba(0,0,0,.5)); transition: transform .16s ease, filter .16s ease; clip-path: polygon(2% 0, 98% 0, 100% 10%, 100% 90%, 98% 100%, 2% 100%, 0 90%, 0 10%); --rot: calc((var(--i,0) % 2)*1deg - 2deg); }
-    .sticker:hover{ transform: rotate(calc(var(--rot) + .8deg)) translateY(-4px); filter: drop-shadow(0 14px 22px rgba(0,0,0,.6)) }
-    .sticker:before{ content:""; position:absolute; inset:0; background: radial-gradient(circle at 10% 8%, #fff3 0 12%, transparent 13%), radial-gradient(circle at 90% 6%, #fff2 0 10%, transparent 11%); pointer-events:none; }
-    .tag{display:inline-block; font-size:11px; font-weight:900; padding:2px 6px; border:2px solid #fff; border-radius:999px; color:#081128}
-    .tag.new{background:var(--hot)} .tag.fun{background:var(--aqua)} .tag.wip{background:var(--gold)} .tag.weird{background:var(--lime)}
-    .st-title{display:flex;align-items:center;gap:8px;margin:10px 0 4px 0;font-weight:900}
-    .st-title svg{width:28px;height:28px;filter:drop-shadow(0 0 6px #000)}
-    .st-desc{opacity:.9;font-size:13px;line-height:1.2}
+    /* === BACKGROUND GRID ANIMATION === */
+    .retro-grid {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+      background-image: 
+        linear-gradient(rgba(100, 255, 242, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(100, 255, 242, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      transform: perspective(500px) rotateX(20deg) translateY(-50px) scale(1.2);
+      opacity: 0.3;
+      pointer-events: none;
+    }
 
-    /* Dock quick links (different vibe than tiles) */
-    .dock{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
-    .dock a{ text-decoration:none;color:var(--ink); background:#120a30; border:2px solid #3e2e8a; padding:8px 10px; display:flex; align-items:center; gap:8px; transition:transform .12s ease, filter .12s ease; }
-    .dock a:hover{ transform: translateY(-2px); filter: brightness(1.1) }
-    .dock svg{width:20px;height:20px}
+    /* === HEADER & SPLASH === */
+    header {
+      text-align: center;
+      padding: 60px 20px 40px;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .logo {
+      font-family: var(--font-logo);
+      font-size: clamp(2rem, 6vw, 4rem);
+      color: var(--text-main);
+      text-shadow: 4px 4px 0px var(--accent);
+      margin: 0;
+      cursor: default;
+      transition: transform 0.2s;
+    }
+    .logo:hover { transform: scale(1.02) rotate(-2deg); }
 
-    /* Modal (More) */
-    .modal{ position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; z-index:30; opacity:0; transition:opacity .2s ease }
-    .modal.show{ display:flex; opacity:1 }
-    .card{ background:#0f0a3c; border:3px solid #66a2ff; max-width:760px; width:92%; max-height:80vh; overflow:auto; padding:14px; position:relative }
-    .close{ position:absolute; right:8px; top:8px; border:2px solid #fff; padding:2px 6px; cursor:pointer }
-    .more-grid{ display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)) }
-    .more-item{ background:#150e54; border:2px solid #66a2ff; padding:10px; text-decoration:none; color:#fff; transition: transform .12s ease }
-    .more-item:hover{ transform: translateY(-3px) }
+    .splash-container {
+      position: relative;
+      display: inline-block;
+      max-width: 600px;
+    }
 
-    footer{display:flex;justify-content:center;opacity:.85;font-size:12px;margin:20px 0}
+    .splash-text {
+      color: var(--splash-color);
+      font-size: 1.2rem;
+      font-weight: bold;
+      position: absolute;
+      bottom: -25px;
+      right: -20px;
+      width: max-content;
+      max-width: 90vw;
+      transform: rotate(-10deg);
+      text-shadow: 2px 2px 0px #000;
+      animation: bounce 2s infinite ease-in-out;
+      pointer-events: none;
+    }
 
-    /* Confetti for banner click */
-    .confetti{ position:fixed; width:6px; height:10px; top:-10px; left:50%; opacity:0; transform:translateX(-50%); z-index:40 }
-    .confetti.show{ animation: drop 1.2s ease-out forwards }
-    @keyframes drop{ 0%{opacity:1; transform:translateY(-10px) translateX(var(--x,0)) rotate(0)} 100%{opacity:0; transform:translateY(100vh) translateX(calc(var(--x,0) * 3)) rotate(260deg)} }
+    @keyframes bounce {
+      0%, 100% { transform: rotate(-10deg) scale(1); }
+      50% { transform: rotate(-10deg) scale(1.1); }
+    }
 
-    /* New Visitor Popup (NVP) */
-    .nvp{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(5,3,20,.6); backdrop-filter: blur(6px); z-index:50; opacity:0; transition:opacity .2s ease }
-    .nvp.show{ display:flex; opacity:1 }
-    .nvp-card{ background:#0f0a3c; border:3px solid #66a2ff; max-width:520px; width:92%; padding:16px; box-shadow:0 10px 30px #0008 }
-    .nvp-title{ font-weight:900; font-size:20px; margin:0 0 8px }
-    .nvp-msg{ opacity:.95; line-height:1.3; margin-bottom:12px }
-    .nvp-actions{ display:flex; gap:10px; flex-wrap:wrap }
-    .btn{ padding:8px 12px; border:2px solid #fff; cursor:pointer; font-weight:800 }
-    .btn-rainbow{ background:linear-gradient(90deg,#f0f,#90f,#0bf,#0ff,#0f9,#ff6); color:#021 }
-    .btn-ghost{ background:transparent; color:#fff }
+    /* === CONTROLS BAR === */
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      z-index: 10;
+    }
+
+    .ctrl-btn {
+      background: var(--card-bg);
+      border: var(--card-border);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ctrl-btn:hover { background: var(--highlight); color: #000; }
+    
+    .edit-mode-indicator {
+      display: none;
+      background: var(--accent);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      box-shadow: 0 0 10px var(--accent);
+      animation: pulse 1s infinite;
+    }
+    .edit-mode-indicator.active { display: block; }
+
+    @keyframes pulse { 0% {opacity:1;} 50% {opacity:0.7;} 100% {opacity:1;} }
+
+    /* === STICKERBOARD GRID === */
+    .stickerboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      width: 90%;
+      max-width: 1200px;
+      padding-bottom: 60px;
+      position: relative;
+    }
+
+    .sticker {
+      position: relative;
+      background: var(--card-bg);
+      border: var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      text-decoration: none;
+      color: var(--text-main);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      user-select: none;
+      box-shadow: var(--shadow);
+    }
+
+    /* Hover effect (only if not dragging) */
+    .sticker:not(.dragging):hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+      border-color: var(--highlight);
+      z-index: 2;
+    }
+
+    /* Dragging State */
+    .sticker.draggable { cursor: grab; }
+    .sticker.dragging { 
+      opacity: 0.5; 
+      border: 2px dashed var(--splash-color);
+      cursor: grabbing;
+    }
+
+    .st-icon { width: 40px; height: 40px; }
+    .st-icon svg { width: 100%; height: 100%; }
+    .st-header { display: flex; align-items: center; justify-content: space-between; }
+    
+    .st-title { font-weight: 900; font-size: 1.1rem; margin: 0; }
+    .st-desc { font-size: 0.85rem; color: var(--text-sub); line-height: 1.4; }
+
+    .tag {
+      font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: bold; color: #000;
+      text-transform: uppercase;
+    }
+    .tag.new { background: var(--splash-color); }
+    .tag.wip { background: var(--accent); color: #fff; }
+    .tag.fun { background: var(--highlight); }
+
+    /* === POPUP / MODAL === */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      z-index: 100; display: none; justify-content: center; align-items: center;
+    }
+    .modal-overlay.show { display: flex; animation: fadeIn 0.3s; }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 2px solid var(--highlight);
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 500px;
+      width: 90%;
+      color: var(--text-main);
+      box-shadow: 0 0 50px rgba(100, 255, 242, 0.2);
+      text-align: left;
+    }
+
+    .modal-title { margin-top: 0; color: var(--highlight); font-size: 1.5rem; }
+    .modal-btn {
+      margin-top: 20px;
+      background: var(--highlight);
+      color: #0b0130;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      float: right;
+    }
+
+    /* Settings Modal Specifics */
+    .settings-opts button {
+      display: block; width: 100%; margin: 8px 0; padding: 10px;
+      background: rgba(255,255,255,0.1); border: 1px solid var(--text-sub); color: var(--text-main);
+      cursor: pointer; border-radius: 6px; text-align: left;
+    }
+    .settings-opts button:hover { background: rgba(255,255,255,0.2); }
+
+    @keyframes fadeIn { from {opacity:0} to {opacity:1} }
+
+    footer {
+      margin-top: auto; padding: 20px; font-size: 0.8rem; color: var(--text-sub); opacity: 0.7;
+    }
+
   </style>
 </head>
 <body>
-  <div class="sky"></div>
-  <div class="grid"></div>
+
+  <div class="retro-grid"></div>
 
   <header>
-    <div class="vhs">
-      <div class="logo" aria-hidden="true"></div>
-      <div>
-        <h1 class="title">CentralSchool.fun</h1>
-        <div class="sub"> FUN +67   SANITY -3 </div>
-      </div>
-    </div>
-    <div class="banner">
-      <span>Central Space Program</span>
-      <a href="cards.html" id="tcLink">Open Trading Cards</a>
-    </div>
-    <div class="ticker">
-      <div class="flap-track" id="flaps"></div>
+    <div class="splash-container">
+      <h1 class="logo">CentralSchool.fun</h1>
+      <div class="splash-text" id="splashText">Now loading...</div>
     </div>
   </header>
 
-  <main>
-    <!-- Stickerboard tiles (unique look vs shop) -->
-    <div class="board">
-      <a class="sticker" href="cards.html" style="--i:0; --rot:-4deg">
+  <div class="controls">
+    <div class="edit-mode-indicator" id="editIndicator">EDIT MODE ACTIVE (Drag to Reorder)</div>
+    <button class="ctrl-btn" onclick="openSettings()">⚙️ Settings</button>
+  </div>
+
+  <!-- The Stickerboard -->
+  <main class="stickerboard" id="board">
+    <!-- Items have IDs for blacklist/whitelist logic -->
+    
+    <a class="sticker" href="cards.html" id="st_cards">
+      <div class="st-header">
+        <div class="st-icon"><svg viewBox="0 0 24 24" fill="var(--splash-color)"><rect x="3" y="3" width="18" height="12" rx="2"/><path d="M7 8h10" stroke="#000" stroke-width="2"/></svg></div>
         <span class="tag new">NEW</span>
-        <div class="st-title">
-          <svg viewBox="0 0 24 24" fill="#ffd66b"><rect x="3" y="3" width="18" height="12" rx="2"/><path d="M7 8h10" stroke="#112" stroke-width="2"/></svg>
-          Trading Cards
-        </div>
-        <div class="st-desc">Order Packs of Trading Cards. Shipped Right to your class</div>
-      </a>
+      </div>
+      <h3 class="st-title">Trading Cards</h3>
+      <div class="st-desc">Order Packs. Shipped right to your class.</div>
+    </a>
 
-      <a class="sticker" href="projectmuseum.html" style="--i:1; --rot:1.5deg">
+    <a class="sticker" href="projectmuseum.html" id="st_museum">
+      <div class="st-header">
+        <div class="st-icon"><svg viewBox="0 0 24 24" fill="var(--highlight)"><path d="M12 2l9 20H3z"/></svg></div>
         <span class="tag fun">FUN</span>
-        <div class="st-title">
-          <svg viewBox="0 0 24 24" fill="#64fff2"><path d="M12 2l9 20H3z"/></svg>
-         2024 Project Pages
-        </div>
-        <div class="st-desc">Artifacts & oddities salvaged from projects</div>
-      </a>
+      </div>
+      <h3 class="st-title">Project Museum</h3>
+      <div class="st-desc">Artifacts & oddities salvaged from old projects.</div>
+    </a>
 
-      <a class="sticker" href="space.html" style="--i:2; --rot:-2deg">
-        <span class="tag weird">CASA</span>
-        <div class="st-title">
-          <svg viewBox="0 0 24 24" fill="#8fc8ff"><path d="M12 2l4 8-4 12-4-12z"/></svg>
-          Central Air and Space Association
-        </div>
-        <div class="st-desc"> Rockets and Planes with questionable trajectories.</div>
-      </a>
+    <a class="sticker" href="space.html" id="st_space">
+      <div class="st-header">
+        <div class="st-icon"><svg viewBox="0 0 24 24" fill="#8fc8ff"><path d="M12 2l4 8-4 12-4-12z"/></svg></div>
+        <span class="tag">CASA</span>
+      </div>
+      <h3 class="st-title">Space Program</h3>
+      <div class="st-desc">Rockets with questionable trajectories.</div>
+    </a>
 
-      <a class="sticker" href="videocave.html" style="--i:3; --rot:2deg">
-        <span class="tag fun">FUN</span>
-        <div class="st-title">
-          <svg viewBox="0 0 24 24" fill="#9dffa8"><rect x="3" y="6" width="18" height="12" rx="2"/><polygon points="10,9 15,12 10,15" fill="#051227"/></svg>
-          Content Pool
-        </div>
-        <div class="st-desc">Clips, mixes, and bloopers that made the cut.</div>
-      </a>
+    <a class="sticker" href="videocave.html" id="st_video">
+      <div class="st-header">
+        <div class="st-icon"><svg viewBox="0 0 24 24" fill="#9dffa8"><rect x="3" y="6" width="18" height="12" rx="2"/><polygon points="10,9 15,12 10,15" fill="#051227"/></svg></div>
+        <span class="tag fun">Content</span>
+      </div>
+      <h3 class="st-title">Video Cave</h3>
+      <div class="st-desc">Clips, mixes, and bloopers that survived editing.</div>
+    </a>
 
-      <a class="sticker" href="ImageGen.html" style="--i:4; --rot:-1.4deg">
-        <span class="tag fun">FUN</span>
-        <div class="st-title">
-          <svg viewBox="0 0 24 24" fill="#ffd66b"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="12" cy="12" r="4" fill="#051227"/></svg>
-          Images.Fun
-        </div>
-        <div class="st-desc">Generate AI art starring your favorite teachers.</div>
-      </a>
+    <a class="sticker" href="ImageGen.html" id="st_ai">
+      <div class="st-header">
+        <div class="st-icon"><svg viewBox="0 0 24 24" fill="var(--splash-color)"><circle cx="12" cy="12" r="6"/></svg></div>
+        <span class="tag fun">AI</span>
+      </div>
+      <h3 class="st-title">Images.Fun</h3>
+      <div class="st-desc">Generate art starring your favorite teachers.</div>
+    </a>
 
-      <a class="sticker" href="progamerden.html" style="--i:5; --rot:-1deg">
-        <span class="tag wip">GAMES!!!</span>
-        <div class="st-title">
-          <svg viewBox="0 0 24 24" fill="#ff68d8"><rect x="3" y="10" width="18" height="6" rx="3"/><circle cx="9" cy="13" r="1.2" fill="#051227"/><circle cx="15" cy="13" r="1.2" fill="#051227"/></svg>
-          PRO Gamer Den
-        </div>
-        <div class="st-desc">Games that I stole from other ppl on scratch... And Skibidi Slicers!</div>
-      </a>
+    <a class="sticker" href="progamerden.html" id="st_games">
+      <div class="st-header">
+        <div class="st-icon"><svg viewBox="0 0 24 24" fill="var(--accent)"><rect x="2" y="6" width="20" height="12" rx="3"/></svg></div>
+        <span class="tag wip">GAMES</span>
+      </div>
+      <h3 class="st-title">Pro Gamer Den</h3>
+      <div class="st-desc">Scratch games and Skibidi Slicers.</div>
+    </a>
 
-      <a class="sticker" href="thecentraltimes.html" id="centralTimesLink" style="--i:6; --rot:1.2deg">
+    <a class="sticker" href="thecentraltimes.html" id="st_news">
+      <div class="st-header">
+        <div class="st-icon"><svg viewBox="0 0 24 24" fill="#fff"><rect x="4" y="4" width="16" height="16"/></svg></div>
         <span class="tag">NEWS</span>
-        <div class="st-title">
-          <svg viewBox="0 0 24 24" fill="#ffd66b"><rect x="3" y="4" width="8" height="14" fill="#fff"/><rect x="13" y="4" width="8" height="14" fill="#fff"/><rect x="11" y="4" width="2" height="14" fill="#c9c9c9"/></svg>
-          The Central Times
-        </div>
-        <div class="st-desc">News-ish. Opinions optional.</div>
-      </a>
+      </div>
+      <h3 class="st-title">Central Times</h3>
+      <div class="st-desc">News-ish. Opinions optional.</div>
+    </a>
 
-      <a class="sticker" href="tlks.html" id="centralTlksLink" style="--i:7; --rot:-3deg">
-        <span class="tag weird">Preview</span>
-        <div class="st-title">
-          <svg viewBox="0 0 24 24" fill="#ff8a8a"><rect x="5" y="6" width="14" height="10" rx="2"/></svg>
-          CentralTlks
-        </div>
-        <div class="st-desc">Central Tlks is a group chat for the entire school! It's currently in beta. Report bugs to Alex or Cole</div>
-      </a>
+    <a class="sticker" href="tlks.html" id="st_chat">
+      <div class="st-header">
+        <div class="st-icon"><svg viewBox="0 0 24 24" fill="#ff8a8a"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
+        <span class="tag wip">BETA</span>
+      </div>
+      <h3 class="st-title">CentralTlks</h3>
+      <div class="st-desc">School-wide group chat. Report bugs to Cole.</div>
+    </a>
 
-      <a class="sticker" href="https://rizzgpt-446778277069.us-west1.run.app/" style="--i:8; --rot:1.8deg">
-        <span class="tag">NEW</span>
-        <div class="st-title">
-          <svg viewBox="0 0 24 24" fill="#9dffa8"><circle cx="12" cy="8" r="4"/><path d="M8 16c1.5-2 6.5-2 8 0" stroke="#051227" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-          Talk to RizzGPT
-        </div>
-        <div class="st-desc">Chat with RizzGPT for pickup lines, advice, and more.</div>
-      </a>
+    <a class="sticker" href="https://rizzgpt-446778277069.us-west1.run.app/" id="st_rizz">
+      <div class="st-header">
+        <div class="st-icon"><svg viewBox="0 0 24 24" fill="#9dffa8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+        <span class="tag new">AI</span>
+      </div>
+      <h3 class="st-title">RizzGPT</h3>
+      <div class="st-desc">Get pickup lines and questionable advice.</div>
+    </a>
+    
+    <!-- Utility Links -->
+    <a class="sticker" href="minecraft.html" id="st_mc">
+      <h3 class="st-title">CMSCraft</h3>
+      <div class="st-desc">Minecraft server (scuffed).</div>
+    </a>
+    <a class="sticker" href="hell.html" id="st_hell">
+      <h3 class="st-title">Tab Hell</h3>
+      <div class="st-desc">Don't click this. Seriously.</div>
+    </a>
+    <a class="sticker" href="slurp.html" id="st_slurp">
+      <h3 class="st-title">Email Slurper</h3>
+      <div class="st-desc">Get codes from Chromebook.</div>
+    </a>
 
-      <a class="sticker" href="#" id="openMore" style="--i:9; --rot:2.4deg">
-        <span class="tag">MORE</span>
-        <div class="st-title">
-          <svg viewBox="0 0 24 24" fill="#8fc8ff"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
-          More…
-        </div>
-        <div class="st-desc">Extra experiments and side quests.</div>
-      </a>
-    </div>
-
-    <!-- Dock quick links -->
-    <div class="dock">
-      <a href="minecraft.html" title="Minecraft (scuffed)">
-        <svg viewBox="0 0 24 24" fill="#3ad16a"><rect x="3" y="3" width="18" height="18" stroke="#000" stroke-width="1.5" fill="none"/></svg>
-        <span>CMSCraft</span>
-      </a>
-      <a href="centralcast.html" title="Central Podcast">
-        <svg viewBox="0 0 24 24" fill="#ffd27a"><circle cx="12" cy="12" r="3" fill="#001a33"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="#ffd27a" stroke-width="1.6"/></svg>
-        <span>Central Podcast</span>
-      </a>
-      <a href="hell.html" title="Tab Hell">
-        <svg viewBox="0 0 24 24" fill="#ff5858"><path d="M5 4h14v6H5z"/><path d="M5 10h14v6H5z" opacity=".7"/></svg>
-        <span>Tab Hell</span>
-      </a>
-      <a href="slurp.html" title="Email Slurper">
-        <svg viewBox="0 0 24 24" fill="#7affe0"><path d="M3 6h18l-9 8z"/><rect x="3" y="6" width="18" height="12" fill="none" stroke="#7affe0" stroke-width="1.3"/></svg>
-        <span>Get Email Codes from your Chromebook</span>
-      </a>
-      <a href="error!%20(crash%20apple).html" title="Crash Apple">
-        <svg viewBox="0 0 24 24" fill="#ffb1b1"><path d="M12 2l4 6-4 6-4-6z"/></svg>
-        <span>Crash Apple</span>
-      </a>
-    </div>
   </main>
 
-  <!-- More modal -->
-  <div class="modal" id="moreModal" aria-hidden="true" role="dialog">
-    <div class="card">
-      <span class="close" id="closeMore">✕</span>
-      <h3>More Experiments</h3>
-      <div class="more-grid" id="moreList"></div>
+  <footer>
+    CentralSchool.fun • Press 'E' to Customize • Division Safe Mode Active
+  </footer>
+
+  <!-- Announcement Modal -->
+  <div id="annoModal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 class="modal-title" id="annoTitle">Update</h2>
+      <div id="annoContent"></div>
+      <button class="modal-btn" onclick="closeModal('annoModal')">Got it</button>
     </div>
   </div>
 
-  <!-- Footer (visitor counter removed) -->
-  <footer><span>CentralSchool.fun</span></footer>
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 class="modal-title">Site Settings</h2>
+      <div class="settings-opts">
+        <p><strong>Theme:</strong></p>
+        <button onclick="setTheme('default')">🌌 Default (Vapor)</button>
+        <button onclick="setTheme('light')">☀️ Flashbang (Light)</button>
+        <button onclick="setTheme('contrast')">⚫ High Contrast</button>
+        <p><strong>Layout:</strong></p>
+        <button onclick="resetLayout()">↺ Reset Sticker Order</button>
+      </div>
+      <button class="modal-btn" onclick="closeModal('settingsModal')">Close</button>
+    </div>
+  </div>
 
 <script>
-// ===== New Visitor Popup (JSON toggleable) =====
-const NVP_CONFIG = {
-  enabled: true,
-  key: 'new-csf_seen_v1',
-  cooldownDays: 90,
-  title: 'Welcome to the new CentralSchool.fun',
-  message: 'This entire website has been updated. Explore new pages and enjoy... Hopefuly',
-  link: { href: 'index.html', label: 'Continue' },
-  cancelLabel: 'Stop Showing This'
+/**
+ * 1. SPLASH TEXT FEATURE
+ */
+const splashes = [
+  "Now loading… school, but fun",
+  "100% homework-adjacent",
+  "Made by students, survived by teachers",
+  "Not blocked (yet)",
+  "Powered by questionable decisions",
+  "Welcome to the fun side of school",
+  "Now with 47% more chaos",
+  "Approved by absolutely nobody",
+  "Educational? Debatable.",
+  "Runs best during math class",
+  "This wasn’t in the handbook",
+  "Centralized fun deployed",
+  "Better than the default homepage",
+  "Warning: may increase productivity accidentally",
+  "Built different. Literally.",
+  "One tab away from greatness",
+  "Teachers clicking nervously",
+  "Loading… please stop refreshing",
+  "Finally, a good school website",
+  "Chromebook-certified chaos",
+  "Now featuring ✨stuff✨",
+  "Student-made. School-wide.",
+  "FunServer online",
+  "Somehow still allowed",
+  "If it breaks, it’s a feature",
+  "Welcome, Central humans",
+  "The hub they didn’t know they needed",
+  "Optimized for procrastination",
+  "Runs on vibes and JavaScript",
+  "School, but less boring",
+  "This took longer than expected",
+  "Now entering the Fun Zone",
+  "You’re supposed to be working",
+  "Made with love and mild panic",
+  "CentralSchool.fun has joined the game"
+];
+
+function setSplash() {
+  const t = document.getElementById('splashText');
+  t.textContent = splashes[Math.floor(Math.random() * splashes.length)];
+}
+
+/**
+ * 2. ANNOUNCEMENT SYSTEM (JSON + Date Logic)
+ * Edit 'ANNOUNCEMENT_CONFIG' to change popup.
+ */
+const ANNOUNCEMENT_CONFIG = {
+  active: true,
+  title: "Welcome to Version 2.0",
+  content: "<p>The site has been completely redesigned! Try pressing <b>'E'</b> to enter Edit Mode and rearrange your stickers.</p><p>Check out the new Settings menu to change themes.</p>",
+  endDate: "2025-12-31" // YYYY-MM-DD format
 };
-function nvpSeen(){
-  try{
-    const ts = +localStorage.getItem(NVP_CONFIG.key) || 0;
-    if(!ts) return false;
-    return Date.now() - ts < (NVP_CONFIG.cooldownDays*24*60*60*1000);
-  }catch{ return false }
-}
-function nvpMarkSeen(){
-  try{ localStorage.setItem(NVP_CONFIG.key, Date.now()); }catch{}
-  document.cookie = `${NVP_CONFIG.key}=1; max-age=${NVP_CONFIG.cooldownDays*86400}; path=/`;
-}
-function ensureNvpDom(){
-  let overlay = document.getElementById('nvp');
-  if(overlay) return overlay;
-  overlay = document.createElement('div');
-  overlay.className = 'nvp';
-  overlay.id = 'nvp';
-  overlay.setAttribute('aria-hidden','true');
-  overlay.innerHTML = `
-    <div class="nvp-card" role="dialog" aria-labelledby="nvpTitle" aria-describedby="nvpMsg">
-      <h3 class="nvp-title" id="nvpTitle"></h3>
-      <div class="nvp-msg" id="nvpMsg"></div>
-      <div class="nvp-actions" id="nvpActions"></div>
-    </div>`;
-  document.body.appendChild(overlay);
-  overlay.addEventListener('click', (e)=>{ if(e.target===overlay){ nvpMarkSeen(); overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); } });
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && overlay.classList.contains('show')){ nvpMarkSeen(); overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); } });
-  return overlay;
-}
-function ensureInfoPopupDom(){
-  let overlay = document.getElementById('infoPopup');
-  if(overlay) return overlay;
-  overlay = document.createElement('div');
-  overlay.className = 'nvp';
-  overlay.id = 'infoPopup';
-  overlay.setAttribute('aria-hidden','true');
-  overlay.innerHTML = `
-    <div class="nvp-card" role="dialog" aria-labelledby="infoTitle" aria-describedby="infoMsg">
-      <h3 class="nvp-title" id="infoTitle"></h3>
-      <div class="nvp-msg" id="infoMsg"></div>
-      <div class="nvp-actions" id="infoActions"></div>
-    </div>`;
-  document.body.appendChild(overlay);
-  function closePopup(){
-    overlay.classList.remove('show');
-    overlay.setAttribute('aria-hidden','true');
-  }
-  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closePopup(); });
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && overlay.classList.contains('show')) closePopup(); });
-  return overlay;
-}
-function showInfoPopup(titleText, messageText){
-  const overlay = ensureInfoPopupDom();
-  const title = overlay.querySelector('#infoTitle');
-  const msg = overlay.querySelector('#infoMsg');
-  const actions = overlay.querySelector('#infoActions');
-  title.textContent = titleText || 'Notice';
-  msg.textContent = messageText || '';
-  actions.innerHTML = '';
-  const close=document.createElement('button');
-  close.className='btn btn-ghost';
-  close.textContent='Close';
-  close.onclick=()=>{ overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); };
-  actions.appendChild(close);
-  overlay.classList.add('show');
-  overlay.setAttribute('aria-hidden','false');
-}
-function initNVP(){
-  if(!NVP_CONFIG.enabled || nvpSeen()) return;
-  const overlay = ensureNvpDom();
-  const title = overlay.querySelector('#nvpTitle');
-  const msg = overlay.querySelector('#nvpMsg');
-  const actions = overlay.querySelector('#nvpActions');
-  title.textContent = NVP_CONFIG.title||'Notice';
-  msg.textContent = NVP_CONFIG.message||'';
-  actions.innerHTML = '';
-  if(NVP_CONFIG.link && NVP_CONFIG.link.href){
-    const go=document.createElement('button');
-    go.className='btn btn-rainbow';
-    go.textContent=NVP_CONFIG.link.label||'Open';
-    go.onclick=()=>{ nvpMarkSeen(); window.location.href=NVP_CONFIG.link.href; };
-    actions.appendChild(go);
-  }
-  const cancel=document.createElement('button');
-  cancel.className='btn btn-ghost';
-  cancel.textContent=NVP_CONFIG.cancelLabel||'Dismiss';
-  cancel.onclick=()=>{ nvpMarkSeen(); overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); };
-  actions.appendChild(cancel);
-  overlay.classList.add('show');
-  overlay.setAttribute('aria-hidden','false');
+
+function checkAnnouncement() {
+  if (!ANNOUNCEMENT_CONFIG.active) return;
+  
+  const now = new Date();
+  const end = new Date(ANNOUNCEMENT_CONFIG.endDate);
+  
+  // If current date is past end date, do nothing
+  if (now > end) return;
+
+  // Check if user has already seen THIS specific announcement (hash of title)
+  const id = "seen_" + ANNOUNCEMENT_CONFIG.title.replace(/\s/g, '');
+  if (localStorage.getItem(id)) return;
+
+  // Show Modal
+  document.getElementById('annoTitle').innerText = ANNOUNCEMENT_CONFIG.title;
+  document.getElementById('annoContent').innerHTML = ANNOUNCEMENT_CONFIG.content;
+  document.getElementById('annoModal').classList.add('show');
+
+  // Mark seen
+  localStorage.setItem(id, 'true');
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  initNVP();
+/**
+ * 3. DIVISION BLACKLIST SYSTEM (?D=x)
+ * Configures 25 slots. Add IDs to the array to hide them for that div.
+ */
+const DIVISION_CONFIG = {
+  "1": ["st_games", "st_hell"], // Example: Div 1 can't see Games or Hell
+  "2": ["st_chat"],
+  "3": [],
+  // Fill 4-25 as needed
+  ...Array.from({length: 22}, (_, i) => ({ [(i+4).toString()]: [] })).reduce((a,b)=>({...a,...b}), {})
+};
 
-  // ===== Flap ticker =====
-  const lines = [
-    "BREAKING: Stickerboard escaped the glue factory.",
-    "ALERT: Principal bans boring homepages.",
-    "SCIENCE: Split-flaps make everything cooler.",
-    "GAMING: Snack meta buffs announced.",
-    "WEATHER: Sky confirms it’s still blue.",
-    "EXTRA: Trading Cards now available → cards.html"
-  ];
-  const flaps = document.getElementById('flaps');
-  function loadFlaps(){
-    flaps.innerHTML = "";
-    const seq = [...lines, ...lines.slice(0,2)]; // loop smooth
-    seq.forEach(text=>{
-      const d=document.createElement('div');
-      d.className='flap'; d.textContent=text;
-      flaps.appendChild(d);
+function applyDivisionFilter() {
+  const params = new URLSearchParams(window.location.search);
+  const divID = params.get('D'); // ?D=1
+
+  if (divID && DIVISION_CONFIG[divID]) {
+    const blockedIds = DIVISION_CONFIG[divID];
+    blockedIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.remove();
     });
+    console.log(`Division ${divID} loaded. Restrictions applied.`);
   }
-  loadFlaps();
+}
 
-  // ===== More modal =====
-  const moreModal=document.getElementById('moreModal');
-  const openMore=document.getElementById('openMore');
-  const closeMore=document.getElementById('closeMore');
-  const moreList=document.getElementById('moreList');
-  const moreData=[
-    {name:"Central Podcast", url:"centralcast.html"},
-    {name:"Tab Hell", url:"hell.html"},
-    {name:"Email Slurper", url:"slurp.html"},
-    {name:"Crash Apple", url:"error!%20(crash%20apple).html"}
-  ];
-  function openModal(){
-    moreList.innerHTML='';
-    moreData.forEach((m,i)=>{
-      const a=document.createElement('a');
-      a.className='more-item'; a.href=m.url; a.textContent=m.name;
-      a.style.animationDelay=(i*0.05)+'s';
-      moreList.appendChild(a);
-    });
-    moreModal.classList.add('show'); moreModal.setAttribute('aria-hidden','false');
+/**
+ * 4. DRAG AND DROP & EDIT MODE & THEMES
+ */
+let isEditMode = false;
+const board = document.getElementById('board');
+let items = [...board.children];
+
+function toggleEditMode() {
+  isEditMode = !isEditMode;
+  const indicator = document.getElementById('editIndicator');
+  
+  if (isEditMode) {
+    indicator.classList.add('active');
+    enableDrag();
+  } else {
+    indicator.classList.remove('active');
+    disableDrag();
+    saveLayout();
   }
-  function closeModal(){ moreModal.classList.remove('show'); moreModal.setAttribute('aria-hidden','true'); }
-  openMore.addEventListener('click',e=>{e.preventDefault(); openModal();});
-  closeMore.addEventListener('click',closeModal);
-  moreModal.addEventListener('click',e=>{ if(e.target===moreModal) closeModal(); });
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && moreModal.classList.contains('show')) closeModal(); });
+}
 
-  // ===== Banner confetti =====
-  document.getElementById('tcLink').addEventListener('click', ()=>{
-    for(let i=0;i<24;i++){
-      const s=document.createElement('div'); s.className='confetti show';
-      s.style.left=(50+Math.random()*20-10)+'%';
-      s.style.setProperty('--x', (Math.random()*40-20)+'px');
-      s.style.background = `hsl(${Math.floor(Math.random()*360)}, 90%, 60%)`;
-      document.body.appendChild(s);
-      setTimeout(()=>s.remove(), 1500);
+// Drag Events
+function enableDrag() {
+  const stickers = document.querySelectorAll('.sticker');
+  stickers.forEach(sticker => {
+    sticker.setAttribute('draggable', 'true');
+    sticker.classList.add('draggable');
+    sticker.addEventListener('click', preventClickInEdit);
+    sticker.addEventListener('dragstart', handleDragStart);
+    sticker.addEventListener('dragend', handleDragEnd);
+  });
+  board.addEventListener('dragover', handleDragOver);
+}
+
+function disableDrag() {
+  const stickers = document.querySelectorAll('.sticker');
+  stickers.forEach(sticker => {
+    sticker.setAttribute('draggable', 'false');
+    sticker.classList.remove('draggable');
+    sticker.removeEventListener('click', preventClickInEdit);
+    sticker.removeEventListener('dragstart', handleDragStart);
+    sticker.removeEventListener('dragend', handleDragEnd);
+  });
+  board.removeEventListener('dragover', handleDragOver);
+}
+
+function preventClickInEdit(e) {
+  if(isEditMode) e.preventDefault();
+}
+
+let draggedItem = null;
+
+function handleDragStart(e) {
+  draggedItem = this;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragEnd(e) {
+  this.classList.remove('dragging');
+  draggedItem = null;
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  const afterElement = getDragAfterElement(board, e.clientY, e.clientX);
+  if (afterElement == null) {
+    board.appendChild(draggedItem);
+  } else {
+    board.insertBefore(draggedItem, afterElement);
+  }
+}
+
+// Math to find position
+function getDragAfterElement(container, y, x) {
+  const draggableElements = [...container.querySelectorAll('.sticker:not(.dragging)')];
+
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    // Simple logic: distance to center of box
+    const offsetX = x - (box.left + box.width / 2);
+    const offsetY = y - (box.top + box.height / 2);
+    const dist = Math.hypot(offsetX, offsetY); // Euclidean distance
+
+    if (dist < closest.offset) {
+      return { offset: dist, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.POSITIVE_INFINITY }).element;
+}
+
+// Save/Load Layout
+function saveLayout() {
+  const currentOrder = [...board.children].map(child => child.id).filter(id => id);
+  localStorage.setItem('stickerOrder', JSON.stringify(currentOrder));
+}
+
+function loadLayout() {
+  const saved = localStorage.getItem('stickerOrder');
+  if (!saved) return;
+  
+  const order = JSON.parse(saved);
+  const currentItems = {};
+  [...board.children].forEach(el => { if(el.id) currentItems[el.id] = el; });
+  
+  // Re-append in order
+  order.forEach(id => {
+    if (currentItems[id]) {
+      board.appendChild(currentItems[id]);
     }
   });
+}
 
-  const centralTimesLink = document.getElementById('centralTimesLink');
-  if(centralTimesLink){
-    centralTimesLink.addEventListener('click', (e)=>{
-      e.preventDefault();
-      showInfoPopup('The Central Times', 'Articles are coming soon via the news paper enrichment.');
-    });
-  }
-  const centralTlksLink = document.getElementById('centralTlksLink');
-  if(centralTlksLink){
-    centralTlksLink.addEventListener('click', (e)=>{
-      e.preventDefault();
-      showInfoPopup('CentralTlks', 'Tlks will arrive in the future.');
-    });
-  }
+function resetLayout() {
+  localStorage.removeItem('stickerOrder');
+  location.reload();
+}
 
-  // ===== Self-tests (don’t remove) =====
-  (function tests(){
-    const out=[];
-    function ok(name,cond){ out.push((cond?'PASS':'FAIL')+': '+name); }
-    ok('Banner link points to cards.html', (document.getElementById('tcLink')||{}).getAttribute?.('href')==='cards.html');
-    ok('Flaps loaded', document.querySelectorAll('.flap').length>3);
-    ok('Stickers exist', document.querySelectorAll('.sticker').length>=6);
-    // Modal open/close
-    openModal(); ok('More items render', document.querySelectorAll('#moreList .more-item').length===moreData.length); closeModal();
-    console.log('[Stickerboard Home Tests]\n'+out.join('\n'));
-  })();
+// Themes
+function setTheme(themeName) {
+  if (themeName === 'default') {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.removeItem('siteTheme');
+  } else {
+    document.documentElement.setAttribute('data-theme', themeName);
+    localStorage.setItem('siteTheme', themeName);
+  }
+}
+
+function loadTheme() {
+  const t = localStorage.getItem('siteTheme');
+  if (t) document.documentElement.setAttribute('data-theme', t);
+}
+
+/* === GENERAL UI FUNCTIONS === */
+function openSettings() { document.getElementById('settingsModal').classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// Key listener for 'E'
+document.addEventListener('keydown', (e) => {
+  // Ignore if typing in an input (not relevant here but good practice)
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key.toLowerCase() === 'e') {
+    toggleEditMode();
+  }
 });
 
-
-(function () {
-  // === CONFIG ===
-  const redirectUrl = 'bye.html'; // <- set your redirect destination
-  const checkIntervalMs = 2000; // how often to re-check (ms)
-
-  // === helpers ===
-  function hasBypass() {
-    try {
-      return new URLSearchParams(window.location.search).has('bypass');
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function isInTargetWindow(now) {
-    // local PC time is used (Date() is local)
-    // target: 2025-11-12 between 10:25 (inclusive) and 12:00 (exclusive)
-    if (now.getFullYear() !== 2025) return false;
-    if (now.getMonth() !== 10) return false; // months are 0-indexed: 10 => November
-    if (now.getDate() !== 12) return false;
-
-    const h = now.getHours();
-    const m = now.getMinutes();
-
-    // start: 10:25 (10 hours, 25 minutes) inclusive
-    const afterStart = (h > 10) || (h === 10 && m >= 25);
-    // end: before 12:00
-    const beforeEnd = (h < 12);
-
-    return afterStart && beforeEnd;
-  }
-
-  function alreadyOnTarget() {
-    // avoids redirecting if already on the target URL
-    try {
-      const current = window.location.href;
-      // Basic check: same origin + path prefix — adjust if you want exact match
-      return current === redirectUrl || current.startsWith(redirectUrl + '#') || current.startsWith(redirectUrl + '?');
-    } catch (e) {
-      return false;
-    }
-  }
-
-  // === main check/redirect ===
-  function checkAndRedirect() {
-    if (hasBypass()) return;               // bypass param present -> do nothing
-    if (alreadyOnTarget()) return;         // already there
-    const now = new Date();
-    if (isInTargetWindow(now)) {
-      // do the redirect
-      window.location.href = redirectUrl;
-    }
-  }
-
-  // run immediately, then in a loop
-  checkAndRedirect();
-  setInterval(checkAndRedirect, checkIntervalMs);
-})();
-
-
-
+/* === INIT === */
+document.addEventListener('DOMContentLoaded', () => {
+  setSplash();
+  applyDivisionFilter(); // Must happen before layout load to ensure IDs exist
+  loadLayout();
+  loadTheme();
+  checkAnnouncement();
+});
 
 </script>
 </body>

@@ -8,7 +8,7 @@
 <script async src="https://tlk.io/embed.js" type="text/javascript"></script>
 
   <meta charset="UTF-8">
-  <title>CCP - Central Content Pool</title>
+  <title></title>
   <style>
 
     /* Smooth zoom animation for video cards */
@@ -560,24 +560,16 @@ body, header {
   </style>
 </head>
 <!-- Welcome Overlay -->
-<div id="welcome-overlay">
-  <div id="welcome-box">
-    <h1>Welcome to Content Pool V2</h1>
-    <p>This is still being worked on and may be a little slow,<br>
-    but we are gonna give you access now.</p>
-    <div class="welcome-buttons">
-      <button id="enter-btn">🚀 Enter Content Pool V2</button>
-      <button id="old-btn">Learn More</button>
-    </div>
-  </div>
-</div>
+
 
 <body>
 
-  <header>Welcome to CCP</header>
-  <div class="logo">CCP</div>
-  <div class="subtext">(Central Content Pool)</div>
-  <div class="fineprint">(Not Communist!)</div>
+  <header>VideoCave</header>
+  <div class="logo">VideoCave</div>
+  
+  <div class="subtext">
+    (Central Content Pool)</div>
+  <div class="fineprint"></div>
 
   <div id="hf-status" class="status-banner"></div>
 
@@ -758,7 +750,7 @@ const categories = {
     music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/ifoakijw/22.%20Credits%20%28Wii%20Play%20Motion%29.mp3"
   },
   "Cole Content Crate": {
-    album: "B2cCCCEXAMPLE", // Replace with Cole's real album ID
+    album: "#B2c5ON9t3uz8kT7", // Replace with Cole's real album ID
     bg: "linear-gradient(135deg, #8e2de2, #4a00e0)",
     music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/xyz/10.%20Cole%20Theme.mp3"
   }
@@ -1064,11 +1056,11 @@ Object.keys(categories).forEach((cat, idx) => {
 });
 
 // Unlock sounds on user click
-document.getElementById("enter-btn").addEventListener("click", () => {
-  document.getElementById("welcome-overlay").style.display = "none";
+window.addEventListener("DOMContentLoaded", () => {
   soundsEnabled = true;
-  fetchAllCategories().then(checkUrlParam);
+  fetchAllCategories();
 });
+;
 
 // "Old Site" button
 document.getElementById("old-btn").addEventListener("click", () => {

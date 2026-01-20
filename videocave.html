@@ -1,30 +1,1229 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CCP.fun</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap" rel="stylesheet">
+<script async src="https://tlk.io/embed.js" type="text/javascript"></script>
+
+  <meta charset="UTF-8">
+  <title>VideoCave</title>
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: #04010f;
+    /* ============================
+       THEME VARIABLES
+       ============================ */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #ff00ff, #00ffff);
+      --header-bg: linear-gradient(90deg, #ff0080, #ff8c00, #40e0d0, #8a2be2);
+      --card-bg: rgba(255,255,255,0.9);
+      --text-color: #000;
+      --text-shadow: 1px 1px 2px black;
+      --card-border: 3px solid black;
+    }
+
+    body.light-theme {
+      --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      --header-bg: linear-gradient(90deg, #74ebd5, #ACB6E5);
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --text-shadow: none;
+      --card-border: 2px solid #ccc;
+    }
+    
+    body.light-theme .logo, 
+    body.light-theme .subtext, 
+    body.light-theme .total-count {
+      color: #333;
+      text-shadow: none;
+    }
+
+    /* ============================
+       EXISTING STYLES
+       ============================ */
+    .video-card {
+      transition: transform 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
+      transform-origin: center center;
+      position: relative; /* For menu positioning */
+    }
+
+    .modal-body {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transition: all 0.4s ease;
+    }
+    .comments-window {
+      z-index: 100002;
+    }
+
+    .modal-body.with-comments #modal-video {
+      flex: 2;
+      transition: all 0.4s ease;
+    }
+
+    #tlkio-container {
+      flex: 1.2;
+      height: 400px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .modal-body.with-comments #tlkio-container {
+      opacity: 1;
+      pointer-events: all;
+      display: block;
+    }
+
+    .toast-spinner {
+      width: 16px;
+      height: 16px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      z-index: 100000;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      background: rgba(20,20,20,0.9);
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 720px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    }
+
+    .modal-content h2 {
+      margin-bottom: 15px;
+      color: #fff;
+      font-size: 1.4rem;
+      font-weight: bold;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    .comments-window {
+      position: fixed;
+      top: 100px;
+      left: 100px;
+      width: 400px;
+      height: 300px;
+      background: #fff;
+      border: 2px solid #000;
+      box-shadow: 6px 6px 0px rgba(0,0,0,0.5);
+      display: none;
+      flex-direction: column;
+      resize: both;
       overflow: hidden;
+      z-index: 9999;
     }
-    iframe {
-      border: 0;
+
+    .comments-header {
+      background: linear-gradient(90deg, #0055aa, #0077cc);
+      color: #fff;
+      padding: 4px 8px;
+      cursor: move;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: "MS Sans Serif", sans-serif;
+      font-size: 14px;
+      user-select: none;
+    }
+
+    .comments-header button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .modal-header {
+      background: var(--header-bg);
+      color: white;
+      padding: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header button {
+      background: #000;
+      color: white;
+      border: 2px solid white;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    
+    /* Video Element */
+    .modal-content video {
       width: 100%;
-      height: 100%;
+      max-height: 80vh;
     }
+
+    /* Body & Layout */
+    body {
+      font-family: 'Comic Neue', cursive;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      transition: background 1s ease;
+      background: var(--bg-gradient);
+      background-size: 400% 400%;
+      animation: rainbowShift 12s infinite;
+    }
+    
+    header {
+      background: var(--header-bg);
+      background-size: 600% 600%;
+      animation: rainbowShift 8s infinite;
+      color: white;
+      padding: 15px;
+      font-size: 2em;
+      border-bottom: 4px double #fff;
+      text-shadow: 2px 2px 0 black;
+      position: relative;
+    }
+
+    /* Theme Toggle Button */
+    #theme-toggle {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      border: 2px solid white;
+      color: white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s;
+    }
+    #theme-toggle:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    @keyframes rainbowShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .logo {
+      font-size: 50px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 3px 3px 0 #000, 0 0 10px cyan, 0 0 20px magenta;
+      margin-top: 20px;
+    }
+    .subtext, .fineprint {
+      color: white;
+      text-shadow: var(--text-shadow);
+    }
+    .subtext { font-size: 24px; margin-top: -10px; }
+    .fineprint { font-size: 12px; font-style: italic; }
+
+    .container {
+      margin: 20px auto;
+      width: 90%;
+      max-width: 1200px;
+    }
+
+    /* Search Bar + Lucky Button */
+    .search-container {
+      margin: 20px auto;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    #search-input {
+      width: 70%;
+      padding: 10px;
+      font-size: 18px;
+      border: 3px solid #fff;
+      background: rgba(255,255,255,0.9);
+      outline: none;
+      transition: 0.3s;
+    }
+    #search-input:focus { background: #ffff99; }
+    #lucky-btn {
+      background: linear-gradient(90deg, #ff0000, #ff9900, #33cc33, #3399ff, #cc33ff);
+      background-size: 400% 400%;
+      animation: rainbowShift 5s infinite;
+      border: 3px solid white;
+      color: white;
+      font-weight: bold;
+      padding: 10px 20px;
+      cursor: pointer;
+      text-shadow: 1px 1px 2px black;
+      transition: transform 0.3s;
+    }
+    #lucky-btn:hover { transform: scale(1.1) rotate(-2deg); }
+
+    #old-btn {
+      background: #777;       
+      color: white;          
+      border: 2px solid #555; 
+      cursor: pointer;
+      padding: 12px 20px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    #old-btn:hover { background: #999; }
+
+    /* Category Navigation */
+    .category-bar {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+    .category-btn {
+      background: linear-gradient(45deg, #00f, #f0f);
+      border: 3px solid white;
+      color: white;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      text-shadow: 1px 1px 2px black;
+      transition: 0.3s;
+    }
+    .category-btn.active, .category-btn:hover {
+      background: linear-gradient(45deg, #ff0, #f00);
+      transform: scale(1.15) rotate(2deg);
+    }
+
+    .total-count {
+      font-size: 18px;
+      margin: 10px;
+      font-weight: bold;
+      color: white;
+      text-shadow: var(--text-shadow);
+    }
+
+    /* Videos Grid */
+    .videos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+    }
+
+    .video-card {
+      background: var(--card-bg);
+      border: var(--card-border);
+      padding: 10px;
+      width: 320px;
+      cursor: pointer;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      animation: fadeIn 0.5s ease-in;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Disable card click on the menu area */
+    .video-card-content {
+      flex: 1;
+    }
+
+    .video-card:hover {
+      transform: scale(1.08) rotate(-1deg);
+      box-shadow: 0 0 20px cyan, 0 0 30px magenta;
+    }
+    .video-card img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border: 4px solid black;
+    }
+    .video-card h2 {
+      margin: 10px 0 0 0;
+      font-size: 20px;
+      color: var(--text-color);
+    }
+
+    /* 3-DOT MENU STYLES */
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 5px;
+      position: relative;
+    }
+    .menu-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--text-color);
+      padding: 0 5px;
+    }
+    .menu-dropdown {
+      display: none;
+      position: absolute;
+      bottom: 30px;
+      right: 0;
+      background: #fff;
+      border: 2px solid #000;
+      border-radius: 4px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+      z-index: 50;
+      min-width: 180px;
+      text-align: left;
+    }
+    .menu-dropdown.show {
+      display: block;
+      animation: fadeIn 0.2s;
+    }
+    .menu-item {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: none;
+      border: none;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      cursor: pointer;
+      color: #000;
+      font-family: inherit;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .menu-item:hover {
+      background: #f0f0f0;
+    }
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .status-banner {
+      display: none;
+      margin: 12px auto 0;
+      padding: 12px 18px;
+      max-width: 600px;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 14px;
+      background: linear-gradient(90deg, #ff1744, #ff9100);
+      box-shadow: 0 0 18px rgba(255, 68, 68, 0.6);
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+      animation: fadeIn 0.4s ease;
+    }
+    .status-banner.visible { display: block; }
   </style>
 </head>
-<body>
-  <iframe
-    src="https://central-content-pool-446778277069.us-west1.run.app/"
-    title="Content Pool"
-    allow="fullscreen"
-    allowfullscreen
 
-  ></iframe>
+<body>
+
+  <header>
+    VideoCave
+    <button id="theme-toggle" aria-label="Toggle Theme">🌙</button>
+  </header>
+  <div class="logo">VideoCave</div>
+  
+  <div class="subtext">(Central Content Pool)</div>
+  <div class="fineprint"></div>
+
+  <div id="hf-status" class="status-banner"></div>
+
+  <div class="container">
+    <!-- Search + Lucky -->
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search for videos...">
+      <button id="old-btn">Old Site</button>
+    </div>
+
+    <!-- Category Bar -->
+    <div class="category-bar" id="category-bar"></div>
+    <div class="total-count" id="total-count">Total Videos: 0</div>
+
+    <div class="videos" id="video-list"></div>
+  </div>
+
+<div id="modal-overlay" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modal-title"></h2>
+      <div class="modal-controls">
+        <button id="fullscreen-btn" class="ctl-btn">Fullscreen</button>
+        <button class="ctl-btn js-close-modal">Close</button>
+        <button class="close-icon js-close-modal" aria-label="Close">&times;</button>
+      </div>
+    </div>
+
+  <div class="modal-body">
+  <video id="modal-video" controls autoplay style="width:100%; max-height:400px; background:#000;">
+    <source id="video-source" src="" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+<div id="comments-window" class="comments-window">
+  <div class="comments-header">
+    <span>Comments</span>
+    <button id="comments-close">×</button>
+  </div>
+  <div id="tlkio"
+       data-channel="placeholder"
+       data-theme="theme--minimal"
+       style="width:100%; height:100%;">
+  </div>
+</div>
+
+<script>
+
+// =======================
+// 🛑 BLOCKED DIVISIONS DATA
+// =======================
+const BLOCKED_DIVISIONS = {
+  "1": ["https://example.com/blocked-video-1.mp4"],
+  "2": [],
+  "3": [],
+  "4": [],
+  "5": [],
+  "6": [],
+  "7": [],
+  "8": [],
+  "9": [],
+  "10": [],
+  "11": [],
+  "12": [],
+  "13": [],
+  "14": [],
+  "15": [],
+  "16": [],
+  "17": [],
+  "18": [],
+  "19": [],
+  "20": [],
+  "21": [],
+  "22": [],
+  "23": [],
+  "24": [],
+  "25": []
+};
+
+// =======================
+// 🌟 RECOMMENDED VIDEOS (To Watch List)
+// =======================
+// Add specific URLs here. If found in the pool, they appear in "Recommended".
+const RECOMMENDED_LIST = [
+   "https://cvws.icloud-content.com/S/ATKAhnsOjk714n6lduEo9-GbNyOV/copy_0172C673-8040-4D36-A382-1AE641BDE628.mp4?o=AsZJOPNlHRm7ayedyFUOH0uPa2K5x1fnukVv2__QwYJI&v=1&z=https%3A%2F%2Fp162-content.icloud.com%3A443&x=1&a=CAogCV1ArXQPIYKv0kovYPQ_ZAUOZndyv9GeuJGt4sPJfRYSaRDWyI_OvTMY1t-i070zIgEAUgSbNyOVaieY9Q19P_n2SoPkCchz1HIbXrSUm1Eb7NCseZXQnStLqNxKvQPmZVFyJzrKI4bLYQn_QXdHbX2RiNRQAyL8jak2ukCP_zZoeYei5X0DbfOoLQ&e=1768895852&r=627df484-4df1-469d-9ee7-5ba44e2d55b0-11&s=YjM3KdKOCjFIIOLCAqArDTqwZDI",
+    "",
+   // Add more URLs here...
+];
+
+
+let activeLoadingToast = null;
+
+function showLoadingToast(message = "Loading videos…") {
+  hideLoadingToast(); 
+  activeLoadingToast = Toastify({
+    text: `<span class="toast-spinner"></span> ${message}`,
+    duration: -1, 
+    gravity: "bottom",
+    position: "center",
+    escapeMarkup: false,
+    style: {
+      background: "linear-gradient(90deg, #2196f3, #21cbf3)",
+      fontWeight: "bold",
+      display: "flex",
+      alignItems: "center"
+    }
+  });
+  activeLoadingToast.showToast();
+}
+
+function hideLoadingToast() {
+  const toasts = document.querySelectorAll(".toastify");
+  if (toasts.length > 0) {
+    toasts[toasts.length - 1].remove();
+  }
+  activeLoadingToast = null;
+}
+
+// =======================
+// 🔊 Sounds
+// =======================
+const sounds = {
+  loading: new Audio("https://www.centralschool.fun/Voicy_Loading%20sound%20Of%20Wii.mp3"),
+  error: new Audio("https://vgmsite.com/soundtracks/gamecube-system-sounds-gc-gamerip-2001/znczmalshq/01.%20Error.mp3"),
+  success: new Audio("https://downloads.khinsider.com/game-soundtracks/album/gamecube-system-sounds-gc-gamerip-2001/08.%2520Menu%2520Turn%2520Center.mp3"),
+  hover: new Audio("https://www.centralschool.fun/minimalist-button-hover-sound-effect-399749.mp3"),
+  click: new Audio("https://www.centralschool.fun/tv-shutdown-386167.mp3"),
+  category: new Audio("https://www.centralschool.fun/quick-swipe-405450.mp3")
+};
+sounds.loading.loop = true;
+
+let soundsEnabled = false; 
+
+// =======================
+// 📦 Globals
+// =======================
+let allVideosByCategory = {};
+let currentCategory = "Fun"; // Changed default
+let bgMusic = null;
+const musicCache = {};
+const musicPositions = {};
+const videoList = document.getElementById('video-list');
+const searchInput = document.getElementById('search-input');
+const categoryBar = document.getElementById('category-bar');
+const totalCount = document.getElementById('total-count');
+const commentsWindow = document.getElementById("comments-window");
+const hfStatusBanner = document.getElementById('hf-status');
+
+// Track videos hidden by user in this session
+const hiddenSessionVideos = new Set();
+
+function setContentPoolStatus(isDown) {
+  if (!hfStatusBanner) return;
+  if (isDown) {
+    hfStatusBanner.textContent = "Content Pool is down. Please try again later.";
+    hfStatusBanner.classList.add('visible');
+  } else {
+    hfStatusBanner.classList.remove('visible');
+  }
+}
+
+// =======================
+// 🔔 Toasts (Toastify.js)
+// =======================
+function toastify(text, type = "info", opts = {}) {
+  const palettes = {
+    info:    "linear-gradient(90deg, #40e0d0, #8a2be2)",
+    success: "linear-gradient(90deg, #00c853, #64dd17)",
+    error:   "linear-gradient(90deg, #ff1744, #ff9100)"
+  };
+
+  Toastify({
+    text,
+    duration: opts.duration ?? 4500,
+    close: true,
+    gravity: "bottom",
+    position: "center",
+    stopOnFocus: true,
+    escapeMarkup: true, 
+    style: { background: palettes[type] },
+    onClick: opts.onClick
+  }).showToast();
+}
+
+// =======================
+// 🎛 Categories
+// =======================
+const categories = {
+  "Class": { // Renamed from General
+    album: "B0p532ODWH4KDMb",
+    bg: "linear-gradient(135deg, #00c6ff, #0072ff)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/yizahfoe/01.%20Main%20Menu.mp3"
+  },
+  "Fun": {
+    album: "B2c5n8hH4uWRoAW",
+    bg: "linear-gradient(135deg, #ff00cc, #3333ff)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/ygkvkljl/03.%20Mii%20Channel.mp3"
+  },
+  "Rockets": {
+    album: "B2c5yeZFhHXzdFg",
+    bg: "linear-gradient(135deg, #ff512f, #dd2476)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/liqmqlxx/09.%20Training%20Menu%20%28Wii%20Fit%29.mp3"
+  },
+  "Sam Content": {
+    album: "B2cGI9HKKtaAF3T",
+    bg: "linear-gradient(135deg, #43cea2, #185a9d)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/xkiaqfir/14.%20Results%20%28Wii%20Sports%29.mp3"
+  },
+  "Serious": {
+    album: "B2c59UlCquMMGkJ",
+    bg: "linear-gradient(135deg, #232526, #414345)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/hvkzhflq/15.%20Yoga%20%28Wii%20Fit%29.mp3"
+  },
+  "Music": {
+    album: "B2cJ0DiRHusi12z",
+    bg: "linear-gradient(135deg, #f7971e, #ffd200)",
+    music: "https://nu.vgmsite.com/soundtracks/wii-music-collection/ifoakijw/22.%20Credits%20%28Wii%20Play%20Motion%29.mp3"
+  },
+};
+
+// =======================
+// 🛑 Blocking Logic
+// =======================
+function isVideoBlocked(url) {
+    if (!url) return true;
+    // Check all divisions
+    for (const div in BLOCKED_DIVISIONS) {
+        if (BLOCKED_DIVISIONS[div].includes(url)) {
+            console.log(`Blocked video from Division ${div}: ${url}`);
+            return true;
+        }
+    }
+    return false;
+}
+
+function showErrorToast(cat, album) {
+  if (soundsEnabled) sounds.error.play();
+  Toastify({
+    text: `❌ Failed to load ${cat}. Tap to retry.`,
+    duration: 8000,
+    gravity: "bottom",
+    position: "center",
+    close: true,
+    style: {
+      background: "linear-gradient(90deg,#ff1744,#ff9100)",
+      fontWeight: "bold"
+    },
+    onClick: () => retryFetchCategory(cat, album)
+  }).showToast();
+}
+
+// =======================
+// 🎲 Build Recommended
+// =======================
+function buildRecommended() {
+  const recommendedVideos = new Map();
+  
+  // 1. Gather ALL available videos from all categories into a temporary pool
+  const tempPool = [];
+  Object.values(allVideosByCategory).forEach(videos => {
+    videos.forEach(v => tempPool.push(v));
+  });
+
+  // 2. Filter tempPool against RECOMMENDED_LIST
+  // We only show videos if their URL is in the whitelist AND they aren't blocked
+  tempPool.forEach(v => {
+      if (RECOMMENDED_LIST.includes(v.url) && !isVideoBlocked(v.url)) {
+          recommendedVideos.set(v.url, v);
+      }
+  });
+
+  // 3. Convert to array and Shuffle
+  let finalArray = Array.from(recommendedVideos.values());
+  for (let i = finalArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [finalArray[i], finalArray[j]] = [finalArray[j], finalArray[i]];
+  }
+
+  allVideosByCategory["Recommended"] = finalArray;
+
+  if (currentCategory === "Recommended") {
+    renderVideos(allVideosByCategory["Recommended"]);
+  }
+}
+
+  
+// =======================
+// 📥 Fetching
+// =======================
+async function fetchAllCategories() {
+  if (soundsEnabled) {
+    sounds.loading.currentTime = 0;
+    sounds.loading.play();
+  }
+
+  showLoadingToast("Loading videos…");
+  let total = 0; 
+  allVideosByCategory = {};
+  setContentPoolStatus(false);
+
+  const fetchAlbumData = async (cat, album) => {
+    const res = await fetch(`https://salexai-funserver-2-0.hf.space/album/${album}`);
+    if (!res.ok) throw new Error(`HF Space responded with ${res.status}`);
+    const data = await res.json();
+    // Filter blocked videos immediately
+    const cleanVideos = (data.videos || []).filter(v => !isVideoBlocked(v.url));
+    return cleanVideos;
+  };
+
+  const categoryEntries = Object.entries(categories);
+  const results = await Promise.all(
+    categoryEntries.map(([cat, { album }]) =>
+      fetchAlbumData(cat, album)
+        .then(videos => {
+          allVideosByCategory[cat] = videos;
+
+          if (cat !== "Recommended" && cat !== "Cole Content Crate") {
+            const prev = total;
+            total += videos.length;
+            animateCounter(totalCount, prev, total, 600);
+          }
+
+          return { cat, success: true };
+        })
+        .catch(error => {
+          allVideosByCategory[cat] = allVideosByCategory[cat] || [];
+          showErrorToast(cat, album);
+          return { cat, success: false, error };
+        })
+    )
+  );
+
+  buildRecommended(); // Replaces rebuildGeneral
+
+  const allFailed = results.every(result => !result.success);
+
+  if (soundsEnabled) {
+    sounds.loading.pause();
+    sounds.loading.currentTime = 0;
+    if (allFailed) sounds.error.play();
+    else sounds.success.play();
+  }
+
+  hideLoadingToast();
+
+  if (allFailed) {
+    setContentPoolStatus(true);
+    toastify("Content Pool is down. Please try again later.", "error", { duration: 6000 });
+    return;
+  }
+
+  setContentPoolStatus(false);
+  preloadMusic();
+
+  Toastify({
+    text: "All videos loaded ✅",
+    duration: 3000,
+    gravity: "bottom",
+    position: "center",
+    style: { background: "linear-gradient(90deg,#00c853,#64dd17)" }
+  }).showToast();
+
+  switchCategory("Recommended", document.querySelector(".category-btn"));
+}
+
+
+async function retryFetchCategory(cat, album, _toastElIgnored) {
+  try {
+    const res = await fetch(`https://salexai-funserver-2-0.hf.space/album/${album}`);
+    const data = await res.json();
+    // Filter blocked videos
+    const cleanVideos = (data.videos || []).filter(v => !isVideoBlocked(v.url));
+    allVideosByCategory[cat] = cleanVideos;
+    
+    if (currentCategory === cat) renderVideos(allVideosByCategory[cat]);
+    if (soundsEnabled) sounds.success.play();
+    setContentPoolStatus(false);
+    toastify(`${cat} loaded`, "success");
+  } catch {
+    showErrorToast(cat, album);
+  }
+}
+
+function animateCounter(element, start, end, duration = 1000) {
+  let startTime = null;
+  function tick(timestamp) {
+    if (!startTime) startTime = timestamp;
+    const progress = Math.min((timestamp - startTime) / duration, 1);
+    const value = Math.floor(start + (end - start) * progress);
+    element.textContent = `Total Videos: ${value}`;
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+
+// =======================
+// 🎶 Music
+// =======================
+function preloadMusic() {
+  for (const [cat, { music }] of Object.entries(categories)) {
+    const audio = new Audio(music);
+    audio.loop = true;
+    audio.preload = "auto";
+    audio.volume = 0;
+    musicCache[cat] = audio;
+    musicPositions[cat] = 0;
+  }
+}
+function fadeOutMusic(audio, duration = 800) {
+  if (!audio) return;
+  let step = 50, fadeAmount = audio.volume / (duration / step);
+  let fade = setInterval(() => {
+    if (audio.volume > 0.05) audio.volume = Math.max(0, audio.volume - fadeAmount);
+    else { clearInterval(fade); audio.pause(); audio.volume = 0; }
+  }, step);
+}
+function fadeInMusic(audio, duration = 800) {
+  if (!audio) return;
+  audio.play();
+  audio.volume = 0;
+  let step = 50, fadeAmount = 1 / (duration / step);
+  let fade = setInterval(() => {
+    if (audio.volume < 0.95) audio.volume = Math.min(1, audio.volume + fadeAmount);
+    else { clearInterval(fade); audio.volume = 1; }
+  }, step);
+}
+function crossfade(oldAudio, newAudio, duration) {
+  if (!newAudio) return;
+  let step = 50, fadeAmount = step / duration;
+  if (oldAudio) {
+    let fadeOut = setInterval(() => {
+      if (oldAudio.volume > 0.05) oldAudio.volume -= fadeAmount;
+      else { clearInterval(fadeOut); oldAudio.pause(); oldAudio.volume = 0; }
+    }, step);
+  }
+  newAudio.volume = 0;
+  let fadeIn = setInterval(() => {
+    if (newAudio.volume < 0.95) newAudio.volume += fadeAmount;
+    else { clearInterval(fadeIn); newAudio.volume = 1; }
+  }, step);
+}
+
+// =======================
+// 📂 Categories
+// =======================
+function switchCategory(cat, btn) {
+  if (currentCategory === cat) return;
+  const oldCat = currentCategory;
+  currentCategory = cat;
+  document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  // Only change background if not in light mode (light mode overrides gradients)
+  if(!document.body.classList.contains('light-theme')){
+      document.body.style.background = categories[cat].bg;
+  }
+
+  if (soundsEnabled) {
+    sounds.category.currentTime = 0;
+    sounds.category.play();
+  }
+
+  sounds.category.onended = () => {
+    const oldMusic = musicCache[oldCat];
+    const newMusic = musicCache[cat];
+    if (oldMusic) musicPositions[oldCat] = oldMusic.currentTime;
+    if (newMusic) { newMusic.currentTime = musicPositions[cat] || 0; newMusic.play(); }
+    crossfade(oldMusic, newMusic, 1000);
+    bgMusic = newMusic;
+  };
+
+  videoList.style.opacity = 0;
+  setTimeout(() => {
+    renderVideos(allVideosByCategory[cat]);
+    videoList.style.opacity = 1;
+  }, 300);
+}
+
+
+// =======================
+// 🎬 Video Rendering (Updated with Menu)
+// =======================
+function renderVideos(videoArray) {
+  videoList.innerHTML = '';
+  if (!videoArray || videoArray.length === 0) {
+    videoList.innerHTML = "<p>No videos available, Your class may not have videos avalible </p>";
+    return;
+  }
+  
+  for (const vid of videoArray) {
+    // 1. Check if blocked
+    if(isVideoBlocked(vid.url)) continue;
+
+    // 2. Check if hidden by user
+    if(hiddenSessionVideos.has(vid.url)) continue;
+
+    const title = vid.caption && vid.caption.trim() ? vid.caption.trim() : 'Unnamed Video';
+    const thumb = vid.poster && vid.poster.trim() ? vid.poster : 'https://via.placeholder.com/320x180.png?text=No+Preview';
+    
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    
+    // Internal HTML structure
+    card.innerHTML = `
+        <div class="video-card-content">
+            <img src="${thumb}" alt="Thumbnail">
+        </div>
+        <div class="card-footer">
+            <h2>${title}</h2>
+            <div class="menu-container" style="position:relative;">
+                <button class="menu-btn">⋮</button>
+                <div class="menu-dropdown">
+                    <a href="https://www.centralschool.fun/video-removal.html?video=${encodeURIComponent(vid.url)}" target="_blank" class="menu-item">🗑 Submit Removal</a>
+                    <button class="menu-item hide-video-btn">👁️‍🗨️ Hide for Today</button>
+                    <a href="${vid.url}" download target="_blank" class="menu-item">⬇ Download MP4</a>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Event: Hover sound
+    card.addEventListener('mouseover', () => { if (soundsEnabled) sounds.hover.play(); });
+    
+    // Event: Open Modal (Click on image/content only)
+    const contentDiv = card.querySelector('.video-card-content');
+    contentDiv.addEventListener('click', () => {
+      if (soundsEnabled) sounds.click.play();
+      openModal(title, vid.url);
+    });
+
+    // Event: Menu Toggle
+    const menuBtn = card.querySelector('.menu-btn');
+    const dropdown = card.querySelector('.menu-dropdown');
+    
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Stop card click
+        // Close other open menus
+        document.querySelectorAll('.menu-dropdown').forEach(d => {
+            if(d !== dropdown) d.style.display = 'none';
+        });
+        
+        dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
+    });
+
+    // Event: Hide Video
+    const hideBtn = card.querySelector('.hide-video-btn');
+    hideBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        hiddenSessionVideos.add(vid.url);
+        card.style.display = 'none';
+        toastify("Video hidden for this session.", "info");
+    });
+
+    videoList.appendChild(card);
+  }
+}
+
+// Close menus when clicking elsewhere
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.menu-container')) {
+        document.querySelectorAll('.menu-dropdown').forEach(d => d.style.display = 'none');
+    }
+});
+
+
+// =======================
+// 🎬 Modal + URL Params
+// =======================
+function openModal(title, url) {
+  document.getElementById("modal-title").textContent = title;
+  document.getElementById("video-source").src = url;
+  const modalVideo = document.getElementById("modal-video");
+  modalVideo.load();
+  modalVideo.play();
+
+  document.getElementById("modal-overlay").classList.add("active");
+  fadeOutMusic(bgMusic, 800);
+
+  // reset comments
+  commentsOpen = false;
+  document.querySelector(".modal-body").classList.remove("with-comments");
+  document.getElementById("tlkio-container").style.display = "none";
+
+  // hint toast
+  showCommentHint();
+
+  // update URL
+  const newUrl = new URL(window.location.href);
+  newUrl.searchParams.set("vid", encodeURIComponent(url));
+  history.replaceState({}, "", newUrl);
+}
+
+// =======================
+// 🚀 Init
+// =======================
+Object.keys(categories).forEach((cat, idx) => {
+  const btn = document.createElement('button');
+  btn.className = "category-btn" + (idx === 0 ? " active" : "");
+  btn.textContent = cat;
+  btn.addEventListener('click', () => switchCategory(cat, btn));
+  categoryBar.appendChild(btn);
+});
+
+// Unlock sounds on user click
+window.addEventListener("DOMContentLoaded", () => {
+  soundsEnabled = true;
+  fetchAllCategories();
+});
+
+// "Old Site" button
+document.getElementById("old-btn").addEventListener("click", () => {
+  window.location.href = "https://www.centralschool.fun/products/content-pool-upgrades";
+});
+
+
+window.addEventListener("DOMContentLoaded", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const vid = urlParams.get("vid");
+
+  if (vid) {
+    const decodedVid = decodeURIComponent(vid);
+    openModal("Video", decodedVid);
+  }
+});
+
+// Close everywhere
+function closeModal() {
+  const v = document.getElementById("modal-video");
+  v.pause();
+  document.getElementById("modal-overlay").classList.remove("active");
+  fadeInMusic(bgMusic, 800);
+
+  const newUrl = new URL(window.location.href);
+  newUrl.searchParams.delete("vid");
+  newUrl.searchParams.delete("title");
+  history.replaceState({}, "", newUrl);
+}
+
+// Bind to both buttons (X + Close)
+document.querySelectorAll(".js-close-modal").forEach(el =>
+  el.addEventListener("click", closeModal)
+);
+
+// Click outside modal-content closes
+document.getElementById("modal-overlay").addEventListener("click", (e) => {
+  if (e.target.id === "modal-overlay") closeModal();
+});
+
+// Keyboard shortcuts
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeModal();
+  if (e.key.toLowerCase() === "f") {
+    const v = document.getElementById("modal-video");
+    if (v.requestFullscreen) v.requestFullscreen();
+    else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
+    else if (v.msRequestFullscreen) v.msRequestFullscreen();
+  }
+});
+
+// Fullscreen button
+document.getElementById("fullscreen-btn").addEventListener("click", () => {
+  const v = document.getElementById("modal-video");
+  if (v.requestFullscreen) v.requestFullscreen();
+  else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
+  else if (v.msRequestFullscreen) v.msRequestFullscreen();
+});
+
+const commentsClose = document.getElementById("comments-close");
+const tlkioDiv = document.getElementById("tlkio");
+
+function toggleComments(videoUrl) {
+  if (!commentsOpen) {
+    const match = videoUrl.match(/\/S\/([^/]+)/);
+    let channelName = "defaultchat";
+    if (match && match[1]) {
+      channelName = match[1].substring(0, 10); 
+    }
+
+    const tlkioDiv = document.getElementById("tlkio");
+    tlkioDiv.innerHTML = "";
+    tlkioDiv.setAttribute("data-channel", channelName);
+
+    const oldScript = document.querySelector("script[data-tlkio]");
+    if (oldScript) oldScript.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://tlk.io/embed.js"; 
+    script.async = true;
+    script.setAttribute("data-tlkio", "true");
+    document.body.appendChild(script);
+
+    commentsWindow.style.display = "flex";
+    commentsOpen = true;
+  } else {
+    commentsWindow.style.display = "none";
+    commentsOpen = false;
+  }
+}
+
+// make draggable
+(function() {
+  const header = commentsWindow.querySelector(".comments-header");
+  let offsetX = 0, offsetY = 0, isDown = false;
+
+  header.addEventListener("mousedown", (e) => {
+    isDown = true;
+    offsetX = e.clientX - commentsWindow.offsetLeft;
+    offsetY = e.clientY - commentsWindow.offsetTop;
+  });
+
+  document.addEventListener("mouseup", () => isDown = false);
+
+  document.addEventListener("mousemove", (e) => {
+    if (isDown) {
+      commentsWindow.style.left = (e.clientX - offsetX) + "px";
+      commentsWindow.style.top = (e.clientY - offsetY) + "px";
+    }
+  });
+})();
+
+let commentsOpen = false;
+
+document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "c" && document.getElementById("modal-overlay").classList.contains("active")) {
+    const src = document.getElementById("video-source").src;
+    toggleComments(src);
+  }
+});
+
+function showCommentHint() {
+  Toastify({
+    text: "💬 Press C to Comment",
+    duration: 1000,
+    gravity: "bottom",
+    position: "center",
+    style: { background: "linear-gradient(90deg, #2196f3, #21cbf3)", fontWeight: "bold" }
+  }).showToast();
+}
+
+
+// =======================
+// 🌗 Theme Toggle Logic
+// =======================
+const themeToggleBtn = document.getElementById("theme-toggle");
+themeToggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('light-theme');
+    
+    // Update button icon
+    if(document.body.classList.contains('light-theme')) {
+        themeToggleBtn.textContent = "☀️";
+        document.body.style.background = ""; // Clear inline style gradient
+    } else {
+        themeToggleBtn.textContent = "🌙";
+        // Restore category gradient if needed
+        if(currentCategory && categories[currentCategory]) {
+             document.body.style.background = categories[currentCategory].bg;
+        }
+    }
+});
+
+</script>
 </body>
 </html>

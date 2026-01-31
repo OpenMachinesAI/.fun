@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Camera + Mic + Specs + Battery Dashboard</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --card:#121a24;
+      --card2:#0f1620;
+      --text:#e8f0ff;
+      --muted:#9fb0c7;
+      --border:rgba(255,255,255,0.10);
+      --good:#55ffb0;
+      --warn:#ffd36a;
+      --bad:#ff6a6a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(900px 600px at 20% 10%, rgba(90,160,255,.18), transparent 60%),
+                  radial-gradient(900px 600px at 80% 30%, rgba(120,255,200,.12), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+    header{
+      padding:16px 18px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    header h1{
+      font-size:16px;
+      margin:0;
+      letter-spacing:.4px;
+      color:var(--text);
+      opacity:.95;
+    }
+    header .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    button{
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      border:1px solid var(--border);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:12px;
+    }
+    button:hover{ border-color: rgba(255,255,255,.18); }
+    button:disabled{ opacity:.5; cursor:not-allowed; }
+
+    .grid{
+      padding:12px 14px 18px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: repeat(2, 1fr);
+      gap:12px;
+      flex:1;
+      min-height:0;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:12px;
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+    }
+    .card .title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .card .title h2{
+      margin:0;
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:.3px;
+      color:var(--text);
+    }
+    .pill{
+      font-size:11px;
+      color:var(--muted);
+      border:1px solid var(--border);
+      padding:4px 8px;
+      border-radius:999px;
+      background: rgba(0,0,0,.18);
+      white-space:nowrap;
+    }
+    .content{
+      flex:1;
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    /* Camera card */
+    video{
+      width:100%;
+      height:100%;
+      background: #06090d;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      object-fit:cover;
+      min-height:0;
+      flex:1;
+    }
+
+    /* Mic visualizer */
+    canvas{
+      width:100%;
+      height:100%;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: #06090d;
+      display:block;
+      min-height:0;
+      flex:1;
+    }
+
+    /* Specs list */
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      overflow:auto;
+      padding-right:4px;
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+      border-radius:12px;
+      padding:8px 10px;
+      font-size:12px;
+    }
+    .row b{
+      color:var(--muted);
+      font-weight:700;
+    }
+    .row span{
+      text-align:right;
+      max-width:60%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    /* Battery bar */
+    .batteryWrap{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+      border-radius:14px;
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .bar{
+      height:14px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      transition: width .25s ease;
+      background: linear-gradient(90deg, rgba(85,255,176,.9), rgba(90,160,255,.9));
+    }
+    .batteryMeta{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .statusDot{
+      width:10px; height:10px;
+      border-radius:50%;
+      background: rgba(255,255,255,.35);
+      border:1px solid rgba(255,255,255,.18);
+      display:inline-block;
+      margin-right:6px;
+      vertical-align:middle;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px){
+      .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows:auto; }
+    }
+    @media (max-width: 600px){
+      header{ flex-direction:column; align-items:flex-start; }
+      .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Local Device Dashboard (Camera • Mic • Specs • Battery)</h1>
+    <div class="actions">
+      <button id="btnStartCam">Start Camera</button>
+      <button id="btnStopCam" disabled>Stop Camera</button>
+      <button id="btnStartMic">Start Mic</button>
+      <button id="btnStopMic" disabled>Stop Mic</button>
+    </div>
+  </header>
+
+  <!-- 4x2 grid (we fill 4 tiles; the rest are empty slots by design) -->
+  <main class="grid">
+    <section class="card" style="grid-column: 1 / span 2; grid-row: 1;">
+      <div class="title">
+        <h2>Camera</h2>
+        <span class="pill" id="camStatus">off</span>
+      </div>
+      <div class="content">
+        <video id="video" playsinline autoplay muted></video>
+      </div>
+    </section>
+
+    <section class="card" style="grid-column: 3 / span 2; grid-row: 1;">
+      <div class="title">
+        <h2>Microphone Visualizer</h2>
+        <span class="pill" id="micStatus">off</span>
+      </div>
+      <div class="content">
+        <canvas id="viz"></canvas>
+      </div>
+    </section>
+
+    <section class="card" style="grid-column: 1 / span 2; grid-row: 2;">
+      <div class="title">
+        <h2>Specs</h2>
+        <span class="pill" id="specsHint">auto</span>
+      </div>
+      <div class="content">
+        <div class="list" id="specList"></div>
+      </div>
+    </section>
+
+    <section class="card" style="grid-column: 3 / span 2; grid-row: 2;">
+      <div class="title">
+        <h2>Battery</h2>
+        <span class="pill" id="batStatus">unknown</span>
+      </div>
+      <div class="content">
+        <div class="batteryWrap">
+          <div class="bar"><div id="batFill"></div></div>
+          <div class="batteryMeta">
+            <div><span class="statusDot" id="batDot"></span><span id="batText">Not available yet</span></div>
+            <div id="batExtra">—</div>
+          </div>
+        </div>
+        <div class="list" id="batNotes"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ===== Helpers =====
+    const $ = (id) => document.getElementById(id);
+    function setPill(id, text){ $(id).textContent = text; }
+
+    // ===== Specs =====
+    function addSpec(label, value){
+      const row = document.createElement("div");
+      row.className = "row";
+      const left = document.createElement("b");
+      left.textContent = label;
+      const right = document.createElement("span");
+      right.textContent = value;
+      row.appendChild(left);
+      row.appendChild(right);
+      $("specList").appendChild(row);
+    }
+
+    function loadSpecs(){
+      $("specList").innerHTML = "";
+      const nav = navigator;
+
+      addSpec("User Agent", nav.userAgent || "—");
+      addSpec("Platform", nav.platform || "—");
+      addSpec("Language", nav.language || "—");
+      addSpec("Online", (nav.onLine ? "Yes" : "No"));
+
+      addSpec("Screen", `${screen.width}×${screen.height} @ ${window.devicePixelRatio || 1}x`);
+      addSpec("Viewport", `${Math.round(window.innerWidth)}×${Math.round(window.innerHeight)}`);
+
+      addSpec("CPU Cores", (nav.hardwareConcurrency ?? "Unknown"));
+      addSpec("Device Memory", (nav.deviceMemory ? `${nav.deviceMemory} GB (approx)` : "Not exposed"));
+      addSpec("Touch Points", (nav.maxTouchPoints ?? "—"));
+    }
+
+    window.addEventListener("resize", () => {
+      // Update only viewport line (quick)
+      // simplest: re-render all
+      loadSpecs();
+    });
+
+    // ===== Camera =====
+    let camStream = null;
+
+    async function startCamera(){
+      try{
+        setPill("camStatus", "requesting...");
+        camStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },
+          audio: false
+        });
+        $("video").srcObject = camStream;
+        setPill("camStatus", "on");
+        $("btnStartCam").disabled = true;
+        $("btnStopCam").disabled = false;
+      }catch(err){
+        console.error(err);
+        setPill("camStatus", "blocked/error");
+        alert("Camera failed: " + (err?.message || err));
+      }
+    }
+
+    function stopCamera(){
+      if(camStream){
+        camStream.getTracks().forEach(t => t.stop());
+        camStream = null;
+      }
+      $("video").srcObject = null;
+      setPill("camStatus", "off");
+      $("btnStartCam").disabled = false;
+      $("btnStopCam").disabled = true;
+    }
+
+    // ===== Mic Visualizer =====
+    let audioStream = null;
+    let audioCtx = null;
+    let analyser = null;
+    let rafId = null;
+
+    function fitCanvas(canvas){
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      return dpr;
+    }
+
+    function drawWave(){
+      const canvas = $("viz");
+      const ctx = canvas.getContext("2d");
+
+      const dpr = fitCanvas(canvas);
+      const w = canvas.width, h = canvas.height;
+
+      const data = new Uint8Array(analyser.fftSize);
+      analyser.getByteTimeDomainData(data);
+
+      // Clear
+      ctx.clearRect(0,0,w,h);
+
+      // Background glow-ish lines
+      ctx.globalAlpha = 0.25;
+      ctx.beginPath();
+      ctx.moveTo(0, h/2);
+      ctx.lineTo(w, h/2);
+      ctx.strokeStyle = "rgba(255,255,255,0.35)";
+      ctx.lineWidth = 1 * dpr;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // Waveform
+      ctx.beginPath();
+      const step = w / (data.length - 1);
+      for(let i=0;i<data.length;i++){
+        const v = data[i] / 255;       // 0..1
+        const y = (0.15 + v*0.7) * h;  // keep it within bounds
+        const x = i * step;
+        if(i===0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = "rgba(232,240,255,0.9)";
+      ctx.lineWidth = 2 * dpr;
+      ctx.stroke();
+
+      rafId = requestAnimationFrame(drawWave);
+    }
+
+    async function startMic(){
+      try{
+        setPill("micStatus", "requesting...");
+        audioStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true },
+          video: false
+        });
+
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaStreamSource(audioStream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        source.connect(analyser);
+
+        setPill("micStatus", "on");
+        $("btnStartMic").disabled = true;
+        $("btnStopMic").disabled = false;
+
+        cancelAnimationFrame(rafId);
+        drawWave();
+      }catch(err){
+        console.error(err);
+        setPill("micStatus", "blocked/error");
+        alert("Mic failed: " + (err?.message || err));
+      }
+    }
+
+    async function stopMic(){
+      if(rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+
+      if(audioStream){
+        audioStream.getTracks().forEach(t => t.stop());
+        audioStream = null;
+      }
+      if(audioCtx){
+        try{ await audioCtx.close(); }catch{}
+        audioCtx = null;
+      }
+      analyser = null;
+
+      // Clear canvas
+      const c = $("viz");
+      const ctx = c.getContext("2d");
+      fitCanvas(c);
+      ctx.clearRect(0,0,c.width,c.height);
+
+      setPill("micStatus", "off");
+      $("btnStartMic").disabled = false;
+      $("btnStopMic").disabled = true;
+    }
+
+    // ===== Battery =====
+    let battery = null;
+
+    function setBatteryUI(level, charging, chargingTime, dischargingTime){
+      const pct = Math.round(level * 100);
+      $("batFill").style.width = pct + "%";
+
+      const dot = $("batDot");
+      const status = $("batStatus");
+
+      // dot + status label
+      if (charging){
+        dot.style.background = "rgba(85,255,176,.9)";
+        status.textContent = "charging";
+      } else if (pct <= 15){
+        dot.style.background = "rgba(255,106,106,.9)";
+        status.textContent = "low";
+      } else if (pct <= 35){
+        dot.style.background = "rgba(255,211,106,.9)";
+        status.textContent = "medium";
+      } else {
+        dot.style.background = "rgba(85,255,176,.9)";
+        status.textContent = "good";
+      }
+
+      $("batText").textContent = `${pct}% • ${charging ? "Plugged in" : "On battery"}`;
+
+      // extra time info if available
+      const parts = [];
+      if (Number.isFinite(chargingTime) && chargingTime >= 0){
+        const mins = Math.round(chargingTime / 60);
+        parts.push(`Full in ~${mins} min`);
+      }
+      if (Number.isFinite(dischargingTime) && dischargingTime >= 0){
+        const mins = Math.round(dischargingTime / 60);
+        parts.push(`Empty in ~${mins} min`);
+      }
+      $("batExtra").textContent = parts.length ? parts.join(" • ") : "—";
+    }
+
+    function addBatteryNote(text){
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `<b>Note</b><span>${text}</span>`;
+      $("batNotes").appendChild(row);
+    }
+
+    async function initBattery(){
+      $("batNotes").innerHTML = "";
+      if (!("getBattery" in navigator)){
+        setPill("batStatus", "unsupported");
+        $("batText").textContent = "Battery API not supported in this browser.";
+        $("batExtra").textContent = "—";
+        addBatteryNote("Try Chrome on Android or some laptops; many browsers restrict this API.");
+        return;
+      }
+
+      try{
+        battery = await navigator.getBattery();
+        const update = () => setBatteryUI(
+          battery.level,
+          battery.charging,
+          battery.chargingTime,
+          battery.dischargingTime
+        );
+
+        update();
+        battery.addEventListener("levelchange", update);
+        battery.addEventListener("chargingchange", update);
+        battery.addEventListener("chargingtimechange", update);
+        battery.addEventListener("dischargingtimechange", update);
+      }catch(err){
+        console.error(err);
+        setPill("batStatus", "error");
+        $("batText").textContent = "Could not read battery info.";
+        addBatteryNote("Some environments block battery access even if the API exists.");
+      }
+    }
+
+    // ===== Wire buttons =====
+    $("btnStartCam").addEventListener("click", startCamera);
+    $("btnStopCam").addEventListener("click", stopCamera);
+    $("btnStartMic").addEventListener("click", startMic);
+    $("btnStopMic").addEventListener("click", stopMic);
+
+    // ===== Boot =====
+    loadSpecs();
+    initBattery();
+
+    // Fill the canvas once so it doesn't look empty
+    (function initCanvas(){
+      const c = $("viz");
+      const ctx = c.getContext("2d");
+      fitCanvas(c);
+      ctx.fillStyle = "rgba(232,240,255,0.65)";
+      ctx.font = `${Math.max(12, Math.round(c.height/22))}px system-ui`;
+      ctx.fillText("Click “Start Mic” to visualize audio", 16, 28);
+    })();
+  </script>
+</body>
+</html>

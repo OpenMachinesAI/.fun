@@ -214,5 +214,17 @@
     "isNew": true,
     "launcher": "game-launcher.html",
     "content": "FNAC.html"
+  },
+  {
+    "id": "josh-in-germany",
+    "title": "Josh in Germany",
+    "subtitle": "Tribute Game",
+    "description": "A tribute game for Josh while he's away in Germany. He won’t be back for 5 months, so this one’s for him.",
+    "instructions": "Explore, vibe, and survive the Josh-in-Germany arc.",
+    "icon": "🇩🇪",
+    "color": "#000000",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "GERMAN-JOSH.html"
   }
 ]

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Images.Fun</title>
+
+  <style>
+    :root{
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #04010f;
+      overflow: hidden;
+    }
+
+    iframe {
+      border: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* EXIT BUTTON */
+    .exit-btn {
+      position: fixed;
+      top: calc(12px + var(--safe-top));
+      right: calc(12px + var(--safe-right));
+      z-index: 9999;
+
+      background: #ff3b3b;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 6px;
+
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+
+      padding: 8px 12px;
+      cursor: pointer;
+
+      box-shadow: 0 4px 0 #000;
+      touch-action: manipulation;
+    }
+
+    .exit-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #000;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- EXIT BUTTON -->
+  <button class="exit-btn" id="exitBtn">EXIT ✖</button>
+
+  <!-- MAIN IFRAME -->
+  <iframe
+    src="https://images-fun-446778277069.us-west1.run.app"
+    title="Images.Fun Generator"
+    allow="camera; microphone"
+  ></iframe>
+
+  <script>
+    const exitBtn = document.getElementById("exitBtn");
+
+    function sendExit(){
+      try {
+        window.parent.postMessage("exit", "*");
+      } catch (e) {
+        console.warn("Failed to send exit message:", e);
+      }
+    }
+
+    exitBtn.addEventListener("click", sendExit);
+
+    // Optional: allow ESC key to exit as well
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") sendExit();
+    });
+  </script>
+</body>
+</html>

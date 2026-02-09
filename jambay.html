@@ -12,116 +12,283 @@
             --yellow: #fffb96;
             --purple: #b967ff;
             --dark-blue: #050044;
-            --glass: rgba(5, 0, 68, 0.7);
+
+            /* NEW: Wii / bubbly glass */
+            --ink:#0e1b2a;
+            --glass1: rgba(255,255,255,.78);
+            --glass2: rgba(255,255,255,.52);
+            --border: rgba(0,0,0,.10);
+            --shadow: 0 18px 50px rgba(0,0,0,.18);
+            --shadow2: 0 22px 60px rgba(0,0,0,.22);
+
+            /* Wii cursor */
+            --wii-cursor: url("https://www.centralschool.fun/cursor.svg");
+
+            /* Optional gif textures (swap later) */
+            --gif-bg: url("https://media.tenor.com/1y3bZg2oYJcAAAAC/space-stars.gif");
+            --gif-bubbles: url("https://media.tenor.com/7g3kqGkQmH4AAAAC/pixel-art.gif");
+            --gif-header: url("https://media.tenor.com/3K6kzqf4d8YAAAAC/music-equalizer.gif");
+            --gif-card: url("https://media.tenor.com/0dR1g2m8ZqkAAAAC/polaroid-photo.gif");
         }
 
         * { box-sizing: border-box; }
 
+        html, body { height: 100%; }
+
+        /* Apply Wii cursor everywhere */
+        body, button, a, input, textarea, select, label, .album-card {
+            cursor: var(--wii-cursor) 12 12, auto;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background: linear-gradient(180deg, #050044 0%, #4b0082 50%, #ff71ce 100%);
+
+            /* NEW: Wii-ish bubbly background, still using your colors */
+            background:
+              radial-gradient(1200px 600px at 50% -200px, #ffffff 15%, transparent 70%),
+              radial-gradient(800px 420px at 10% 10%, rgba(1,205,254,.20), transparent 65%),
+              radial-gradient(700px 420px at 90% 20%, rgba(255,113,206,.18), transparent 70%),
+              radial-gradient(700px 520px at 40% 100%, rgba(185,103,255,.18), transparent 70%),
+              linear-gradient(180deg, #050044 0%, #4b0082 55%, #ff71ce 140%);
             background-attachment: fixed;
+
             color: var(--cyan);
             font-family: 'Orbitron', sans-serif;
-            height: 100vh;
             display: flex;
             overflow: hidden;
         }
 
-        /* CRT Scanline Overlay */
+        /* Soft GIF shimmer layer */
+        body::after{
+            content:"";
+            position:fixed; inset:0;
+            background: var(--gif-bg) center/cover no-repeat;
+            opacity:.06;
+            filter: blur(2px) saturate(1.15);
+            pointer-events:none;
+            z-index: 1;
+        }
+
+        /* CRT Scanline Overlay (kept, softened a bit) */
         body::before {
             content: " ";
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 255, 0, 0.03));
-            z-index: 100;
-            background-size: 100% 3px, 3px 100%;
+            background:
+                repeating-linear-gradient(to bottom, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 1px, transparent 1px, transparent 5px),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 255, 0, 0.02));
+            z-index: 200;
             pointer-events: none;
+            opacity: .35;
+        }
+
+        /* NEW: floating bubbles (Wii vibe) */
+        .bubbles{
+            position:fixed; inset:0;
+            pointer-events:none;
+            z-index: 0;
+            overflow:hidden;
+        }
+        .bubble{
+            position:absolute;
+            width: clamp(16px, 2.8vw, 44px);
+            height: clamp(16px, 2.8vw, 44px);
+            border-radius:999px;
+            background:
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,.90), rgba(255,255,255,.10) 55%, rgba(1,205,254,.10) 70%, rgba(1,205,254,.05));
+            border: 1px solid rgba(1,205,254,.22);
+            box-shadow: 0 10px 22px rgba(0,0,0,.18);
+            opacity:.85;
+            transform: translateY(110vh);
+            animation: floatUp linear infinite;
+        }
+        .bubble::after{
+            content:"";
+            position:absolute; inset:-8px;
+            background: var(--gif-bubbles) center/cover no-repeat;
+            opacity:.06;
+            border-radius:999px;
+            filter: blur(1px);
+            mix-blend-mode: screen;
+        }
+        @keyframes floatUp{
+            0%{ transform: translateY(110vh) translateX(0) scale(.9); opacity:0; }
+            10%{ opacity:.85; }
+            50%{ transform: translateY(40vh) translateX(18px) scale(1); }
+            100%{ transform: translateY(-20vh) translateX(-18px) scale(1.08); opacity:0; }
+        }
+
+        /* ===== Wii-style iframe EXIT overlay (only appears in iframe) ===== */
+        .iframe-exit{
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            z-index: 9999; /* above everything */
+            display: none;  /* JS will enable when in iframe */
+            border: 1px solid rgba(0,0,0,.10);
+            background:
+                linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.62)),
+                var(--gif-header) center/cover no-repeat;
+            background-blend-mode: screen;
+            color: rgba(0,0,0,.75);
+            padding: 12px 16px;
+            border-radius: 999px;
+            font-family: 'VT323', monospace;
+            font-size: 1.25rem;
+            letter-spacing: .08em;
+            box-shadow: 0 18px 40px rgba(0,0,0,.28);
+            backdrop-filter: blur(12px);
+            transition: transform 160ms ease, box-shadow 160ms ease;
+        }
+        .iframe-exit:hover{ transform: translateY(-2px) scale(1.03); box-shadow: 0 22px 52px rgba(0,0,0,.32); }
+        .iframe-exit:active{ transform: translateY(0) scale(.99); }
+        .iframe-exit::before{
+            content:"";
+            display:inline-block;
+            width:10px; height:10px;
+            margin-right:10px;
+            border-radius:999px;
+            background: var(--hot-pink);
+            box-shadow: 0 0 0 6px rgba(255,113,206,.20);
+            vertical-align: middle;
         }
 
         /* Sidebar Player */
         .sidebar {
             width: 350px;
-            background: var(--glass);
-            border-right: 3px solid var(--hot-pink);
+            /* NEW: glassy sidebar */
+            background:
+                linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.45)),
+                var(--gif-card) center/cover no-repeat;
+            background-blend-mode: screen;
+            border-right: 1px solid rgba(255,255,255,.35);
             display: flex;
             flex-direction: column;
             padding: 20px;
-            box-shadow: 10px 0 20px rgba(0,0,0,0.5);
-            z-index: 10;
+            box-shadow: 12px 0 40px rgba(0,0,0,0.35);
+            z-index: 20;
+            position: relative;
+            backdrop-filter: blur(14px);
         }
+        .sidebar::before{
+            content:"";
+            position:absolute; inset:-60px;
+            background:
+                radial-gradient(520px 280px at 20% 10%, rgba(1,205,254,.22), transparent 70%),
+                radial-gradient(520px 320px at 80% 40%, rgba(255,113,206,.18), transparent 70%);
+            opacity:.9;
+            pointer-events:none;
+            animation: sidebarFloat 9s ease-in-out infinite;
+        }
+        @keyframes sidebarFloat{
+            0%,100%{ transform: translateY(0px); }
+            50%{ transform: translateY(10px); }
+        }
+        .sidebar > * { position: relative; z-index: 1; }
 
         .logo {
             font-family: 'Monoton', cursive;
             font-size: 2.2rem;
             color: var(--hot-pink);
-            text-shadow: 2px 2px var(--cyan);
+            text-shadow: 2px 2px rgba(1,205,254,.8);
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .current-track-art {
             width: 100%;
             aspect-ratio: 1/1;
-            border: 2px solid var(--cyan);
-            box-shadow: 0 0 15px var(--cyan);
+            border-radius: 22px;
+            border: 1px solid rgba(0,0,0,.10);
+            box-shadow: var(--shadow);
             object-fit: cover;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
+            overflow:hidden;
         }
 
         .track-info {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
         }
 
         .track-info h2 {
-            font-size: 1.2rem;
-            color: var(--yellow);
+            font-size: 1.25rem;
+            color: rgba(0,0,0,.72);
             margin: 0;
             font-family: 'VT323', monospace;
             letter-spacing: 2px;
+            background: rgba(255,255,255,.55);
+            border: 1px solid rgba(0,0,0,.08);
+            border-radius: 999px;
+            padding: 8px 12px;
+            box-shadow: 0 12px 22px rgba(0,0,0,.12);
         }
 
         /* Controls */
         .controls {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 20px;
+            margin: 14px 0 16px;
+            gap: 10px;
         }
 
         .ctrl-btn {
-            background: transparent;
-            border: 1px solid var(--cyan);
-            color: var(--cyan);
-            padding: 10px;
-            cursor: pointer;
+            background:
+              linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.62)),
+              var(--gif-bubbles) center/cover no-repeat;
+            background-blend-mode: screen;
+            border: 1px solid rgba(0,0,0,.10);
+            color: rgba(0,0,0,.75);
+            padding: 10px 12px;
+            border-radius: 999px;
+            cursor: var(--wii-cursor) 12 12, pointer;
             font-family: 'VT323', monospace;
             font-size: 1.2rem;
+            box-shadow: 0 14px 26px rgba(0,0,0,.16);
+            transition: transform 160ms ease, box-shadow 160ms ease;
+            min-width: 92px;
         }
 
         .ctrl-btn:hover {
-            background: var(--cyan);
-            color: var(--dark-blue);
-            box-shadow: 0 0 10px var(--cyan);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 18px 34px rgba(0,0,0,.20);
         }
+        .ctrl-btn:active { transform: translateY(0) scale(.99); }
 
         .progress-container {
             width: 100%;
-            height: 8px;
-            background: #000;
-            border: 1px solid var(--purple);
-            cursor: pointer;
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,.18);
+            border: 1px solid rgba(0,0,0,.10);
+            cursor: var(--wii-cursor) 12 12, pointer;
             position: relative;
+            overflow:hidden;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
         }
 
         .progress-bar {
             width: 0%;
             height: 100%;
-            background: var(--hot-pink);
-            box-shadow: 0 0 10px var(--hot-pink);
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(255,113,206,.95), rgba(1,205,254,.85));
+            box-shadow: 0 0 12px rgba(255,113,206,.45);
+        }
+
+        /* Status */
+        .status{
+            font-family: 'VT323', monospace;
+            font-size: 1.05rem;
+            color: rgba(0,0,0,.55);
+            text-align: center;
+            margin-top: auto;
+            background: rgba(255,255,255,.50);
+            border: 1px solid rgba(0,0,0,.08);
+            border-radius: 22px;
+            padding: 12px;
+            box-shadow: 0 14px 26px rgba(0,0,0,.12);
         }
 
         /* Main Content Area */
@@ -129,97 +296,159 @@
             flex-grow: 1;
             overflow-y: auto;
             padding: 40px;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(255,255,255,0.10);
+            z-index: 10;
+            position: relative;
+            backdrop-filter: blur(8px);
         }
 
         .search-container {
-            margin-bottom: 40px;
+            margin-bottom: 24px;
             width: 100%;
         }
 
         #search-bar {
             width: 100%;
-            background: transparent;
-            border: 2px solid var(--purple);
-            padding: 15px;
-            color: var(--white);
+            background:
+              linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.60)),
+              var(--gif-header) center/cover no-repeat;
+            background-blend-mode: screen;
+            border: 1px solid rgba(0,0,0,.10);
+            padding: 14px 16px;
+            color: rgba(0,0,0,.70);
             font-family: 'Orbitron', sans-serif;
-            color: var(--cyan);
             font-size: 1rem;
             outline: none;
-            transition: 0.3s;
+            transition: 0.2s;
+            border-radius: 999px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
         }
 
         #search-bar:focus {
-            box-shadow: 0 0 20px var(--purple);
-            border-color: var(--hot-pink);
+            box-shadow: var(--shadow2);
+            border-color: rgba(1,205,254,.35);
         }
 
         .album-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 30px;
+            gap: 22px;
+        }
+
+        /* Ripple */
+        .ripple{
+            position:absolute;
+            border-radius:999px;
+            transform: translate(-50%,-50%);
+            pointer-events:none;
+            width:20px; height:20px;
+            background: rgba(1,205,254,.22);
+            box-shadow: 0 0 0 8px rgba(1,205,254,.10);
+            animation: rippleOut 560ms ease-out forwards;
+            mix-blend-mode: screen;
+            z-index: 5;
+        }
+        @keyframes rippleOut{
+            0%{ opacity:0; transform: translate(-50%,-50%) scale(.4); }
+            20%{ opacity:1; }
+            100%{ opacity:0; transform: translate(-50%,-50%) scale(11); }
         }
 
         .album-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border: 1px solid transparent;
-            transition: 0.3s;
-            cursor: pointer;
+            position:relative;
+            background:
+              linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,255,255,.50)),
+              var(--gif-card) center/cover no-repeat;
+            background-blend-mode: screen;
+            padding: 14px;
+            border: 1px solid rgba(0,0,0,.10);
+            transition: 0.2s;
+            cursor: var(--wii-cursor) 12 12, pointer;
             text-align: center;
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            overflow:hidden;
+            backdrop-filter: blur(12px);
+            transform: translateZ(0);
+            animation: floatCard 3.2s ease-in-out infinite;
+        }
+        .album-card:nth-child(2n){ animation-delay:.15s; }
+        .album-card:nth-child(3n){ animation-delay:.30s; }
+        @keyframes floatCard{
+            0%,100%{ transform: translateY(0); }
+            50%{ transform: translateY(-6px); }
         }
 
         .album-card:hover {
-            border-color: var(--hot-pink);
-            transform: translateY(-5px);
-            background: rgba(255, 113, 206, 0.1);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow2);
+            border-color: rgba(255,113,206,.35);
         }
+        .album-card:active { transform: translateY(-2px) scale(.99); }
 
         .album-card img {
             width: 100%;
             aspect-ratio: 1/1;
             object-fit: cover;
             margin-bottom: 10px;
+            border-radius: 18px;
+            border: 1px solid rgba(0,0,0,.10);
+            box-shadow: 0 12px 26px rgba(0,0,0,.16);
         }
 
         .album-card span {
             font-family: 'VT323', monospace;
-            font-size: 1.1rem;
-            color: var(--cyan);
+            font-size: 1.2rem;
+            color: rgba(0,0,0,.72);
+            display:inline-block;
+            background: rgba(255,255,255,.55);
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,.08);
+            box-shadow: 0 10px 18px rgba(0,0,0,.10);
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--dark-blue); }
-        ::-webkit-scrollbar-thumb { background: var(--purple); }
-        ::-webkit-scrollbar-thumb:hover { background: var(--hot-pink); }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(5,0,68,.35); }
+        ::-webkit-scrollbar-thumb { background: rgba(185,103,255,.65); border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,113,206,.75); }
 
+        @media (max-width: 920px){
+            body{ flex-direction: column; }
+            .sidebar{ width: 100%; flex: 0 0 auto; border-right:none; border-bottom: 1px solid rgba(255,255,255,.35); }
+            .main-content{ padding: 18px; }
+        }
     </style>
 </head>
 <body>
+    <!-- NEW: Bubbles layer -->
+    <div class="bubbles" id="bubbles" aria-hidden="true"></div>
+
+    <!-- NEW: iframe-only EXIT (Wii-like) -->
+    <button class="iframe-exit" id="iframeExit" type="button" title="Exit">EXIT ✖</button>
 
     <aside class="sidebar">
         <div class="logo">ＪＡＭＢＡＹ</div>
-        
+
         <img id="current-art" class="current-track-art" src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=500" alt="Art">
-        
+
         <div class="track-info">
             <h2 id="current-title">Select a Track</h2>
         </div>
 
-        <div class="progress-container" id="progress-container">
+        <div class="progress-container" id="progress-container" title="Seek">
             <div class="progress-bar" id="progress"></div>
         </div>
 
         <div class="controls">
-            <button class="ctrl-btn" onclick="prevTrack()">≪ PREV</button>
-            <button class="ctrl-btn" id="play-btn" onclick="togglePlay()">PLAY ▶</button>
-            <button class="ctrl-btn" onclick="nextTrack()">NEXT ≫</button>
+            <button class="ctrl-btn" type="button" onclick="prevTrack()">≪ PREV</button>
+            <button class="ctrl-btn" type="button" id="play-btn" onclick="togglePlay()">PLAY ▶</button>
+            <button class="ctrl-btn" type="button" onclick="nextTrack()">NEXT ≫</button>
         </div>
 
-        <div style="font-family: 'VT323'; font-size: 0.9rem; color: var(--purple); text-align: center; margin-top: auto;">
+        <div class="status">
             SYSTEM STATUS: ONLINE<br>
             BUFFERING NOSTALGIA...
         </div>
@@ -230,159 +459,161 @@
             <input type="text" id="search-bar" placeholder="SEARCH THE VIRTUAL PLAZA..." onkeyup="filterSongs()">
         </div>
 
-        <div class="album-grid" id="album-grid">
-            <!-- Albums injected here -->
-        </div>
+        <div class="album-grid" id="album-grid"></div>
     </main>
 
     <audio id="audio-player"></audio>
 
     <script>
 const songData = [
-  {
-    id: 0,
-    name: "Cole VanDePoll",
-    url: "https://www.centralschool.fun/tracklist/Cole%20VanDePoll.mp3",
-    art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png"
-  },
-  {
-    id: 1,
-    name: "Cookin Fries",
-    url: "https://www.centralschool.fun/tracklist/Cookin%20Fries.mp3",
-    art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png"
-  },
-  {
-    id: 2,
-    name: "Mr Carson Golf",
-    url: "https://www.centralschool.fun/tracklist/Mr%20Carson%20Golf.mp3",
-    art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png"
-  },
-  {
-    id: 3,
-    name: "Mr Golder RAP",
-    url: "https://www.centralschool.fun/tracklist/Mr%20Golder%20RAP.mp3",
-    art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png"
-  },
-  {
-    id: 4,
-    name: "Mr Good — Got the Goods",
-    url: "https://www.centralschool.fun/tracklist/Mr%20Good--%20Got%20the%20goods.mp3",
-    art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png"
-  },
-  {
-    id: 5,
-    name: "Ms. Pierik",
-    url: "https://www.centralschool.fun/tracklist/Ms.%20Pierik.mp3",
-    art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png"
-  },
-  {
-    id: 6,
-    name: "Outdoor ED",
-    url: "https://www.centralschool.fun/tracklist/Outdoor%20ED.mp3",
-    art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png"
-  },
-  {
-    id: 7,
-    name: "Sam Is…..",
-    url: "https://www.centralschool.fun/tracklist/Sam%20is.....mp3",
-    art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png"
-  },
-  {
-    id: 8,
-    name: "Where Is Mr Shortreed",
-    url: "https://www.centralschool.fun/tracklist/Where%20is%20Mr%20Shortreed.mp3",
-    art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png"
-  },
-  {
-    id: 9,
-    name: "Who’s the Man — Mr. Shortreed!",
-    url: "https://www.centralschool.fun/tracklist/Who%E2%80%99s%20the%20man_%20%E2%80%94%20Mr.%20Shortreed!.mp3",
-    art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png"
-  }
+  { id: 0, name: "Cole VanDePoll", url: "https://www.centralschool.fun/tracklist/Cole%20VanDePoll.mp3", art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png" },
+  { id: 1, name: "Cookin Fries", url: "https://www.centralschool.fun/tracklist/Cookin%20Fries.mp3", art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png" },
+  { id: 2, name: "Mr Carson Golf", url: "https://www.centralschool.fun/tracklist/Mr%20Carson%20Golf.mp3", art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png" },
+  { id: 3, name: "Mr Golder RAP", url: "https://www.centralschool.fun/tracklist/Mr%20Golder%20RAP.mp3", art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png" },
+  { id: 4, name: "Mr Good — Got the Goods", url: "https://www.centralschool.fun/tracklist/Mr%20Good--%20Got%20the%20goods.mp3", art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png" },
+  { id: 5, name: "Ms. Pierik", url: "https://www.centralschool.fun/tracklist/Ms.%20Pierik.mp3", art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png" },
+  { id: 6, name: "Outdoor ED", url: "https://www.centralschool.fun/tracklist/Outdoor%20ED.mp3", art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png" },
+  { id: 7, name: "Sam Is…..", url: "https://www.centralschool.fun/tracklist/Sam%20is.....mp3", art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png" },
+  { id: 8, name: "Where Is Mr Shortreed", url: "https://www.centralschool.fun/tracklist/Where%20is%20Mr%20Shortreed.mp3", art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png" },
+  { id: 9, name: "Who’s the Man — Mr. Shortreed!", url: "https://www.centralschool.fun/tracklist/Who%E2%80%99s%20the%20man_%20%E2%80%94%20Mr.%20Shortreed!.mp3", art: "https://www.centralschool.fun/tracklist/not_a_chatgpt_image.png" }
 ];
 
+let currentTrackIndex = 0;
+let isPlaying = false;
+const audio = document.getElementById('audio-player');
+const playBtn = document.getElementById('play-btn');
+const progress = document.getElementById('progress');
 
-        let currentTrackIndex = 0;
-        let isPlaying = false;
-        const audio = document.getElementById('audio-player');
-        const playBtn = document.getElementById('play-btn');
-        const progress = document.getElementById('progress');
+function addRipple(el, clientX, clientY){
+  const r = document.createElement("span");
+  r.className = "ripple";
+  const rect = el.getBoundingClientRect();
+  r.style.left = (clientX - rect.left) + "px";
+  r.style.top  = (clientY - rect.top) + "px";
+  el.appendChild(r);
+  setTimeout(() => r.remove(), 650);
+}
 
-        // Render the Grid
-        function renderAlbums(songs) {
-            const grid = document.getElementById('album-grid');
-            grid.innerHTML = '';
-            songs.forEach(song => {
-                const card = document.createElement('div');
-                card.className = 'album-card';
-                card.onclick = () => loadTrack(song.id);
-                card.innerHTML = `
-                    <img src="${song.art}" alt="${song.name}">
-                    <span>${song.name}</span>
-                `;
-                grid.appendChild(card);
-            });
-        }
+// ===== iframe-only EXIT button =====
+(function setupIframeExit(){
+  const exitBtn = document.getElementById("iframeExit");
 
-        // Search functionality
-        function filterSongs() {
-            const query = document.getElementById('search-bar').value.toLowerCase();
-            const filtered = songData.filter(s => s.name.toLowerCase().includes(query));
-            renderAlbums(filtered);
-        }
+  // Detect iframe safely
+  let inIframe = false;
+  try { inIframe = window.self !== window.top; } catch(e){ inIframe = true; }
 
-        // Player Logic
-        function loadTrack(index) {
-            currentTrackIndex = index;
-            const track = songData[index];
-            audio.src = track.url;
-            document.getElementById('current-art').src = track.art;
-            document.getElementById('current-title').innerText = track.name;
-            
-            audio.play();
-            isPlaying = true;
-            playBtn.innerText = "PAUSE ||";
-        }
+  if(!inIframe){
+    exitBtn.style.display = "none";
+    return;
+  }
 
-        function togglePlay() {
-            if (!audio.src) return;
-            if (isPlaying) {
-                audio.pause();
-                playBtn.innerText = "PLAY ▶";
-            } else {
-                audio.play();
-                playBtn.innerText = "PAUSE ||";
-            }
-            isPlaying = !isPlaying;
-        }
+  // Show only in iframe
+  exitBtn.style.display = "inline-flex";
 
-        function nextTrack() {
-            currentTrackIndex = (currentTrackIndex + 1) % songData.length;
-            loadTrack(currentTrackIndex);
-        }
+  // When clicked: ask parent to close (works with your other apps), fallback to history
+  exitBtn.addEventListener("click", () => {
+    try { window.parent.postMessage("exit", "*"); } catch(e){}
+    // fallback
+    setTimeout(() => {
+      try { window.location.href = "about:blank"; } catch(e){}
+    }, 120);
+  });
+})();
 
-        function prevTrack() {
-            currentTrackIndex = (currentTrackIndex - 1 + songData.length) % songData.length;
-            loadTrack(currentTrackIndex);
-        }
+// ===== Bubbles spawn =====
+(function spawnBubbles(){
+  const wrap = document.getElementById("bubbles");
+  const count = 20;
+  for(let i=0;i<count;i++){
+    const b = document.createElement("div");
+    b.className = "bubble";
+    b.style.left = (Math.random()*100) + "vw";
+    b.style.animationDuration = (10 + Math.random()*10) + "s";
+    b.style.animationDelay = (-Math.random()*12) + "s";
+    b.style.opacity = (0.45 + Math.random()*0.45).toFixed(2);
+    wrap.appendChild(b);
+  }
+})();
 
-        // Progress Bar update
-        audio.addEventListener('timeupdate', () => {
-            const pct = (audio.currentTime / audio.duration) * 100;
-            progress.style.width = pct + '%';
-        });
+// Render the Grid
+function renderAlbums(songs) {
+  const grid = document.getElementById('album-grid');
+  grid.innerHTML = '';
+  songs.forEach(song => {
+    const card = document.createElement('div');
+    card.className = 'album-card';
 
-        // Seek
-        document.getElementById('progress-container').addEventListener('click', (e) => {
-            const width = e.target.clientWidth;
-            const clickX = e.offsetX;
-            audio.currentTime = (clickX / width) * audio.duration;
-        });
+    // Ripple + click
+    card.addEventListener("pointerdown", (e) => addRipple(card, e.clientX, e.clientY));
+    card.addEventListener("click", () => loadTrack(song.id));
 
-        audio.addEventListener('ended', nextTrack);
+    card.innerHTML = `
+      <img src="${song.art}" alt="${song.name}">
+      <span>${song.name}</span>
+    `;
+    grid.appendChild(card);
+  });
+}
 
-        // Init
-        renderAlbums(songData);
+// Search functionality
+function filterSongs() {
+  const query = document.getElementById('search-bar').value.toLowerCase();
+  const filtered = songData.filter(s => s.name.toLowerCase().includes(query));
+  renderAlbums(filtered);
+}
+
+// Player Logic
+function loadTrack(index) {
+  currentTrackIndex = index;
+  const track = songData[index];
+  audio.src = track.url;
+  document.getElementById('current-art').src = track.art;
+  document.getElementById('current-title').innerText = track.name;
+
+  audio.play();
+  isPlaying = true;
+  playBtn.innerText = "PAUSE ||";
+}
+
+function togglePlay() {
+  if (!audio.src) return;
+  if (isPlaying) {
+    audio.pause();
+    playBtn.innerText = "PLAY ▶";
+  } else {
+    audio.play();
+    playBtn.innerText = "PAUSE ||";
+  }
+  isPlaying = !isPlaying;
+}
+
+function nextTrack() {
+  currentTrackIndex = (currentTrackIndex + 1) % songData.length;
+  loadTrack(currentTrackIndex);
+}
+
+function prevTrack() {
+  currentTrackIndex = (currentTrackIndex - 1 + songData.length) % songData.length;
+  loadTrack(currentTrackIndex);
+}
+
+// Progress Bar update
+audio.addEventListener('timeupdate', () => {
+  const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+  progress.style.width = pct + '%';
+});
+
+// Seek
+document.getElementById('progress-container').addEventListener('click', (e) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  audio.currentTime = (clickX / rect.width) * audio.duration;
+});
+
+audio.addEventListener('ended', nextTrack);
+
+// Init
+renderAlbums(songData);
     </script>
 </body>
 </html>

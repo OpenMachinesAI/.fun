@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Install FunClient Bookmarklet</title>
+  <style>
+    :root{
+      --bg1:#050044;
+      --bg2:#4b0082;
+      --pink:#ff71ce;
+      --cyan:#01cdfe;
+      --yellow:#fffb96;
+      --glass:rgba(5,0,68,.72);
+      --card:rgba(255,255,255,.08);
+      --stroke:rgba(255,255,255,.18);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:#fff;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(1,205,254,.35), transparent 45%),
+        radial-gradient(circle at 80% 20%, rgba(255,113,206,.35), transparent 45%),
+        radial-gradient(circle at 30% 90%, rgba(255,251,150,.25), transparent 50%),
+        linear-gradient(180deg,var(--bg1),var(--bg2),#ff71ce);
+      overflow-x:hidden;
+    }
+    .wrap{
+      max-width:920px;
+      margin:0 auto;
+      padding:32px 18px 60px;
+    }
+    header{
+      text-align:center;
+      padding:22px 14px 10px;
+    }
+    .title{
+      font-size:clamp(28px,5vw,44px);
+      letter-spacing:.5px;
+      margin:0 0 8px;
+      text-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    .sub{
+      margin:0 auto;
+      max-width:650px;
+      color:rgba(255,255,255,.88);
+      line-height:1.45;
+    }
+    .card{
+      margin-top:22px;
+      background:linear-gradient(180deg,var(--glass),rgba(0,0,0,.18));
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      box-shadow:0 18px 60px rgba(0,0,0,.35);
+      padding:18px;
+      backdrop-filter: blur(10px);
+    }
+    .grid{
+      display:grid;
+      gap:14px;
+      grid-template-columns:1fr;
+    }
+    @media(min-width:860px){
+      .grid{grid-template-columns:1.1fr .9fr;}
+    }
+
+    .installBtn{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:18px 16px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.22);
+      background:linear-gradient(135deg, rgba(1,205,254,.25), rgba(255,113,206,.25));
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
+      cursor:grab;
+      user-select:none;
+      text-decoration:none;
+      color:#fff;
+      font-weight:800;
+      font-size:18px;
+      letter-spacing:.3px;
+      transform: translateZ(0);
+      transition: transform .18s ease, filter .18s ease;
+    }
+    .installBtn:active{cursor:grabbing; transform: scale(.98);}
+    .installBtn:hover{filter:brightness(1.1); transform: translateY(-2px);}
+    .pill{
+      font-size:12px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.25);
+      background:rgba(0,0,0,.22);
+      font-weight:700;
+    }
+
+    .steps{
+      margin:0;
+      padding-left:18px;
+      line-height:1.55;
+      color:rgba(255,255,255,.9);
+    }
+    .hint{
+      margin-top:10px;
+      color:rgba(255,255,255,.75);
+      font-size:13px;
+    }
+    .codeRow{
+      display:flex;
+      gap:10px;
+      align-items:stretch;
+      margin-top:12px;
+    }
+    textarea{
+      flex:1;
+      min-height:84px;
+      resize:none;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.2);
+      background:rgba(0,0,0,.25);
+      color:#fff;
+      padding:12px 12px;
+      outline:none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:12px;
+      line-height:1.35;
+    }
+    button{
+      width:140px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.22);
+      background:linear-gradient(135deg, rgba(255,251,150,.22), rgba(1,205,254,.22));
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:0 12px 30px rgba(0,0,0,.25);
+      transition: transform .15s ease, filter .15s ease;
+    }
+    button:hover{filter:brightness(1.08); transform: translateY(-1px);}
+    button:active{transform: translateY(0) scale(.99);}
+    .ok{
+      display:inline-block;
+      margin-top:10px;
+      font-size:13px;
+      color:rgba(255,255,255,.92);
+    }
+    .warn{
+      margin-top:10px;
+      font-size:13px;
+      color:rgba(255,255,255,.85);
+      background:rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.16);
+      padding:10px 12px;
+      border-radius:14px;
+    }
+    .small{
+      font-size:12px;
+      opacity:.85;
+      margin-top:8px;
+      line-height:1.45;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1 class="title">Install the FunClient Bookmarklet</h1>
+      <p class="sub">
+        This adds a button to your bookmarks bar that launches FunClient in a new window (max sized) and attempts fullscreen.
+      </p>
+    </header>
+
+    <div class="card">
+      <div class="grid">
+        <div>
+          <h2 style="margin:0 0 10px;">Desktop install (fast)</h2>
+          <p style="margin:0 0 12px;color:rgba(255,255,255,.88);">
+            Drag this button to your bookmarks bar:
+          </p>
+
+          <a id="bm" class="installBtn" href="#">
+            🚀 Launch FunClient
+            <span class="pill">DRAG ME</span>
+          </a>
+
+          <div class="hint">
+            If you don’t see the bookmarks bar: <b>Ctrl + Shift + B</b> (Windows) or <b>⌘ + Shift + B</b> (Mac)
+          </div>
+
+          <div class="warn">
+            If the new window doesn’t open, your browser blocked popups — allow popups for <b>centralschool.fun</b>.
+          </div>
+        </div>
+
+        <div>
+          <h2 style="margin:0 0 10px;">Mobile install (iOS / Android)</h2>
+          <ol class="steps">
+            <li>Bookmark this page first.</li>
+            <li>Edit the bookmark.</li>
+            <li>Rename it to <b>FunClient</b> (optional).</li>
+            <li>Replace the URL with the code below.</li>
+            <li>Save. Tap the bookmark to launch.</li>
+          </ol>
+
+          <div class="codeRow">
+            <textarea id="bmCode" readonly></textarea>
+            <button id="copyBtn">Copy</button>
+          </div>
+          <div id="copyMsg" class="ok" style="display:none;">✅ Copied!</div>
+
+          <div class="small">
+            Note: iOS Safari is strict — it may open the window but require a tap inside it for true fullscreen.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---- Bookmarklet target ----
+    const TARGET_URL = "https://www.centralschool.fun/funclient.html";
+
+    // Bookmarklet code (tries: open max window + requestFullscreen in the new window)
+    const bookmarklet = `javascript:(()=>{const w=window.open('${TARGET_URL}','funclient','popup=yes,width='+screen.width+',height='+screen.height+',top=0,left=0');if(!w){alert('Popup blocked — allow popups for this site');return;}w.onload=()=>{try{w.document.documentElement.requestFullscreen?.();}catch(e){}}})();`;
+
+    // Set href for drag-to-bookmarks install
+    const bm = document.getElementById("bm");
+    bm.href = bookmarklet;
+
+    // Show code for copy/paste install
+    const bmCode = document.getElementById("bmCode");
+    bmCode.value = bookmarklet;
+
+    // Copy button
+    const copyBtn = document.getElementById("copyBtn");
+    const copyMsg = document.getElementById("copyMsg");
+
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(bookmarklet);
+        copyMsg.style.display = "inline-block";
+        setTimeout(()=>copyMsg.style.display="none", 1200);
+      } catch (e) {
+        // Fallback: select text so user can copy manually
+        bmCode.focus();
+        bmCode.select();
+        copyMsg.style.display = "inline-block";
+        copyMsg.textContent = "📋 Selected — press copy";
+        setTimeout(()=>{
+          copyMsg.style.display="none";
+          copyMsg.textContent = "✅ Copied!";
+        }, 1600);
+      }
+    });
+  </script>
+</body>
+</html>

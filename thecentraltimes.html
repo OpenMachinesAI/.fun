@@ -26,6 +26,10 @@
       border-bottom: 4px double #000;
       padding: 1rem;
       background: rgba(255,255,255,0.8);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(6px);
     }
 
     h1 {
@@ -66,6 +70,8 @@
       color: inherit;
       opacity: 0;
       animation: fadeIn .8s forwards;
+      position: relative;
+      overflow: hidden;
     }
 
     .article:hover {
@@ -82,21 +88,40 @@
       margin: 0 0 .5rem;
     }
 
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-top: .75rem;
+    }
+
+    .pill-btn {
+      border: 2px solid #000;
+      background: #fff;
+      font-family: inherit;
+      font-size: .95rem;
+      cursor: pointer;
+      padding: .35rem .6rem;
+      transition: transform .15s ease, background .2s ease;
+      user-select: none;
+    }
+    .pill-btn:hover { background: #f0f0f0; transform: translateY(-1px); }
+    .pill-btn:active { transform: translateY(0px) scale(0.98); }
+
     #show-all {
       display: block;
-      margin: 1rem auto;
+      margin: 1rem auto 2rem;
       padding: 0.5rem 1rem;
       border: 2px solid #000;
       background: #fff;
       font-family: inherit;
       font-size: 1rem;
       cursor: pointer;
-      transition: background .2s ease;
+      transition: background .2s ease, transform .15s ease;
     }
 
-    #show-all:hover {
-      background: #f0f0f0;
-    }
+    #show-all:hover { background: #f0f0f0; transform: translateY(-1px); }
+    #show-all:active { transform: translateY(0px) scale(0.98); }
 
     footer {
       border-top: 4px double #000;
@@ -117,12 +142,12 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Overlay for zoomed PDF + credits */
+    /* Overlay for zoomed PDF + toolbar */
     .overlay {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.82);
       display: none;
       align-items: center;
       justify-content: center;
@@ -131,32 +156,95 @@
 
     .overlay.show {
       display: flex;
-      animation: fadeIn .3s forwards;
+      animation: fadeIn .25s forwards;
     }
+
+    .overlay .panel {
+      width: min(1100px, 92vw);
+      height: min(840px, 86vh);
+      background: #fff;
+      border: 2px solid #000;
+      box-shadow: 0 0 22px rgba(0,0,0,0.55);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      transform: scale(0.92);
+      animation: zoomIn .25s forwards;
+      position: relative;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      padding: .6rem .7rem;
+      border-bottom: 2px solid #000;
+      background: linear-gradient(180deg, #fff, #f6f6f6);
+    }
+
+    .toolbar .left {
+      display: flex;
+      flex-direction: column;
+      gap: .1rem;
+      min-width: 0;
+    }
+
+    .toolbar .title {
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 60vw;
+    }
+    .toolbar .sub {
+      font-size: .9rem;
+      color: #444;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 60vw;
+    }
+
+    .toolbar .actions {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .toolbar .actions button {
+      border: 2px solid #000;
+      background: #fff;
+      font-family: inherit;
+      font-size: .95rem;
+      cursor: pointer;
+      padding: .35rem .6rem;
+      transition: transform .15s ease, background .2s ease;
+    }
+    .toolbar .actions button:hover { background: #f0f0f0; transform: translateY(-1px); }
+    .toolbar .actions button:active { transform: translateY(0px) scale(0.98); }
 
     .overlay iframe {
-      width: 80%;
-      height: 80%;
+      width: 100%;
+      height: 100%;
       border: none;
-      box-shadow: 0 0 20px rgba(0,0,0,0.6);
       background: #fff;
-      transform: scale(0.9);
-      animation: zoomIn .3s forwards;
     }
 
-    .overlay.hideAnim iframe {
-      animation: zoomOut .3s forwards;
+    .overlay.hideAnim .panel {
+      animation: zoomOut .2s forwards;
     }
 
     #close-btn, #close-credits {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 14px;
+      right: 14px;
       background: #fff;
       border: 2px solid #000;
       padding: 0.3rem 0.6rem;
       cursor: pointer;
       font-weight: bold;
+      z-index: 2;
     }
 
     /* Credits content */
@@ -169,23 +257,42 @@
       text-align: left;
       font-size: 1rem;
       transform: scale(0.9);
-      animation: zoomIn .3s forwards;
+      animation: zoomIn .25s forwards;
+      border: 2px solid #000;
+      position: relative;
     }
 
     @keyframes zoomIn {
-      from { transform: scale(0.7); opacity: 0; }
+      from { transform: scale(0.85); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
 
     @keyframes zoomOut {
       from { transform: scale(1); opacity: 1; }
-      to { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(0.9); opacity: 0; }
     }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.95);
+      border: 2px solid #000;
+      padding: .55rem .8rem;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+      display: none;
+      z-index: 2000;
+      max-width: 92vw;
+    }
+    #toast.show { display: block; animation: fadeIn .2s forwards; }
 
     /* Mobile support */
     @media (max-width: 600px) {
       h1 { font-size: 2rem; }
-      .overlay iframe { width: 95%; height: 85%; }
+      .overlay .panel { width: 95vw; height: 86vh; }
+      .toolbar .title, .toolbar .sub { max-width: 78vw; }
       #credits-content { width: 90%; font-size: 0.9rem; }
     }
   </style>
@@ -204,18 +311,35 @@
     <p>© 2025 The Central Times — Updated Weekly | <a id="credits-link">Credits</a></p>
   </footer>
 
+  <!-- Toast -->
+  <div id="toast" role="status" aria-live="polite"></div>
+
   <!-- Overlay for PDFs -->
-  <div id="overlay" class="overlay">
-    <button id="close-btn">X Close</button>
-    <iframe id="pdf-frame"></iframe>
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <button id="close-btn" title="Close">X Close</button>
+    <div class="panel">
+      <div class="toolbar">
+        <div class="left">
+          <div class="title" id="pdf-title">Loading…</div>
+          <div class="sub" id="pdf-sub"> </div>
+        </div>
+        <div class="actions">
+          <button id="btn-copy-link" title="Copy a shareable link">Copy Link</button>
+          <button id="btn-share" title="Share (if supported)">Share</button>
+          <button id="btn-download" title="Download PDF">Download</button>
+          <button id="btn-open-new" title="Open PDF in a new tab">Open</button>
+        </div>
+      </div>
+      <iframe id="pdf-frame" title="Central Times PDF viewer"></iframe>
+    </div>
   </div>
 
   <!-- Overlay for Credits -->
-  <div id="credits-overlay" class="overlay">
+  <div id="credits-overlay" class="overlay" aria-hidden="true">
     <button id="close-credits">X Close</button>
     <div id="credits-content">
       <h2>Credits</h2>
-      <p><strong>Editor-in-Chief:</strong> Alex Ross</p>
+      <p><strong>Editor-in-Chief:</strong> Alex Rose</p>
       <p><strong>Design:</strong> Central School Fun Team</p>
       <p><strong>Special Thanks:</strong> Central Middle School Community</p>
       <p>Built with ❤️ in 2025</p>
@@ -226,6 +350,7 @@
   <script type="application/json" id="articles-data">
   [
     {
+      "id": "cafeteria-revamp",
       "title": "Cafeteria Revamps Menu With Local Produce",
       "author": "Staff Reporter",
       "date": "2025-09-28",
@@ -233,6 +358,7 @@
       "url": "sample.pdf"
     },
     {
+      "id": "rocket-project",
       "title": "Rocket Project Nears Launch Day",
       "author": "Science Desk",
       "date": "2025-09-27",
@@ -240,6 +366,7 @@
       "url": "rocket.pdf"
     },
     {
+      "id": "musical-revival",
       "title": "Rehearsals Begin for Central Musical Revival",
       "author": "Arts & Letters",
       "date": "2025-09-25",
@@ -247,6 +374,7 @@
       "url": "musical.pdf"
     },
     {
+      "id": "library-wing",
       "title": "New Library Wing Opens",
       "author": "Campus Beat",
       "date": "2025-09-20",
@@ -254,6 +382,7 @@
       "url": "library.pdf"
     },
     {
+      "id": "debate-champs",
       "title": "Local Team Wins Debate Championship",
       "author": "Sports Desk",
       "date": "2025-09-18",
@@ -264,6 +393,69 @@
   </script>
 
   <script>
+    /***********************
+     * Security / Allowlist
+     ***********************/
+    const CENTRAL_ORIGIN = "https://www.centralschool.fun";
+
+    function getCentralBaseOrigin() {
+      // If you host this page on centralschool.fun, this will match.
+      // If you test locally, we still force PDFs to come from CENTRAL_ORIGIN.
+      return CENTRAL_ORIGIN;
+    }
+
+    function isSafePdfPath(u) {
+      // Only allow:
+      // - relative paths like "news/issue1.pdf" or "rocket.pdf"
+      // - absolute URLs that are exactly on https://www.centralschool.fun
+      try {
+        const base = getCentralBaseOrigin();
+        const url = new URL(u, base); // relative resolves to central base
+        const isCentral = (url.origin === base);
+        const isPdf = url.pathname.toLowerCase().endsWith(".pdf");
+        // Prevent tricks like "https://www.centralschool.fun.evil.com"
+        // (origin check already handles it)
+        return isCentral && isPdf;
+      } catch {
+        return false;
+      }
+    }
+
+    function toCentralPdfUrl(u) {
+      // Returns fully-qualified, central-only URL
+      const base = getCentralBaseOrigin();
+      const url = new URL(u, base);
+      return url.toString();
+    }
+
+    /***********************
+     * URL param deep-linking
+     * ?news=<id>  (recommended)
+     * ?pdf=<path> (optional, but still restricted to centralschool.fun + must match an article)
+     ***********************/
+    function getQueryParam(name) {
+      return new URLSearchParams(location.search).get(name);
+    }
+
+    function setQueryParam(name, value) {
+      const url = new URL(location.href);
+      if (value === null || value === undefined || value === "") {
+        url.searchParams.delete(name);
+      } else {
+        url.searchParams.set(name, value);
+      }
+      // Keep it clean when embedded
+      history.replaceState(null, "", url.toString());
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => t.classList.remove("show"), 1800);
+    }
+
     function formatDate(str) {
       const d = new Date(str);
       return d.toLocaleDateString(undefined, {
@@ -302,41 +494,111 @@
               const icon = w.weathercode < 3 ? "☀️" : (w.weathercode < 60 ? "☁️" : "🌧️");
               el.textContent = `${dateStr} — ${w.temperature}°C ${icon}`;
             })
-            .catch(() => {
-              el.textContent = `${dateStr} — Weather unavailable`;
-            });
-        }, () => {
-          el.textContent = `${dateStr} — Weather unavailable`;
-        });
+            .catch(() => { el.textContent = `${dateStr} — Weather unavailable`; });
+        }, () => { el.textContent = `${dateStr} — Weather unavailable`; });
       } else {
         el.textContent = `${dateStr} — Weather unavailable`;
       }
     }
 
-    function renderArticles(showAll=false) {
+    function getArticles() {
       const data = document.getElementById("articles-data").textContent;
-      const articles = JSON.parse(data);
+      return JSON.parse(data);
+    }
+
+    function renderArticles(showAll=false) {
+      const articles = getArticles();
       const container = document.getElementById("articles");
       container.innerHTML = "";
       const toShow = showAll ? articles : articles.slice(0,3);
+
       toShow.forEach((article, i) => {
         const card = document.createElement("div");
         card.className = "article";
-        card.style.animationDelay = `${i*0.1}s`;
+        card.style.animationDelay = `${i*0.08}s`;
+
         card.innerHTML = `
           <h2>${article.title}</h2>
           <p><em>${article.author}</em> — ${formatDate(article.date)}</p>
           <p>${article.summary}</p>
+          <div class="pill-row">
+            <span class="pill-btn" data-action="open">Read</span>
+            <span class="pill-btn" data-action="share">Share</span>
+            <span class="pill-btn" data-action="download">Download</span>
+          </div>
         `;
-        card.addEventListener("click", () => openPDF(article.url));
+
+        // Whole card opens
+        card.addEventListener("click", (e) => {
+          const pill = e.target.closest("[data-action]");
+          if (pill) {
+            e.stopPropagation();
+            const action = pill.getAttribute("data-action");
+            if (action === "open") openArticle(article, { updateUrl: true });
+            if (action === "share") shareArticle(article);
+            if (action === "download") downloadArticle(article);
+            return;
+          }
+          openArticle(article, { updateUrl: true });
+        });
+
         container.appendChild(card);
       });
     }
 
-    function openPDF(url) {
+    function findArticleById(id) {
+      if (!id) return null;
+      const articles = getArticles();
+      return articles.find(a => (a.id || "").toLowerCase() === id.toLowerCase()) || null;
+    }
+
+    function findArticleByPdfPath(pdfPath) {
+      if (!pdfPath) return null;
+      const articles = getArticles();
+      // Match by exact stored URL (relative) OR by resolved central URL
+      const wantCentral = toCentralPdfUrl(pdfPath);
+      return articles.find(a => {
+        try {
+          const aCentral = toCentralPdfUrl(a.url);
+          return a.url === pdfPath || aCentral === wantCentral;
+        } catch {
+          return false;
+        }
+      }) || null;
+    }
+
+    function openArticle(article, { updateUrl } = { updateUrl: true }) {
+      // Enforce:
+      // 1) Article must exist in JSON
+      // 2) URL must be central + pdf
+      if (!article || !article.url) return;
+
+      if (!isSafePdfPath(article.url)) {
+        showToast("Blocked: PDFs must be from CentralSchool.fun");
+        return;
+      }
+
       const overlay = document.getElementById("overlay");
       overlay.classList.add("show");
-      document.getElementById("pdf-frame").src = url;
+      overlay.setAttribute("aria-hidden", "false");
+
+      const pdfUrl = toCentralPdfUrl(article.url);
+      document.getElementById("pdf-frame").src = pdfUrl;
+
+      document.getElementById("pdf-title").textContent = article.title || "The Central Times";
+      document.getElementById("pdf-sub").textContent =
+        `${article.author || "Staff"} • ${article.date ? formatDate(article.date) : ""} • ${new URL(pdfUrl).pathname}`;
+
+      // Store current
+      overlay.dataset.currentId = article.id || "";
+      overlay.dataset.currentPdf = pdfUrl;
+
+      if (updateUrl) {
+        // Shareable deep-link by ID (preferred)
+        setQueryParam("news", article.id || "");
+        // Make sure random pdf param isn’t lingering
+        setQueryParam("pdf", null);
+      }
     }
 
     function closePDF() {
@@ -344,18 +606,198 @@
       overlay.classList.add("hideAnim");
       setTimeout(() => {
         overlay.classList.remove("show","hideAnim");
+        overlay.setAttribute("aria-hidden", "true");
         document.getElementById("pdf-frame").src = "";
-      }, 300);
+      }, 200);
+
+      // Clear share param when closing
+      setQueryParam("news", null);
+      setQueryParam("pdf", null);
     }
 
+    function currentShareLink() {
+      const overlay = document.getElementById("overlay");
+      const id = overlay.dataset.currentId || "";
+      if (!id) return location.href.split("#")[0];
+      const url = new URL(location.href);
+      url.searchParams.set("news", id);
+      url.searchParams.delete("pdf");
+      return url.toString();
+    }
+
+    async function copyShareLink() {
+      const link = currentShareLink();
+      try {
+        await navigator.clipboard.writeText(link);
+        showToast("Link copied!");
+      } catch {
+        // Fallback
+        const ta = document.createElement("textarea");
+        ta.value = link;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        showToast("Link copied!");
+      }
+    }
+
+    async function shareCurrent() {
+      const overlay = document.getElementById("overlay");
+      const title = document.getElementById("pdf-title").textContent || "The Central Times";
+      const link = currentShareLink();
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, text: "Read this Central Times issue:", url: link });
+          showToast("Shared!");
+          return;
+        } catch {
+          // user cancelled or failed — fall back to copy
+        }
+      }
+      await copyShareLink();
+      showToast("Sharing not supported — link copied.");
+    }
+
+    function downloadCurrent() {
+      const overlay = document.getElementById("overlay");
+      const pdfUrl = overlay.dataset.currentPdf;
+      if (!pdfUrl) return;
+
+      // Create a safe filename based on path
+      const path = new URL(pdfUrl).pathname.split("/").pop() || "central-times.pdf";
+      const a = document.createElement("a");
+      a.href = pdfUrl;
+      a.download = path; // browsers may ignore for cross-origin; but centralschool.fun is same-origin for your site
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      showToast("Download started.");
+    }
+
+    function openCurrentNewTab() {
+      const overlay = document.getElementById("overlay");
+      const pdfUrl = overlay.dataset.currentPdf;
+      if (!pdfUrl) return;
+      window.open(pdfUrl, "_blank", "noopener,noreferrer");
+    }
+
+    async function shareArticle(article) {
+      // Open it (no overlay required), share deep link by ID
+      if (!article || !article.id) {
+        showToast("This article needs an id to share.");
+        return;
+      }
+      const url = new URL(location.href);
+      url.searchParams.set("news", article.id);
+      url.searchParams.delete("pdf");
+      const link = url.toString();
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: article.title, text: "Read this Central Times issue:", url: link });
+          showToast("Shared!");
+          return;
+        } catch {}
+      }
+      try {
+        await navigator.clipboard.writeText(link);
+        showToast("Link copied!");
+      } catch {
+        showToast("Couldn’t copy link.");
+      }
+    }
+
+    function downloadArticle(article) {
+      if (!article || !article.url) return;
+      if (!isSafePdfPath(article.url)) {
+        showToast("Blocked: PDFs must be from CentralSchool.fun");
+        return;
+      }
+      const pdfUrl = toCentralPdfUrl(article.url);
+      const filename = new URL(pdfUrl).pathname.split("/").pop() || "central-times.pdf";
+      const a = document.createElement("a");
+      a.href = pdfUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast("Download started.");
+    }
+
+    function handleDeepLink() {
+      const byId = getQueryParam("news");
+      const byPdf = getQueryParam("pdf");
+
+      // Preferred: ?news=<id>
+      if (byId) {
+        const article = findArticleById(byId);
+        if (!article) {
+          showToast("That news link is invalid (unknown article).");
+          // Clear bad param
+          setQueryParam("news", null);
+          return;
+        }
+        openArticle(article, { updateUrl: true });
+        return;
+      }
+
+      // Optional: ?pdf=<path> but ONLY if it matches an existing article AND is central PDF
+      if (byPdf) {
+        if (!isSafePdfPath(byPdf)) {
+          showToast("Blocked: PDFs must be from CentralSchool.fun");
+          setQueryParam("pdf", null);
+          return;
+        }
+        const article = findArticleByPdfPath(byPdf);
+        if (!article) {
+          showToast("Blocked: PDF must match an article in Central Times.");
+          setQueryParam("pdf", null);
+          return;
+        }
+        openArticle(article, { updateUrl: true });
+      }
+    }
+
+    // Close overlay by clicking outside panel
+    document.getElementById("overlay").addEventListener("click", (e) => {
+      if (e.target.id === "overlay") closePDF();
+    });
+
+    // Esc closes overlay
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const overlay = document.getElementById("overlay");
+        if (overlay.classList.contains("show")) closePDF();
+        const credits = document.getElementById("credits-overlay");
+        if (credits.classList.contains("show")) credits.classList.remove("show");
+      }
+    });
+
     document.getElementById("close-btn").addEventListener("click", closePDF);
+
+    // Toolbar actions
+    document.getElementById("btn-copy-link").addEventListener("click", copyShareLink);
+    document.getElementById("btn-share").addEventListener("click", shareCurrent);
+    document.getElementById("btn-download").addEventListener("click", downloadCurrent);
+    document.getElementById("btn-open-new").addEventListener("click", openCurrentNewTab);
 
     // Credits overlay
     document.getElementById("credits-link").addEventListener("click", () => {
       document.getElementById("credits-overlay").classList.add("show");
+      document.getElementById("credits-overlay").setAttribute("aria-hidden", "false");
     });
     document.getElementById("close-credits").addEventListener("click", () => {
       document.getElementById("credits-overlay").classList.remove("show");
+      document.getElementById("credits-overlay").setAttribute("aria-hidden", "true");
+    });
+    document.getElementById("credits-overlay").addEventListener("click", (e) => {
+      if (e.target.id === "credits-overlay") {
+        document.getElementById("credits-overlay").classList.remove("show");
+        document.getElementById("credits-overlay").setAttribute("aria-hidden", "true");
+      }
     });
 
     updateEditionLabel();
@@ -366,6 +808,9 @@
       renderArticles(true);
       document.getElementById("show-all").style.display = "none";
     });
+
+    // Deep link open on load
+    handleDeepLink();
   </script>
 </body>
 </html>

@@ -3,640 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CES Game Launcher</title>
+  <title>Game Launcher</title>
   <style>
     :root{
       --accent:#4e7dff;
-      --ink:#eef4ff;
-      --bg1:#07101b;
-      --bg2:#0a1a2b;
-
-      --gb-dark:#0e2a1e;
-      --gb-mid:#1f4a2b;
-      --gb-lite:#b7ffb7;
-
-      --panel:#0c1731;
-      --panel2:#0a1330;
-
-      --scan:rgba(255,255,255,.06);
-      --noise:rgba(255,255,255,.04);
+      --ink:#f5f7ff;
+      --bg:#0c1436;
+      --panel:#101c46;
     }
-
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      color:var(--ink);
-      font-family:"Trebuchet MS","Courier New",monospace;
-      background:
-        radial-gradient(circle at 20% 0%, #1d2e57 0%, transparent 45%),
-        radial-gradient(circle at 80% 20%, #1c6b57 0%, transparent 40%),
-        radial-gradient(circle at 50% 120%, #0b173a 0%, #050918 70%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      overflow:hidden;
-    }
-
-    /* ---------- Layout ---------- */
-    .frame{
-      width:min(520px, 100%);
-      border-radius:22px;
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.15);
-      box-shadow:0 24px 60px rgba(0,0,0,.55);
-      padding:18px;
-      position:relative;
-      isolation:isolate;
-    }
-
-    .frame::before{
-      content:"";
-      position:absolute; inset:-2px;
-      border-radius:24px;
-      background:conic-gradient(from 210deg,
-        rgba(78,125,255,.0),
-        rgba(78,125,255,.5),
-        rgba(51,255,170,.45),
-        rgba(255,71,206,.35),
-        rgba(78,125,255,.0));
-      filter:blur(10px);
-      opacity:.55;
-      z-index:-1;
-      animation:glow 6s ease-in-out infinite;
-    }
-    @keyframes glow{
-      0%,100%{transform:rotate(0deg); opacity:.45}
-      50%{transform:rotate(12deg); opacity:.65}
-    }
-
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:10px;
-      padding:6px 8px 14px;
-      opacity:.95;
-    }
-
-    .brand{
-      display:flex; flex-direction:column; gap:2px;
-      line-height:1;
-      user-select:none;
-    }
-    .brand .ces{
-      letter-spacing:.34em;
-      font-weight:900;
-      text-transform:uppercase;
-      font-size:.95rem;
-      text-shadow:0 2px 0 rgba(0,0,0,.35);
-    }
-    .brand .sub{
-      font-size:.72rem;
-      opacity:.8;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-    }
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:7px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.14);
-      font-size:.75rem;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      user-select:none;
-      white-space:nowrap;
-    }
-
-    .console{
-      border-radius:18px;
-      background:linear-gradient(180deg, rgba(12,23,49,.85), rgba(10,19,48,.9));
-      border:1px solid rgba(255,255,255,.10);
-      overflow:hidden;
-      position:relative;
-    }
-
-    /* ---------- “Screen” ---------- */
-    .screen{
-      aspect-ratio: 4 / 3;
-      width:100%;
-      display:grid;
-      place-items:center;
-      position:relative;
-      background:
-        radial-gradient(circle at 35% 20%, rgba(183,255,183,.18), transparent 45%),
-        linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.55)),
-        linear-gradient(180deg, #0b2b1a, #071a12);
-    }
-
-    .screen::before{
-      /* scanlines */
-      content:"";
-      position:absolute; inset:0;
-      background:
-        repeating-linear-gradient(
-          0deg,
-          transparent 0px,
-          transparent 3px,
-          var(--scan) 4px
-        );
-      mix-blend-mode:overlay;
-      opacity:.65;
-      pointer-events:none;
-    }
-    .screen::after{
-      /* subtle noise */
-      content:"";
-      position:absolute; inset:0;
-      background:
-        repeating-linear-gradient(90deg, transparent 0 2px, var(--noise) 2px 3px);
-      opacity:.14;
-      pointer-events:none;
-    }
-
-    .crt{
-      width:92%;
-      height:86%;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.10);
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01));
-      box-shadow:
-        inset 0 0 0 1px rgba(0,0,0,.55),
-        inset 0 0 40px rgba(0,0,0,.55);
-      overflow:hidden;
-      position:relative;
-      display:grid;
-      place-items:center;
-    }
-
-    .bootLayer{
-      position:absolute; inset:0;
-      display:grid;
-      place-items:center;
-      padding:18px;
-      text-align:center;
-      user-select:none;
-    }
-
-    .bootText{
-      color:var(--gb-lite);
-      font-weight:900;
-      letter-spacing:.22em;
-      text-transform:uppercase;
-      text-shadow:0 3px 0 rgba(0,0,0,.35);
-    }
-
-    .logoMark{
-      width:min(260px, 90%);
-      display:grid;
-      gap:12px;
-      place-items:center;
-    }
-
-    .pixelBox{
-      width:100%;
-      border-radius:10px;
-      background:linear-gradient(180deg, rgba(183,255,183,.10), rgba(183,255,183,.04));
-      border:1px solid rgba(183,255,183,.20);
-      padding:14px 14px 12px;
-      box-shadow:inset 0 0 0 2px rgba(0,0,0,.35);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .pixelBox .big{
-      font-size:2.05rem;
-      line-height:1;
-      letter-spacing:.34em;
-      margin-left:.2em;
-      color:var(--gb-lite);
-    }
-
-    .pixelBox .small{
-      font-size:.70rem;
-      opacity:.88;
-      letter-spacing:.22em;
-      margin-top:8px;
-      color:rgba(183,255,183,.88);
-    }
-
-    .spark{
-      position:absolute;
-      inset:-30%;
-      background:conic-gradient(from 0deg,
-        rgba(183,255,183,.00),
-        rgba(183,255,183,.18),
-        rgba(183,255,183,.00));
-      animation:spark 2.8s linear infinite;
-      filter:blur(6px);
-      opacity:.9;
-    }
-    @keyframes spark{
-      to{transform:rotate(360deg)}
-    }
-
-    .progress{
-      width:min(260px, 90%);
-      height:10px;
-      border-radius:999px;
-      background:rgba(0,0,0,.38);
-      border:1px solid rgba(183,255,183,.18);
-      overflow:hidden;
-      box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);
-    }
-    .progress > i{
-      display:block;
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg, rgba(183,255,183,.65), rgba(183,255,183,1));
-      box-shadow:0 0 18px rgba(183,255,183,.35);
-      animation:load 1.65s ease-in-out forwards;
-    }
-    @keyframes load{
-      0%{width:0%}
-      70%{width:88%}
-      100%{width:100%}
-    }
-
-    .hint{
-      margin-top:10px;
-      font-size:.78rem;
-      letter-spacing:.22em;
-      text-transform:uppercase;
-      color:rgba(183,255,183,.88);
-      opacity:0;
-      transform:translateY(6px);
-      transition:opacity .35s ease, transform .35s ease;
-    }
-    .hint.show{
-      opacity:1;
-      transform:translateY(0);
-      animation:blink 1.1s steps(1,end) infinite;
-    }
-    @keyframes blink{
-      0%,49%{opacity:1}
-      50%,100%{opacity:.25}
-    }
-
-    /* ---------- Game info layer ---------- */
-    .gameLayer{
-      position:absolute; inset:0;
-      display:grid;
-      place-items:center;
-      padding:18px;
-      opacity:0;
-      transform:scale(.985);
-      transition:opacity .35s ease, transform .35s ease;
-      pointer-events:none;
-    }
-    .gameLayer.ready{
-      opacity:1;
-      transform:scale(1);
-      pointer-events:auto;
-    }
-
-    .gameCard{
-      width:min(320px, 100%);
-      display:grid;
-      gap:10px;
-      padding:14px 14px 12px;
-      border-radius:12px;
-      background:rgba(0,0,0,.28);
-      border:1px solid rgba(183,255,183,.18);
-      box-shadow:inset 0 0 0 2px rgba(0,0,0,.25);
-    }
-    .gameRow{
-      display:flex; gap:12px; align-items:center; justify-content:center;
-    }
-    .gameIcon{
-      font-size:42px;
-      filter:drop-shadow(0 10px 18px rgba(0,0,0,.55));
-    }
-    .gameTitle{
-      font-size:1.25rem;
-      font-weight:900;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      color:var(--gb-lite);
-      line-height:1.1;
-    }
-    .gameSub{
-      margin-top:4px;
-      font-size:.78rem;
-      letter-spacing:.16em;
-      opacity:.88;
-      text-transform:uppercase;
-      color:rgba(183,255,183,.86);
-    }
-    .gameDesc{
-      margin:0;
-      font-size:.86rem;
-      line-height:1.55;
-      color:rgba(229,255,229,.92);
-      opacity:.95;
-    }
-
-    /* ---------- Controls ---------- */
-    .controls{
-      display:grid;
-      grid-template-columns:1fr auto;
-      gap:14px;
-      padding:14px;
-      align-items:center;
-    }
-
-    .legend{
-      font-size:.75rem;
-      opacity:.85;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      user-select:none;
-      line-height:1.4;
-    }
-    .legend b{color:#fff; opacity:1}
-    .legend .kbd{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:26px;
-      padding:3px 7px;
-      border-radius:8px;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(0,0,0,.25);
-      margin:0 4px;
-      font-weight:900;
-      letter-spacing:.12em;
-    }
-
-    .btns{
-      display:flex; align-items:center; gap:10px; justify-content:flex-end;
-    }
-    .btn{
-      cursor:pointer;
-      border:none;
-      border-radius:999px;
-      padding:10px 14px;
-      font-weight:900;
-      letter-spacing:.22em;
-      text-transform:uppercase;
-      color:#061024;
-      background:linear-gradient(135deg, var(--accent), #33ffaa);
-      box-shadow:0 14px 26px rgba(0,0,0,.55);
-      transform:translateY(0);
-      transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
-      user-select:none;
-    }
-    .btn:hover{transform:translateY(-2px); box-shadow:0 18px 30px rgba(0,0,0,.65)}
-    .btn:active{transform:translateY(0); filter:saturate(1.2)}
-    .btn.secondary{
-      background:rgba(255,255,255,.10);
-      color:var(--ink);
-      border:1px solid rgba(255,255,255,.16);
-      box-shadow:none;
-      letter-spacing:.18em;
-    }
-
-    /* ---------- States ---------- */
-    .hidden{display:none !important;}
-
-    /* ---------- Error ---------- */
-    .error{
-      max-width:520px;
-      text-align:center;
-      color:#fff;
-      background:#711b1b;
-      padding:18px 22px;
-      border-radius:16px;
-      border:2px solid #ff4a4a;
-      font-weight:800;
-      letter-spacing:.06em;
-    }
+    *{box-sizing:border-box;font-family:"Trebuchet MS","Courier New",monospace;color:var(--ink)}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#1f2f6b,#0c1436 60%);display:flex;align-items:center;justify-content:center;padding:24px}
+    .window{width:min(480px,100%);background:var(--panel);border:3px solid #fff2;border-radius:18px;box-shadow:0 18px 40px rgba(0,0,0,.55);padding:24px;display:grid;gap:18px;text-align:center}
+    .window h1{margin:0;font-size:1.6rem;text-transform:uppercase;letter-spacing:.2em;text-shadow:3px 3px 0 rgba(0,0,0,.35)}
+    .badge{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;text-transform:uppercase;letter-spacing:.2em;background:#ffffff1a;padding:6px 12px;border-radius:999px;border:1px solid #ffffff33}
+    .icon{font-size:48px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.6))}
+    .desc{font-size:.95rem;line-height:1.6;margin:0;color:#e1e6ff}
+    .cta{display:flex;flex-direction:column;gap:10px}
+    button{cursor:pointer;border:none;border-radius:999px;background:linear-gradient(135deg,var(--accent),#33ffaa);color:#03102a;font-weight:900;font-size:1rem;padding:12px 18px;text-transform:uppercase;letter-spacing:.2em;box-shadow:0 12px 24px rgba(0,0,0,.6);transition:transform .18s ease, box-shadow .18s ease}
+    button:hover{transform:translateY(-3px);box-shadow:0 18px 30px rgba(0,0,0,.65)}
+    .tip{font-size:.75rem;opacity:.75;letter-spacing:.2em;text-transform:uppercase}
+    .error{max-width:420px;text-align:center;color:#fff;background:#711b1b;padding:18px 24px;border-radius:16px;border:2px solid #ff4a4a;font-weight:700}
   </style>
 </head>
 <body>
   <template id="launcher-template">
-    <div class="frame" style="--accent: var(--accent)">
-      <div class="topbar">
-        <div class="brand" aria-label="Chromebook Entertainment System">
-          <div class="ces">CES</div>
-          <div class="sub">Chromebook Entertainment System</div>
-        </div>
-        <div class="pill" id="statusPill">Booting…</div>
-      </div>
-
-      <div class="console" role="application" aria-label="CES Game Launcher">
-        <div class="screen">
-          <div class="crt">
-
-            <!-- Boot layer -->
-            <div class="bootLayer" id="bootLayer">
-              <div class="logoMark">
-                <div class="pixelBox">
-                  <div class="spark" aria-hidden="true"></div>
-                  <div class="bootText big">CES</div>
-                  <div class="bootText small">CHROMEBOOK ENTERTAINMENT SYSTEM</div>
-                </div>
-
-                <div class="progress" aria-label="Boot progress">
-                  <i></i>
-                </div>
-
-                <div class="hint" id="pressHint">Press A to begin</div>
-              </div>
-            </div>
-
-            <!-- Game info layer -->
-            <div class="gameLayer" id="gameLayer" aria-live="polite">
-              <div class="gameCard">
-                <div class="gameRow">
-                  <div class="gameIcon" id="gameIcon" aria-hidden="true">🎮</div>
-                  <div>
-                    <div class="gameTitle" id="gameTitle">Game Title</div>
-                    <div class="gameSub" id="gameBadge">Arcade Classic</div>
-                  </div>
-                </div>
-                <p class="gameDesc" id="gameDescription">Description placeholder.</p>
-              </div>
-              <div class="hint show" style="margin-top:14px" id="pressHint2">
-            </div>
-
-          </div>
-        </div>
-
-        <div class="controls">
-          <div class="legend">
-            <span class="kbd">A</span> start
-            <span style="opacity:.55">•</span>
-            <span class="kbd">Enter</span> also works
-            <br/>
-            <span style="opacity:.7">Tip:</span> Click the screen if keys don’t respond.
-          </div>
-          <div class="btns">
-            <button class="btn secondary" id="restartBtn" type="button">Restart</button>
-            <button class="btn" id="startBtn" type="button">A</button>
-          </div>
-        </div>
+    <div class="window" style="--accent:var(--accent)">
+      <div class="icon" id="gameIcon" aria-hidden="true"></div>
+      <h1 id="gameTitle">Game Title</h1>
+      <div class="badge" id="gameBadge">Cabinet Ready</div>
+      <p class="desc" id="gameDescription">Description placeholder.</p>
+      <div class="cta">
+        <button id="startGame">Launch Game</button>
+        <span class="tip">Press restart in the Win95 bar to return here.</span>
       </div>
     </div>
   </template>
+  <div id="app" role="main" aria-live="polite"></div>
+  <script>
+    (function(){
+      const params = new URLSearchParams(window.location.search);
+      const gameId = params.get('id');
+      const app = document.getElementById('app');
+      const tpl = document.getElementById('launcher-template');
 
-  <div id="app" role="main"></div>
+      function showError(message){
+        const box = document.createElement('div');
+        box.className = 'error';
+        box.textContent = message;
+        app.replaceChildren(box);
+      }
 
-<script>
-(function(){
-  const params = new URLSearchParams(window.location.search);
-  const gameId = params.get('id');
-  const app = document.getElementById('app');
-  const tpl = document.getElementById('launcher-template');
-
-  function showError(message){
-    const box = document.createElement('div');
-    box.className = 'error';
-    box.textContent = message;
-    app.replaceChildren(box);
-  }
-
-  if(!gameId){
-    showError('No game specified. Launch from the Pro Gamer Den menu.');
-    return;
-  }
-
-  let audioCtx = null;
-  function beep(){
-    try{
-      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      const now = audioCtx.currentTime;
-
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(880, now);
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.2, now + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start(now);
-      osc.stop(now + 0.22);
-    }catch(e){}
-  }
-
-  fetch('https://centralschool.fun/gamerden-games.json')
-    .then(res => res.json())
-    .then(games => {
-      const game = games.find(g => g.id === gameId);
-      if(!game){
-        showError('Selected cabinet is offline.');
+      if(!gameId){
+        showError('No game specified. Launch from the Pro Gamer Den menu.');
         return;
       }
 
-      const node = tpl.content.firstElementChild.cloneNode(true);
-      node.style.setProperty('--accent', game.color || '#4e7dff');
-
-      const statusPill = node.querySelector('#statusPill');
-      const bootLayer = node.querySelector('#bootLayer');
-      const gameLayer = node.querySelector('#gameLayer');
-      const pressHint = node.querySelector('#pressHint');
-
-      node.querySelector('#gameIcon').textContent = game.icon || '🎮';
-      node.querySelector('#gameTitle').textContent = game.title;
-      node.querySelector('#gameDescription').textContent = game.description;
-      node.querySelector('#gameBadge').textContent =
-        game.isNew ? 'New arrival' : (game.subtitle || 'Arcade Classic');
-
-      let state = 'booting';
-      let allowStart = false;
-
-      function launch(){
-        if(!allowStart || state === 'launched') return;
-        state = 'launched';
-        allowStart = false;
-        statusPill.textContent = 'Launching…';
-        beep();
-
-        setTimeout(()=>{
-          window.parent.postMessage({type:'gamerden-launch', id:game.id}, '*');
-        },200);
-      }
-
-      function onKey(e){
-        const k = (e.key || '').toLowerCase();
-        if(k === 'a' || e.key === 'Enter'){
-          e.preventDefault();
-          launch();
-        }
-      }
-
-      node.querySelector('#startBtn').addEventListener('click', launch);
-      node.querySelector('#restartBtn').addEventListener('click', () => location.reload());
-      window.addEventListener('keydown', onKey);
-
-      app.replaceChildren(node);
-
-      // --------------------
-      // CLEAN BOOT SEQUENCE
-      // --------------------
-
-      const steps = [
-        'Booting BIOS…',
-        'Loading Kernel…',
-        'Checking Cartridge…',
-        'Syncing Pixels…'
-      ];
-
-      let i = 0;
-      statusPill.textContent = steps[0];
-
-      const bootInterval = setInterval(()=>{
-        i++;
-        if(i < steps.length){
-          statusPill.textContent = steps[i];
-        } else {
-          clearInterval(bootInterval);
-
-          // READY flash
-          statusPill.textContent = 'READY';
-          statusPill.style.background = 'rgba(183,255,183,.25)';
-          statusPill.style.color = '#b7ffb7';
-
-          node.querySelector('.crt').animate(
-            [
-              {filter:'brightness(1)'},
-              {filter:'brightness(1.4)'},
-              {filter:'brightness(1)'}
-            ],
-            {duration:300, easing:'ease-out'}
-          );
-
-          // Fade boot out
-          setTimeout(()=>{
-            bootLayer.style.transition = 'opacity .3s ease, transform .3s ease';
-            bootLayer.style.opacity = '0';
-            bootLayer.style.transform = 'scale(.98)';
-
-            setTimeout(()=>{
-              bootLayer.style.display = 'none';
-              gameLayer.classList.add('ready');
-              pressHint.classList.add('show');
-              allowStart = true;
-              state = 'ready';
-            },300);
-
-          },350);
-        }
-      },420);
-
-    })
-    .catch(()=> showError('Could not load arcade data.'));
-})();
-</script>
+      fetch('gamerden-games.json')
+        .then(res => {
+          if(!res.ok) throw new Error('Failed to load data');
+          return res.json();
+        })
+        .then(games => {
+          const game = games.find(g => g.id === gameId);
+          if(!game){
+            showError('Selected cabinet is offline. Try a different one.');
+            return;
+          }
+          const node = tpl.content.firstElementChild.cloneNode(true);
+          node.style.setProperty('--accent', game.color || '#4e7dff');
+          node.querySelector('#gameIcon').textContent = game.icon || '🎮';
+          node.querySelector('#gameTitle').textContent = game.title;
+          node.querySelector('#gameDescription').textContent = game.description;
+          const badge = node.querySelector('#gameBadge');
+          badge.textContent = game.isNew ? 'New arrival' : (game.subtitle || 'Arcade Classic');
+          badge.style.background = game.isNew ? '#ff4ac755' : '#ffffff1a';
+          badge.style.borderColor = game.isNew ? '#ff9ed6' : '#ffffff44';
+          badge.style.color = game.isNew ? '#ffeef9' : '#f1f4ff';
+          node.querySelector('#startGame').addEventListener('click', () => {
+            window.parent.postMessage({type:'gamerden-launch', id:game.id}, '*');
+          });
+          app.replaceChildren(node);
+        })
+        .catch(err => {
+          console.error(err);
+          showError('Could not load arcade data. Refresh the main site and try again.');
+        });
+    })();
+  </script>
 </body>
 </html>

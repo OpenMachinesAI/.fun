@@ -1,5 +1,42 @@
 [
   {
+    "id": "chromebook-racer",
+    "title": "ChromeBook Racer",
+    "subtitle": "Race on your chromebook",
+    "description": "Drift, race, and absolutely cook your Chromebook GPU.",
+    "instructions": "Use WASD or Arrow Keys to drive. Drift like your grades depend on it.",
+    "icon": "🏎️",
+    "color": "#ff6b6b",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "https://www.onlinegames.io/games/2022/unity3/crazy-drifter/index.html"
+  },
+  {
+    "id": "octopus-activities",
+    "title": "Octopus Activities (totally not squidgame)",
+    "subtitle": "Please dont sue me netflix",
+    "description": "Run. Survive. Definitely not inspired by anything suspicious.",
+    "instructions": "Follow the rules. Move carefully. Don’t get eliminated.",
+    "icon": "🐙",
+    "color": "#ff4ac7",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "https://www.onlinegames.io/games/2021/unity3/squid-race-simulator/index.html"
+  },
+  {
+    "id": "skibidi-toilet-game",
+    "title": "Skibidi Toliot (THE GAME)",
+    "subtitle": "DONT SUE ME TOLIOT MAN",
+    "description": "Toilet chaos. Meme warfare. Pure brainrot energy.",
+    "instructions": "Use your mouse and keyboard to dominate the Skibidi arena.",
+    "icon": "🚽",
+    "color": "#9b5bff",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "https://www.onlinegames.io/games/2023/construct/242/skibidi-toilet-io/index.html"
+  },
+
+  {
     "id": "evil-classroom",
     "title": "Escape the Evil Classroom",
     "subtitle": "By Alex",
@@ -139,7 +176,7 @@
     "instructions": "Arrow keys to drive. Park inside the yellow lines.",
     "icon": "🅿️",
     "color": "#4d94ff",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "parking-game.html"
   },
@@ -151,7 +188,7 @@
     "instructions": "WASD to move. Click to mine/place blocks. E to open inventory.",
     "icon": "🧱",
     "color": "#7fd3a8",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "papercraft.html"
   },
@@ -160,10 +197,10 @@
     "title": "Crazy Cattle 3D",
     "subtitle": "From Yoplay",
     "description": "Herd, stack, and wrangle your way through barnyard 3D chaos.",
-    "instructions": " WASD to move. Click to lasso cattle.",
+    "instructions": "WASD to move. Click to lasso cattle.",
     "icon": "🐄",
     "color": "#9ed4ff",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "crazy-cattle-3d.html"
   },
@@ -175,7 +212,7 @@
     "instructions": "Arrow keys to scurry. Collect the cheese!",
     "icon": "🐭",
     "color": "#9ed4ff",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "crazy-mouse-battle.html"
   },
@@ -187,7 +224,7 @@
     "instructions": "Click the correct resumes to hire. Reject the bad ones. Don't run out of budget!",
     "icon": "💼",
     "color": "#ff7fbf",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "EA GAME GO BRRRRRRRR (2).html"
   },
@@ -199,7 +236,7 @@
     "instructions": "Arrow keys to fly. Avoid the students on the field!",
     "icon": "🛩️",
     "color": "#5bc0de",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "airshipgame.html"
   },
@@ -211,7 +248,7 @@
     "instructions": "Use your mouse to interact",
     "icon": "🎥",
     "color": "#ff5252",
-    "isNew": true,
+    "isNew": false,
     "launcher": "game-launcher.html",
     "content": "FNAC.html"
   },

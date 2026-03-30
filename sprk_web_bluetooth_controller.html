@@ -6,8 +6,8 @@
   <title>SPRK+ Web Bluetooth Controller</title>
   <style>
     :root {
-      --bg: #0b1020;      --panel: #121936;
-
+      --bg: #0b1020;
+      --panel: #121936;
       --panel-2: #18224a;
       --text: #eef3ff;
       --muted: #a9b6d3;
@@ -141,7 +141,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>SPRK+ Web Bluetooth Controller 2</h1>
+  <h1>SPRK+ Web Bluetooth Controller</h1>
   <div class="sub">
     Best-effort browser controller for a <strong>Sphero SPRK+</strong> using Web Bluetooth.
     Run this page on <strong>HTTPS or localhost</strong> in a Chromium-based browser that supports Web Bluetooth.
@@ -326,6 +326,23 @@
     return Uint8Array.from(packet);
   }
 
+  async function getCharacteristicWithRetry(service, uuid, label, tries = 3) {
+    let lastError;
+    for (let i = 1; i <= tries; i++) {
+      try {
+        log(`Trying characteristic ${label} (${i}/${tries})...`);
+        const ch = await service.getCharacteristic(uuid);
+        log(`Got characteristic ${label}`);
+        return ch;
+      } catch (e) {
+        lastError = e;
+        log(`Characteristic ${label} failed on try ${i}: ${e.message || e}`, "warn");
+        await new Promise(r => setTimeout(r, 250));
+      }
+    }
+    throw lastError || new Error(`Failed to get characteristic: ${label}`);
+  }
+
   async function writeChar(characteristic, bytes) {
     const arr = bytes instanceof Uint8Array ? bytes : Uint8Array.from(bytes);
     if (characteristic.writeValueWithoutResponse) {
@@ -439,22 +456,38 @@
 
     log("STEP 3: Got services");
 
-    chars.wake = await bleService.getCharacteristic(UUIDS.WAKE_CHAR);
-    chars.txPower = await bleService.getCharacteristic(UUIDS.TX_POWER_CHAR);
-    chars.antiDos = await bleService.getCharacteristic(UUIDS.ANTI_DOS_CHAR);
-    chars.commands = await controlService.getCharacteristic(UUIDS.COMMANDS_CHAR);
-    chars.response = await controlService.getCharacteristic(UUIDS.RESPONSE_CHAR);
+    log("STEP 3.1: Getting characteristics...");
+    chars.wake = await getCharacteristicWithRetry(bleService, UUIDS.WAKE_CHAR, "wake");
+    chars.txPower = await getCharacteristicWithRetry(bleService, UUIDS.TX_POWER_CHAR, "txPower");
+    chars.antiDos = await getCharacteristicWithRetry(bleService, UUIDS.ANTI_DOS_CHAR, "antiDos");
+    chars.commands = await getCharacteristicWithRetry(controlService, UUIDS.COMMANDS_CHAR, "commands");
 
-    await chars.response.startNotifications();
-    chars.response.addEventListener("characteristicvaluechanged", onNotification);
+    try {
+      chars.response = await getCharacteristicWithRetry(controlService, UUIDS.RESPONSE_CHAR, "response");
+    } catch (e) {
+      log("Response characteristic unavailable; continuing without notifications.", "warn");
+      chars.response = null;
+    }
 
+    log("STEP 3.2: Characteristics ready");
     setConnectedUI(true);
     log("STEP 4: UI enabled");
 
+    if (chars.response) {
+      try {
+        await chars.response.startNotifications();
+        chars.response.addEventListener("characteristicvaluechanged", onNotification);
+        log("STEP 4.1: Notifications enabled");
+      } catch (e) {
+        log(`Notifications failed but continuing: ${e.message || e}`, "warn");
+      }
+    }
+
     try {
       await enterDevMode();
+      log("STEP 5: Dev mode handshake complete");
     } catch (e) {
-      log("Dev mode failed but continuing...");
+      log(`Dev mode failed but continuing: ${e.message || e}`, "warn");
     }
     log("Connected and ready", "ok");
   }

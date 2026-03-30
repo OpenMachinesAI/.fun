@@ -6,8 +6,8 @@
   <title>SPRK+ Web Bluetooth Controller</title>
   <style>
     :root {
-      --bg: #0b1020;
-      --panel: #121936;
+      --bg: #0b1020;      --panel: #121936;
+
       --panel-2: #18224a;
       --text: #eef3ff;
       --muted: #a9b6d3;
@@ -141,7 +141,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>SPRK+ Web Bluetooth Controller</h1>
+  <h1>SPRK+ Web Bluetooth Controller 2</h1>
   <div class="sub">
     Best-effort browser controller for a <strong>Sphero SPRK+</strong> using Web Bluetooth.
     Run this page on <strong>HTTPS or localhost</strong> in a Chromium-based browser that supports Web Bluetooth.
@@ -415,8 +415,29 @@
     log(`Selected device: ${device.name || "Unnamed"}`);
 
     server = await device.gatt.connect();
-    const bleService = await server.getPrimaryService(UUIDS.BLE_SERVICE);
-    const controlService = await server.getPrimaryService(UUIDS.ROBOT_CONTROL_SERVICE);
+    await new Promise(r => setTimeout(r, 500));
+    log('STEP 1: Connected to GATT');
+    let bleService, controlService;
+
+    log("STEP 2: Getting services...");
+
+    try {
+      bleService = await server.getPrimaryService(UUIDS.BLE_SERVICE);
+    } catch {
+      log("BLE service failed, retrying...");
+      await new Promise(r => setTimeout(r, 300));
+      bleService = await server.getPrimaryService(UUIDS.BLE_SERVICE);
+    }
+
+    try {
+      controlService = await server.getPrimaryService(UUIDS.ROBOT_CONTROL_SERVICE);
+    } catch {
+      log("Control service failed, retrying...");
+      await new Promise(r => setTimeout(r, 300));
+      controlService = await server.getPrimaryService(UUIDS.ROBOT_CONTROL_SERVICE);
+    }
+
+    log("STEP 3: Got services");
 
     chars.wake = await bleService.getCharacteristic(UUIDS.WAKE_CHAR);
     chars.txPower = await bleService.getCharacteristic(UUIDS.TX_POWER_CHAR);
@@ -427,8 +448,14 @@
     await chars.response.startNotifications();
     chars.response.addEventListener("characteristicvaluechanged", onNotification);
 
-    await enterDevMode();
     setConnectedUI(true);
+    log("STEP 4: UI enabled");
+
+    try {
+      await enterDevMode();
+    } catch (e) {
+      log("Dev mode failed but continuing...");
+    }
     log("Connected and ready", "ok");
   }
 

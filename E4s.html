@@ -235,13 +235,14 @@
       <div class="eyebrow">Launch Outlook</div>
       <h1>Eagle 4S Tracker</h1>
       <div class="sub">
-        This tracker is designed to predict if the date's will work for our launch, Launch may still go ahead even if a date is risky as conditions can change, so check often
+        Live public tracker for all current Eagle 4S launch options. This checks each listed date,
+        compares weather conditions during the planned launch window of 2:30–3:30 PM, and highlights the strongest launch window.
       </div>
     </section>
 
     <section class="summary">
       <div class="card">
-        <div class="label">Best Date (based on risk): </div>
+        <div class="label">Most Likely Launch Date</div>
         <div class="med" id="bestDate">Loading…</div>
         <div class="small" id="bestText">Checking all four launch windows.</div>
       </div>
@@ -253,14 +254,14 @@
       <div class="card">
         <div class="label">Rocket Status</div>
         <div class="med" id="rocketStage">Ready</div>
-        <div class="small">Vehicle readiness is subjected to change</div>
+        <div class="small">Vehicle readiness is factored in with the 2:30–3:30 PM weather outlook.</div>
       </div>
     </section>
 
     <section class="dates" id="dateGrid"></section>
 
     <div class="footer-note">
-      This tracker is tuned for Eagle 4S, a small rrocket so things can change fast
+      This tracker is tuned for small model rocket launches, and it now scores weather specifically during the planned 2:30–3:30 PM launch window, so rain and stronger winds lower the score pretty fast.
     </div>
   </div>
 
@@ -269,6 +270,7 @@
     const ROCKET_STAGE = 5;
     const LATITUDE = 48.4284;
     const LONGITUDE = -123.3656;
+    const LAUNCH_WINDOW_LABEL = '2:30–3:30 PM';
 
     const LAUNCH_DATES = [
       { label: 'Monday', iso: '2026-04-13' },
@@ -282,8 +284,8 @@
       2: 'Designing',
       3: 'Manufacturing',
       4: 'Assembling',
-      5: 'Rocket Ready for Launch',
-      6: 'Rocket Passed Tests!'
+      5: 'Ready',
+      6: 'Flown'
     };
 
     const STAGE_SCORES = {
@@ -351,7 +353,7 @@
       const url = new URL('https://api.open-meteo.com/v1/forecast');
       url.searchParams.set('latitude', lat);
       url.searchParams.set('longitude', lon);
-      url.searchParams.set('daily', 'weathercode,precipitation_sum,windspeed_10m_max,windgusts_10m_max');
+      url.searchParams.set('hourly', 'weathercode,precipitation,windspeed_10m,windgusts_10m');
       url.searchParams.set('timezone', 'auto');
       url.searchParams.set('start_date', date);
       url.searchParams.set('end_date', date);
@@ -359,14 +361,40 @@
       const res = await fetch(url);
       if (!res.ok) throw new Error('Weather failed');
       const json = await res.json();
-      if (!json.daily || !json.daily.time || !json.daily.time.length) throw new Error('No weather');
+      if (!json.hourly || !json.hourly.time || !json.hourly.time.length) throw new Error('No weather');
+
+      return summarizeLaunchWindow(json.hourly, date);
+    }
+
+    function summarizeLaunchWindow(hourly, date) {
+      const wantedHours = new Set([14, 15]);
+      const indices = [];
+
+      hourly.time.forEach((timeStr, index) => {
+        if (!timeStr.startsWith(date)) return;
+        const hour = Number(timeStr.slice(11, 13));
+        if (wantedHours.has(hour)) indices.push(index);
+      });
+
+      if (!indices.length) throw new Error('No launch-window weather');
+
+      const codes = indices.map(i => hourly.weathercode[i]);
+      const precips = indices.map(i => Number(hourly.precipitation[i]) || 0);
+      const winds = indices.map(i => Number(hourly.windspeed_10m[i]) || 0);
+      const gusts = indices.map(i => Number(hourly.windgusts_10m[i]) || 0);
+
+      const selectedCode = codes[codes.length - 1] ?? codes[0] ?? 0;
+      const avgPrecip = precips.reduce((a, b) => a + b, 0) / precips.length;
+      const avgWind = winds.reduce((a, b) => a + b, 0) / winds.length;
+      const maxGust = Math.max(...gusts);
 
       return {
-        code: json.daily.weathercode[0],
-        condition: wxCodeMap[json.daily.weathercode[0]] || 'Unknown',
-        precip: json.daily.precipitation_sum[0],
-        wind: json.daily.windspeed_10m_max[0],
-        gust: json.daily.windgusts_10m_max[0]
+        code: selectedCode,
+        condition: wxCodeMap[selectedCode] || 'Unknown',
+        precip: avgPrecip,
+        wind: avgWind,
+        gust: maxGust,
+        window: LAUNCH_WINDOW_LABEL
       };
     }
 
@@ -388,7 +416,7 @@
     function renderSummary(best) {
       els.bestDate.textContent = `${best.label} • ${formatFullDate(best.iso)}`;
       els.bestText.textContent = best.ok
-        ? `${pickMessage(best.percent, best.weather)} Safest current launch window for ${ROCKET_NAME}.`
+        ? `${pickMessage(best.percent, best.weather)} Best current launch window for ${ROCKET_NAME}.`
         : `Weather data is unavailable right now, but this date is currently leading from the stored estimate.`;
       els.bestPercent.textContent = `${best.percent}%`;
       els.bestBar.style.width = `${best.percent}%`;
@@ -429,6 +457,7 @@
             <div class="percent">${item.percent}%</div>
             <div class="bar"><div class="fill" style="width:${item.percent}%"></div></div>
             <div class="fact">${pickMessage(item.percent, item.weather)}</div>
+            <div class="small">Launch window checked: ${LAUNCH_WINDOW_LABEL}</div>
             <div class="mini-grid">
               <div class="mini">
                 <div class="k">Condition</div>

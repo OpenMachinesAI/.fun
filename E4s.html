@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eagle 4S Tracker</title>
+  <style>
+    :root {
+      --bg: #07111d;
+      --panel: rgba(16, 27, 46, 0.94);
+      --panel2: rgba(255,255,255,0.03);
+      --line: rgba(255,255,255,0.08);
+      --text: #eef5ff;
+      --muted: #9bb4d5;
+      --good: #43dc8e;
+      --warn: #ffbf57;
+      --bad: #ff6876;
+      --accent: #5bbcff;
+      --radius: 24px;
+      --shadow: 0 18px 50px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(91,188,255,0.16), transparent 35%),
+        linear-gradient(180deg, #07101a 0%, #0a1320 100%);
+      padding: 24px;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      backdrop-filter: blur(8px);
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    h1 {
+      margin: 8px 0 6px;
+      font-size: clamp(34px, 6vw, 52px);
+      line-height: 1;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+      max-width: 760px;
+    }
+
+    .summary {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr .9fr;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+    }
+
+    .big {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 900;
+      margin-top: 8px;
+      line-height: 1;
+    }
+
+    .med {
+      font-size: 22px;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    .small {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .bar {
+      height: 14px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.05);
+      margin-top: 14px;
+    }
+
+    .fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #5abaff, #46e19b);
+      transition: width 0.5s ease;
+    }
+
+    .dates {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .date-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .date-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .date-name {
+      font-size: 23px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .date-sub {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,0.1);
+      white-space: nowrap;
+    }
+
+    .good { color: #baf7d4; background: rgba(67,220,142,0.12); }
+    .warn { color: #ffe0a9; background: rgba(255,191,87,0.14); }
+    .bad { color: #ffc0c7; background: rgba(255,104,118,0.14); }
+
+    .percent {
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1;
+      margin: 6px 0 10px;
+    }
+
+    .fact {
+      margin-top: 12px;
+      font-size: 17px;
+      line-height: 1.45;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .mini {
+      background: var(--panel2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .mini .k {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .mini .v {
+      font-size: 20px;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .summary,
+      .dates {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Launch Outlook</div>
+      <h1>Eagle 4S Tracker</h1>
+      <div class="sub">
+        This tracker is designed to predict if the date's will work for our launch, Launch may still go ahead even if a date is risky as conditions can change, so check often
+      </div>
+    </section>
+
+    <section class="summary">
+      <div class="card">
+        <div class="label">Best Date (based on risk): </div>
+        <div class="med" id="bestDate">Loading…</div>
+        <div class="small" id="bestText">Checking all four launch windows.</div>
+      </div>
+      <div class="card">
+        <div class="label">Best Launch Chance</div>
+        <div class="big" id="bestPercent">0%</div>
+        <div class="bar"><div class="fill" id="bestBar"></div></div>
+      </div>
+      <div class="card">
+        <div class="label">Rocket Status</div>
+        <div class="med" id="rocketStage">Ready</div>
+        <div class="small">Vehicle readiness is subjected to change</div>
+      </div>
+    </section>
+
+    <section class="dates" id="dateGrid"></section>
+
+    <div class="footer-note">
+      This tracker is tuned for Eagle 4S, a small rrocket so things can change fast
+    </div>
+  </div>
+
+  <script>
+    const ROCKET_NAME = 'Eagle 4S';
+    const ROCKET_STAGE = 5;
+    const LATITUDE = 48.4284;
+    const LONGITUDE = -123.3656;
+
+    const LAUNCH_DATES = [
+      { label: 'Monday', iso: '2026-04-13' },
+      { label: 'Tuesday', iso: '2026-04-14' },
+      { label: 'Thursday', iso: '2026-04-16' },
+      { label: 'Friday', iso: '2026-04-17' }
+    ];
+
+    const STAGE_NAMES = {
+      1: 'Planned',
+      2: 'Designing',
+      3: 'Manufacturing',
+      4: 'Assembling',
+      5: 'Rocket Ready for Launch',
+      6: 'Rocket Passed Tests!'
+    };
+
+    const STAGE_SCORES = {
+      1: 12,
+      2: 28,
+      3: 48,
+      4: 72,
+      5: 100,
+      6: 100
+    };
+
+    const MESSAGES = [
+      'Looks good!',
+      "Weather doesn't look like its cooperating.",
+      'Wind may be trying to steal the show.',
+      'This one is looking pretty launchable.',
+      'Clouds are hanging around, but this window still has a shot.',
+      'A calm day makes a happy rocket.',
+      'Rain and rockets are rarely best friends.',
+      'Mission control would probably keep watching the wind.',
+      'This date is shaping up better than the others.',
+      'This one may need a backup plan.'
+    ];
+
+    const wxCodeMap = {
+      0: 'Clear', 1: 'Mainly Clear', 2: 'Partly Cloudy', 3: 'Overcast', 45: 'Fog', 48: 'Rime Fog',
+      51: 'Light Drizzle', 53: 'Drizzle', 55: 'Dense Drizzle', 61: 'Light Rain', 63: 'Rain', 65: 'Heavy Rain',
+      71: 'Light Snow', 73: 'Snow', 75: 'Heavy Snow', 80: 'Rain Showers', 81: 'Rain Showers', 82: 'Heavy Rain Showers',
+      95: 'Thunderstorm', 96: 'Thunderstorm with Hail', 99: 'Severe Thunderstorm with Hail'
+    };
+
+    const els = {
+      bestDate: document.getElementById('bestDate'),
+      bestText: document.getElementById('bestText'),
+      bestPercent: document.getElementById('bestPercent'),
+      bestBar: document.getElementById('bestBar'),
+      rocketStage: document.getElementById('rocketStage'),
+      dateGrid: document.getElementById('dateGrid')
+    };
+
+    init();
+
+    async function init() {
+      els.rocketStage.textContent = STAGE_NAMES[ROCKET_STAGE] || 'Unknown';
+      els.dateGrid.innerHTML = '<div class="card">Loading launch windows…</div>';
+
+      const results = await Promise.all(
+        LAUNCH_DATES.map(async (item) => {
+          try {
+            const weather = await fetchWeather(item.iso, LATITUDE, LONGITUDE);
+            const percent = calculateLikelihood(weather, ROCKET_STAGE);
+            return { ...item, weather, percent, ok: true };
+          } catch (error) {
+            return { ...item, ok: false, percent: Math.round((STAGE_SCORES[ROCKET_STAGE] || 0) * 0.45) };
+          }
+        })
+      );
+
+      results.sort((a, b) => b.percent - a.percent);
+      renderSummary(results[0]);
+      renderCards(results);
+    }
+
+    async function fetchWeather(date, lat, lon) {
+      const url = new URL('https://api.open-meteo.com/v1/forecast');
+      url.searchParams.set('latitude', lat);
+      url.searchParams.set('longitude', lon);
+      url.searchParams.set('daily', 'weathercode,precipitation_sum,windspeed_10m_max,windgusts_10m_max');
+      url.searchParams.set('timezone', 'auto');
+      url.searchParams.set('start_date', date);
+      url.searchParams.set('end_date', date);
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Weather failed');
+      const json = await res.json();
+      if (!json.daily || !json.daily.time || !json.daily.time.length) throw new Error('No weather');
+
+      return {
+        code: json.daily.weathercode[0],
+        condition: wxCodeMap[json.daily.weathercode[0]] || 'Unknown',
+        precip: json.daily.precipitation_sum[0],
+        wind: json.daily.windspeed_10m_max[0],
+        gust: json.daily.windgusts_10m_max[0]
+      };
+    }
+
+    function calculateLikelihood(weather, stage) {
+      const rocketScore = STAGE_SCORES[stage] || 0;
+      let weatherScore = 100;
+
+      if (weather.precip > 0) weatherScore -= Math.min(45, weather.precip * 8);
+      if (/rain|drizzle|thunderstorm/i.test(weather.condition)) weatherScore -= 30;
+      if (/snow|hail/i.test(weather.condition)) weatherScore -= 40;
+      if (/fog/i.test(weather.condition)) weatherScore -= 18;
+      if (weather.wind > 10) weatherScore -= (weather.wind - 10) * 3;
+      if (weather.gust > 16) weatherScore -= (weather.gust - 16) * 2.5;
+
+      weatherScore = clamp(Math.round(weatherScore), 0, 100);
+      return clamp(Math.round(weatherScore * 0.65 + rocketScore * 0.35), 0, 100);
+    }
+
+    function renderSummary(best) {
+      els.bestDate.textContent = `${best.label} • ${formatFullDate(best.iso)}`;
+      els.bestText.textContent = best.ok
+        ? `${pickMessage(best.percent, best.weather)} Safest current launch window for ${ROCKET_NAME}.`
+        : `Weather data is unavailable right now, but this date is currently leading from the stored estimate.`;
+      els.bestPercent.textContent = `${best.percent}%`;
+      els.bestBar.style.width = `${best.percent}%`;
+    }
+
+    function renderCards(results) {
+      els.dateGrid.innerHTML = results.map((item, index) => {
+        const badge = item.percent >= 85 ? 'good' : item.percent >= 50 ? 'warn' : 'bad';
+        const call = item.percent >= 85 ? 'Very Likely' : item.percent >= 70 ? 'Likely' : item.percent >= 50 ? 'Maybe' : item.percent >= 30 ? 'Shaky' : 'No-Go';
+        const crown = index === 0 ? 'Most Likely' : call;
+
+        if (!item.ok) {
+          return `
+            <article class="date-card">
+              <div class="date-head">
+                <div>
+                  <div class="date-name">${item.label}</div>
+                  <div class="date-sub">${formatFullDate(item.iso)}</div>
+                </div>
+                <div class="pill warn">Weather Offline</div>
+              </div>
+              <div class="percent">${item.percent}%</div>
+              <div class="bar"><div class="fill" style="width:${item.percent}%"></div></div>
+              <div class="fact">Weather data is unavailable right now for this date.</div>
+            </article>
+          `;
+        }
+
+        return `
+          <article class="date-card">
+            <div class="date-head">
+              <div>
+                <div class="date-name">${item.label}</div>
+                <div class="date-sub">${formatFullDate(item.iso)}</div>
+              </div>
+              <div class="pill ${badge}">${crown}</div>
+            </div>
+            <div class="percent">${item.percent}%</div>
+            <div class="bar"><div class="fill" style="width:${item.percent}%"></div></div>
+            <div class="fact">${pickMessage(item.percent, item.weather)}</div>
+            <div class="mini-grid">
+              <div class="mini">
+                <div class="k">Condition</div>
+                <div class="v">${item.weather.condition}</div>
+              </div>
+              <div class="mini">
+                <div class="k">Rain</div>
+                <div class="v">${Number(item.weather.precip).toFixed(1)} mm</div>
+              </div>
+              <div class="mini">
+                <div class="k">Wind</div>
+                <div class="v">${Number(item.weather.wind).toFixed(0)} km/h</div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function pickMessage(percent, weather) {
+      if (weather.precip > 1) return MESSAGES[1];
+      if (weather.wind > 18 || weather.gust > 24) return MESSAGES[2];
+      if (percent >= 92) return MESSAGES[0];
+      if (percent >= 84) return MESSAGES[3];
+      if (percent >= 74) return MESSAGES[8];
+      if (percent >= 64) return MESSAGES[7];
+      if (percent >= 54) return MESSAGES[4];
+      if (percent >= 40) return MESSAGES[9];
+      return MESSAGES[6];
+    }
+
+    function formatFullDate(dateStr) {
+      const d = new Date(dateStr + 'T12:00:00');
+      return d.toLocaleDateString(undefined, {
+        weekday: 'long',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+  </script>
+</body>
+</html>

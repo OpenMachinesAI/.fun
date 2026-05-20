@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Launch Likelihood Widget</title>
+  <style>
+    :root {
+      --bg: #08111d;
+      --panel: rgba(17, 28, 47, 0.92);
+      --line: rgba(255,255,255,0.08);
+      --text: #eef5ff;
+      --muted: #9fb7d8;
+      --accent: #58b8ff;
+      --good: #40d98a;
+      --warn: #ffbe55;
+      --bad: #ff6472;
+      --radius: 24px;
+      --shadow: 0 18px 50px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: Inter, system-ui, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(88,184,255,0.16), transparent 35%),
+        linear-gradient(180deg, #07101a 0%, #0a1320 100%);
+    }
+
+    .widget {
+      width: min(100%, 560px);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      backdrop-filter: blur(8px);
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .name {
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 800;
+      margin-top: 6px;
+    }
+
+    .status-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      white-space: nowrap;
+    }
+
+    .status-good {
+      color: #baf7d4;
+      background: rgba(64,217,138,0.12);
+    }
+
+    .status-warn {
+      color: #ffe0aa;
+      background: rgba(255,190,85,0.14);
+    }
+
+    .status-bad {
+      color: #ffc0c6;
+      background: rgba(255,100,114,0.14);
+    }
+
+    .percent {
+      font-size: clamp(52px, 12vw, 84px);
+      font-weight: 900;
+      line-height: 1;
+      margin: 18px 0 10px;
+    }
+
+    .bar {
+      height: 16px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      transition: width 0.5s ease;
+      background: linear-gradient(90deg, #5abaff, #47e39c);
+    }
+
+    .fact {
+      margin-top: 16px;
+      font-size: 18px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .meta {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .box {
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .box .k {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .box .v {
+      margin-top: 8px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .small {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 560px) {
+      .top,
+      .meta {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="top">
+      <div>
+        <div class="eyebrow">Public Launch Widget</div>
+        <div class="name" id="rocketName">Eagle 4S</div>
+      </div>
+      <div class="status-pill" id="statusPill">Checking</div>
+    </div>
+
+    <div class="percent" id="launchPercent">0%</div>
+    <div class="bar"><div class="fill" id="barFill"></div></div>
+    <div class="fact" id="funFact">Loading launch outlook…</div>
+
+    <div class="meta">
+      <div class="box">
+        <div class="k">Rocket Stage</div>
+        <div class="v" id="rocketStage">Ready</div>
+      </div>
+      <div class="box">
+        <div class="k">Primary Date</div>
+        <div class="v" id="launchDate">2026-04-18</div>
+      </div>
+      <div class="box">
+        <div class="k">Launch Call</div>
+        <div class="v" id="launchCall">Likely</div>
+      </div>
+    </div>
+
+    <div class="small">
+      Public version with simple editable variables. Update the values in the script, or pass a date in the URL like <code>?date=2026-04-18</code>, and it will recalculate the launch likelihood automatically.
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // PUBLIC VARIABLES
+    // =========================
+    const ROCKET_NAME = 'Eagle 4S';
+    const ROCKET_STAGE = 5; // 1 Planned, 2 Designing, 3 Manufacturing, 4 Assembling, 5 Ready, 6 Flown
+    const PRIMARY_DATE = '2026-04-18'; // fallback if ?date= is not present
+    const LATITUDE = 48.4284;
+    const LONGITUDE = -123.3656;
+
+    // 10 public fun facts / messages
+    const FUN_FACTS = [
+      'Looks good!',
+      "Weather doesn't look like its cooperating.",
+      'Wind may be trying to steal the show.',
+      'This one is looking pretty launchable.',
+      'Clouds are lurking, but it is not over yet.',
+      'A calm day makes a happy rocket.',
+      'Rain and rockets are rarely best friends.',
+      'This window looks better than a last-minute scrub.',
+      'The field might be cheering for this one.',
+      'Mission control would probably keep watching the wind.'
+    ];
+
+    const STAGE_NAMES = {
+      1: 'Planned',
+      2: 'Designing',
+      3: 'Manufacturing',
+      4: 'Assembling',
+      5: 'Ready',
+      6: 'Flown'
+    };
+
+    const STAGE_SCORES = {
+      1: 12,
+      2: 28,
+      3: 48,
+      4: 72,
+      5: 100,
+      6: 100
+    };
+
+    const wxCodeMap = {
+      0: 'Clear',
+      1: 'Mainly Clear',
+      2: 'Partly Cloudy',
+      3: 'Overcast',
+      45: 'Fog',
+      48: 'Rime Fog',
+      51: 'Light Drizzle',
+      53: 'Drizzle',
+      55: 'Dense Drizzle',
+      61: 'Light Rain',
+      63: 'Rain',
+      65: 'Heavy Rain',
+      71: 'Light Snow',
+      73: 'Snow',
+      75: 'Heavy Snow',
+      80: 'Rain Showers',
+      81: 'Rain Showers',
+      82: 'Heavy Rain Showers',
+      95: 'Thunderstorm',
+      96: 'Thunderstorm with Hail',
+      99: 'Severe Thunderstorm with Hail'
+    };
+
+    const els = {
+      rocketName: document.getElementById('rocketName'),
+      statusPill: document.getElementById('statusPill'),
+      launchPercent: document.getElementById('launchPercent'),
+      barFill: document.getElementById('barFill'),
+      funFact: document.getElementById('funFact'),
+      rocketStage: document.getElementById('rocketStage'),
+      launchDate: document.getElementById('launchDate'),
+      launchCall: document.getElementById('launchCall')
+    };
+
+    init();
+
+    async function init() {
+      els.rocketName.textContent = ROCKET_NAME;
+      els.rocketStage.textContent = STAGE_NAMES[ROCKET_STAGE] || 'Unknown';
+      const selectedDate = getSelectedDate();
+      els.launchDate.textContent = formatDate(selectedDate);
+
+      try {
+        const weather = await fetchWeather(selectedDate, LATITUDE, LONGITUDE);
+        const percent = calculateLikelihood(weather, ROCKET_STAGE);
+        render(percent, weather);
+      } catch (error) {
+        renderFallback();
+      }
+    }
+
+    async function fetchWeather(date, lat, lon) {
+      const url = new URL('https://api.open-meteo.com/v1/forecast');
+      url.searchParams.set('latitude', lat);
+      url.searchParams.set('longitude', lon);
+      url.searchParams.set('daily', 'weathercode,precipitation_sum,windspeed_10m_max,windgusts_10m_max');
+      url.searchParams.set('timezone', 'auto');
+      url.searchParams.set('start_date', date);
+      url.searchParams.set('end_date', date);
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Weather failed');
+      const json = await res.json();
+      if (!json.daily || !json.daily.time || !json.daily.time.length) throw new Error('No weather');
+
+      return {
+        code: json.daily.weathercode[0],
+        condition: wxCodeMap[json.daily.weathercode[0]] || 'Unknown',
+        precip: json.daily.precipitation_sum[0],
+        wind: json.daily.windspeed_10m_max[0],
+        gust: json.daily.windgusts_10m_max[0]
+      };
+    }
+
+    function calculateLikelihood(weather, stage) {
+      const rocketScore = STAGE_SCORES[stage] || 0;
+      let weatherScore = 100;
+
+      if (weather.precip > 0) weatherScore -= Math.min(45, weather.precip * 8);
+      if (/rain|drizzle|thunderstorm/i.test(weather.condition)) weatherScore -= 30;
+      if (/snow|hail/i.test(weather.condition)) weatherScore -= 40;
+      if (/fog/i.test(weather.condition)) weatherScore -= 18;
+      if (weather.wind > 10) weatherScore -= (weather.wind - 10) * 3;
+      if (weather.gust > 16) weatherScore -= (weather.gust - 16) * 2.5;
+
+      weatherScore = clamp(Math.round(weatherScore), 0, 100);
+      return clamp(Math.round(weatherScore * 0.65 + rocketScore * 0.35), 0, 100);
+    }
+
+    function render(percent, weather) {
+      els.launchPercent.textContent = `${percent}%`;
+      els.barFill.style.width = `${percent}%`;
+      els.funFact.textContent = pickFunFact(percent, weather);
+
+      const call = percent >= 85 ? 'Very Likely' :
+                   percent >= 70 ? 'Likely' :
+                   percent >= 50 ? 'Maybe' :
+                   percent >= 30 ? 'Shaky' : 'No-Go';
+
+      els.launchCall.textContent = call;
+      els.statusPill.textContent = call;
+
+      els.statusPill.className = 'status-pill ' + (
+        percent >= 85 ? 'status-good' :
+        percent >= 50 ? 'status-warn' : 'status-bad'
+      );
+    }
+
+    function renderFallback() {
+      const percent = Math.round((STAGE_SCORES[ROCKET_STAGE] || 0) * 0.85);
+      els.launchPercent.textContent = `${percent}%`;
+      els.barFill.style.width = `${percent}%`;
+      els.launchCall.textContent = 'Weather Offline';
+      els.statusPill.textContent = 'Weather Offline';
+      els.statusPill.className = 'status-pill status-warn';
+      els.funFact.textContent = 'Weather feed is unavailable right now, but the rocket side is still looking solid.';
+    }
+
+    function pickFunFact(percent, weather) {
+      if (weather.precip > 1) return FUN_FACTS[1];
+      if (weather.wind > 18 || weather.gust > 24) return FUN_FACTS[2];
+      if (percent >= 90) return FUN_FACTS[0];
+      if (percent >= 80) return FUN_FACTS[3];
+      if (percent >= 70) return FUN_FACTS[7];
+      if (percent >= 60) return FUN_FACTS[9];
+      if (percent >= 50) return FUN_FACTS[4];
+      if (percent >= 40) return FUN_FACTS[6];
+      return FUN_FACTS[5];
+    }
+
+    function getSelectedDate() {
+      const params = new URLSearchParams(window.location.search);
+      const dateParam = params.get('date');
+
+      if (dateParam && /^[-0-9]+$/.test(dateParam) && dateParam.length === 10) {
+        return dateParam;
+      }
+
+      return PRIMARY_DATE;
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr + 'T12:00:00');
+      return d.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+  </script>
+</body>
+</html>

@@ -1,5 +1,17 @@
 [
   {
+    "id": "amogus",
+    "title": "Amogus 2026",
+    "subtitle": "Amogus Play it bro",
+    "description": "Amogus is now avalible on chromebooks.",
+    "instructions": "its fun.",
+    "icon": "🚀",
+    "color": "#ff6b6b",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "amougus.html"
+  },
+  {
     "id": "chromebook-racer",
     "title": "ChromeBook Racer",
     "subtitle": "Race on your chromebook",

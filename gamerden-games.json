@@ -217,6 +217,16 @@
     "content": "crazy-cattle-3d.html"
   },
   {
+    "id": "flying-gorilla",
+    "title": "Flying Gorilla",
+    "subtitle": "From Yoplay",
+    "description": "Dodge pillars and soar as the most aerodynamic gorilla in town.",
+    "icon": "🦍",
+    "color": "#ff9ed6",
+    "isNew": true,
+    "launcher": "game-launcher.html",
+    "content": "flying-kong.html"
+    {
     "id": "crazy-mouse-battle",
     "title": "Crazy Mouse Battle",
     "subtitle": "From Yoplay",
